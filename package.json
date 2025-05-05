@@ -1,0 +1,32 @@
+{
+  "name": "redm-monodb",
+  "version": "1.0.0",
+  "description": "Typescript Wrapper for RedM",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RaP-SoR/redm-monodb.git"
+  },
+  "license": "ISC",
+  "author": "RaPSoR",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "tsc": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@citizenfx/client": "^2.0.14758-1",
+    "@citizenfx/server": "^2.0.14758-1",
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3",
+    "vite": "4.5.1",
+    "vite-plugin-commonjs": "^0.10.4"
+  },
+  "dependencies": {
+    "mongodb": "5.9.2"
+  },
+  "engines": {
+    "node": "<=16.9.1"
+  }
+}
