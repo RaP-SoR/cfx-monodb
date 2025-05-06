@@ -2,6 +2,7 @@
 node_modules
 /dist
 /assets
+coverage
 
 .env.local
 .env.*.local

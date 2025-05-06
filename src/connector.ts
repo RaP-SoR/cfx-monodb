@@ -9,10 +9,9 @@ class MongoDBConnector {
   private client: MongoClient | null = null;
   private db: Db | null = null;
 
-  private constructor() {
+  constructor() {
     this.connectionString = dbConfig.mongoUrl;
     this.options = dbConfig.options;
-
     console.log(
       `[MongoDB] Configuring connection with ${this.connectionString}`
     );

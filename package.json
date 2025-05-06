@@ -1,10 +1,10 @@
 {
-  "name": "redm-monodb",
+  "name": "cfx-mongodb",
   "version": "1.0.0",
-  "description": "Typescript Wrapper for RedM",
+  "description": "Cfx Typescript Wrapper for MongoDB",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RaP-SoR/redm-monodb.git"
+    "url": "git+https://github.com/RaP-SoR/cfx-mongodb.git"
   },
   "license": "ISC",
   "author": "RaPSoR",
@@ -13,7 +13,9 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "devDependencies": {
     "@citizenfx/client": "^2.0.14758-1",
@@ -24,7 +26,11 @@
     "vite-plugin-commonjs": "^0.10.4"
   },
   "dependencies": {
-    "mongodb": "5.9.2"
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "mongodb": "5.9.2",
+    "ts-jest": "^29.3.2",
+    "ts-node": "^10.9.2"
   },
   "engines": {
     "node": "<=16.9.1"
