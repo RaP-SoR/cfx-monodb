@@ -23,3 +23,19 @@ on("onResourceStop", async (resourceName: string) => {
     }
   }
 });
+
+onNet("cfx-mongodb:connect", async (connectionURL: string, options?: object) => {
+  try {
+    const mongodb = MongoDBConnector.getInstance();
+    await mongodb.connect(connectionURL, options);
+    
+
+    console.log(`MongoDB verbunden mit URL: ${connectionURL}`);
+    emitNet("cfx-mongodb:connected", source, true);
+  } catch (error) {
+    console.error("MongoDB Verbindungsfehler:", error);
+    emitNet("cfx-mongodb:connected", source, false, (error as Error).message);
+  }
+});
+
+

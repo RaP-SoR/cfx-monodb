@@ -10,6 +10,7 @@ class MongoDBConnector {
   private db: Db | null = null;
 
   constructor() {
+    
     this.connectionString = dbConfig.mongoUrl;
     this.options = dbConfig.options;
     console.log(
@@ -24,7 +25,18 @@ class MongoDBConnector {
     return MongoDBConnector.instance;
   }
 
-  public async connect(): Promise<void> {
+  public async connect(url?: string, options?: object): Promise<void> {
+    if(url){
+      if (this.isConnected) {
+        MongoDBConnector.getInstance().disconnect(); 
+        console.log("[MongoDB] Disconnecting existing connection for Confuguration");        
+      }
+      this.connectionString = url;
+      this.options = options;
+      console.log(
+        `[MongoDB] Remote Configuring connection with ${this.connectionString}`
+      );
+    }
     if (this.isConnected) {
       console.log("[MongoDB] Connection already established");
       return;

@@ -13,9 +13,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "tsc": "tsc --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "tsc": "tsc --noEmit"
   },
   "devDependencies": {
     "@citizenfx/client": "^2.0.14758-1",
@@ -26,10 +24,7 @@
     "vite-plugin-commonjs": "^0.10.4"
   },
   "dependencies": {
-    "@types/jest": "^29.5.14",
-    "jest": "^29.7.0",
     "mongodb": "5.9.2",
-    "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2"
   },
   "engines": {

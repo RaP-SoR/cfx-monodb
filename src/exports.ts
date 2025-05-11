@@ -160,5 +160,30 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     return mongoDBInstance?.isDbConnected() || false;
   });
 
+  exports("cfx-mongodb:connect", async (connectionURL: string, options?: object) => {
+    try {
+      const mongodb = MongoDBConnector.getInstance();
+      await mongodb.connect(connectionURL, options);
+      
+  
+      console.log(`MongoDB verbunden mit URL: ${connectionURL}`);
+      emitNet("cfx-mongodb:connected", source, true);
+    } catch (error) {
+      console.error("MongoDB Verbindungsfehler:", error);
+      emitNet("cfx-mongodb:connected", source, false, (error as Error).message);
+    }
+  });
+
+  exports("cfx-mongodb:disconnect", async () => {
+    try {
+      const mongodb = MongoDBConnector.getInstance();
+      await mongodb.disconnect();
+      console.log(`MongoDB disconnected`);
+      emitNet("cfx-mongodb:disconnected", source, true);
+    } catch (error) {
+      console.error("MongoDB Disconnection error:", error);
+      emitNet("cfx-mongodb:disconnected", source, false, (error as Error).message);
+    }
+  });
   console.log("[MongoDB] Exports registered with TypeScript generics support");
 }
