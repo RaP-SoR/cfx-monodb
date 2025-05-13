@@ -10,7 +10,6 @@ class MongoDBConnector {
   private db: Db | null = null;
 
   constructor() {
-    
     this.connectionString = dbConfig.mongoUrl;
     this.options = dbConfig.options;
     console.log(
@@ -26,10 +25,12 @@ class MongoDBConnector {
   }
 
   public async connect(url?: string, options?: object): Promise<void> {
-    if(url){
+    if (url) {
       if (this.isConnected) {
-        MongoDBConnector.getInstance().disconnect(); 
-        console.log("[MongoDB] Disconnecting existing connection for Confuguration");        
+        MongoDBConnector.getInstance().disconnect();
+        console.log(
+          "[MongoDB] Disconnecting existing connection for Confuguration"
+        );
       }
       this.connectionString = url;
       this.options = options;
@@ -48,6 +49,7 @@ class MongoDBConnector {
       this.db = this.client.db();
       this.isConnected = true;
       console.log("[MongoDB] Successfully connected");
+      emitNet("cfx-mongodb:connected");
     } catch (error) {
       console.error("[MongoDB] Connection error:", error);
       throw error;
