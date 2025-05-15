@@ -20,3 +20,17 @@ convar_category 'MongoDB' {
     { "mongodb_timeout", "5000", "Timeout für MongoDB-Verbindung in Millisekunden", "CV_STRING" }
   }
 }
+
+server_exports {
+  'connect',
+  'disconnect',
+  'isConnected',
+  'getDb',
+  'findById',
+  'find',
+  'findOne',
+  'insertOne',
+  'updateOne',
+  'deleteOne',
+  'testex'
+}

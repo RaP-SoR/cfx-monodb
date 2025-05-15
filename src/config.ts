@@ -63,6 +63,6 @@ const environment = GetConvar(
   isDevelopmentServer() ? "dev" : "prod"
 ) as "dev" | "prod" | "test";
 
-console.log(`[MongoDB] Environment: ${environment}`);
+console.log(`[CFX-MongoDB] Environment: ${environment}`);
 
 export default config[environment];

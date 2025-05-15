@@ -1,5 +1,7 @@
 import { MongoClient, Db } from "mongodb";
 import dbConfig from "./config";
+import { register } from "module";
+import { registerExports } from "./exports";
 
 class MongoDBConnector {
   private static instance: MongoDBConnector;
@@ -13,7 +15,7 @@ class MongoDBConnector {
     this.connectionString = dbConfig.mongoUrl;
     this.options = dbConfig.options;
     console.log(
-      `[MongoDB] Configuring connection with ${this.connectionString}`
+      `[CFX-MongoDB] Configuring connection with ${this.connectionString}`
     );
   }
 
@@ -29,17 +31,17 @@ class MongoDBConnector {
       if (this.isConnected) {
         MongoDBConnector.getInstance().disconnect();
         console.log(
-          "[MongoDB] Disconnecting existing connection for Confuguration"
+          "[CFX-MongoDB] Disconnecting existing connection for Confuguration"
         );
       }
       this.connectionString = url;
       this.options = options;
       console.log(
-        `[MongoDB] Remote Configuring connection with ${this.connectionString}`
+        `[CFX-MongoDB] Remote Configuring connection with ${this.connectionString}`
       );
     }
     if (this.isConnected) {
-      console.log("[MongoDB] Connection already established");
+      console.log("[CFX-MongoDB] Connection already established");
       return;
     }
 
@@ -48,17 +50,21 @@ class MongoDBConnector {
       await this.client.connect();
       this.db = this.client.db();
       this.isConnected = true;
-      console.log("[MongoDB] Successfully connected");
-      emitNet("cfx-mongodb:connected");
+      console.log("[CFX-MongoDB] Successfully connected");
+      TriggerEvent("cfx-mongodb:connected", true);
+      registerExports(this);
     } catch (error) {
-      console.error("[MongoDB] Connection error:", error);
+      console.error("[CFX-MongoDB] Connection error:", error);
+      console.log(
+        `[CFX-MongoDB] Connection failed with URL: ${this.connectionString}`
+      );
       throw error;
     }
   }
 
   public async disconnect(): Promise<void> {
     if (!this.isConnected || !this.client) {
-      console.log("[MongoDB] No connection available");
+      console.log("[CFX-MongoDB] No connection available");
       return;
     }
 
@@ -67,9 +73,9 @@ class MongoDBConnector {
       this.isConnected = false;
       this.client = null;
       this.db = null;
-      console.log("[MongoDB] Connection successfully closed");
+      console.log("[CFX-MongoDB] Connection successfully closed");
     } catch (error) {
-      console.error("[MongoDB] Error while disconnecting:", error);
+      console.error("[CFX-MongoDB] Error while disconnecting:", error);
       throw error;
     }
   }
@@ -84,7 +90,7 @@ class MongoDBConnector {
 
   public async getAllCollections(): Promise<string[]> {
     if (!this.isConnected || !this.db) {
-      console.log("[MongoDB] No connection available");
+      console.log("[CFX-MongoDB] No connection available");
       return [];
     }
 
@@ -92,7 +98,7 @@ class MongoDBConnector {
       const collections = await this.db.listCollections().toArray();
       return collections.map((collection) => collection.name);
     } catch (error) {
-      console.error("[MongoDB] Error fetching collections:", error);
+      console.error("[CFX-MongoDB] Error fetching collections:", error);
       return [];
     }
   }

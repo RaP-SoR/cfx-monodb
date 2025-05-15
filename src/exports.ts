@@ -15,7 +15,7 @@ import {
 import MongoDBConnector from "./connector";
 
 export function registerExports(mongoDBInstance: MongoDBConnector): void {
-  exports(
+  global.exports(
     "insertOne",
     async <T extends Document>(
       collectionName: string,
@@ -30,7 +30,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
           .insertOne(document);
         return { success: true, insertedId: result.insertedId };
       } catch (error) {
-        console.error(`[MongoDB Export] insertOne error:`, error);
+        console.error(`[CFX-MongoDB Export] insertOne error:`, error);
         return {
           success: false,
           error:
@@ -59,7 +59,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
           .toArray();
         return { success: true, data: result as unknown as T[] };
       } catch (error) {
-        console.error(`[MongoDB Export] find error:`, error);
+        console.error(`[CFX-MongoDB Export] find error:`, error);
         return {
           success: false,
           error:
@@ -84,7 +84,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const result = await db.collection<T>(collectionName).findOne(query);
         return { success: true, data: result as T | null };
       } catch (error) {
-        console.error(`[MongoDB Export] findOne error:`, error);
+        console.error(`[CFX-MongoDB Export] findOne error:`, error);
         return {
           success: false,
           error:
@@ -119,7 +119,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
           modifiedCount: result.modifiedCount,
         };
       } catch (error) {
-        console.error(`[MongoDB Export] updateOne error:`, error);
+        console.error(`[CFX-MongoDB Export] updateOne error:`, error);
         return {
           success: false,
           error:
@@ -144,7 +144,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const result = await db.collection<T>(collectionName).deleteOne(filter);
         return { success: true, deletedCount: result.deletedCount };
       } catch (error) {
-        console.error(`[MongoDB Export] deleteOne error:`, error);
+        console.error(`[CFX-MongoDB Export] deleteOne error:`, error);
         return {
           success: false,
           error:
@@ -160,30 +160,40 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     return mongoDBInstance?.isDbConnected() || false;
   });
 
-  exports("cfx-mongodb:connect", async (connectionURL: string, options?: object) => {
+  exports("connect", async (connectionURL: string, options?: object) => {
     try {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.connect(connectionURL, options);
-      
-  
-      console.log(`MongoDB verbunden mit URL: ${connectionURL}`);
+
+      console.log(`CFX-MongoDB verbunden mit URL: ${connectionURL}`);
       emitNet("cfx-mongodb:connected", source, true);
     } catch (error) {
-      console.error("MongoDB Verbindungsfehler:", error);
+      console.error("CFX-MongoDB Verbindungsfehler:", error);
       emitNet("cfx-mongodb:connected", source, false, (error as Error).message);
     }
   });
 
-  exports("cfx-mongodb:disconnect", async () => {
+  exports("disconnect", async () => {
     try {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.disconnect();
-      console.log(`MongoDB disconnected`);
+      console.log(`CFX-MongoDB disconnected`);
       emitNet("cfx-mongodb:disconnected", source, true);
     } catch (error) {
-      console.error("MongoDB Disconnection error:", error);
-      emitNet("cfx-mongodb:disconnected", source, false, (error as Error).message);
+      console.error("CFX-MongoDB Disconnection error:", error);
+      emitNet(
+        "cfx-mongodb:disconnected",
+        source,
+        false,
+        (error as Error).message
+      );
     }
   });
-  console.log("[MongoDB] Exports registered with TypeScript generics support");
+  exports("testex", (): string => {
+    console.error("Testex");
+    return "Test Result";
+  });
+  console.log(
+    "[CFX-MongoDB] Exports registered with TypeScript generics support"
+  );
 }
