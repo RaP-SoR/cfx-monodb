@@ -27,10 +27,10 @@ server_exports {
   'isConnected',
   'getDb',
   'findById',
+  'findAll',
   'find',
-  'findOne',
-  'insertOne',
-  'updateOne',
-  'deleteOne',
-  'testex'
+  'insert',
+  'update',
+  'delete',
+  'count'
 }

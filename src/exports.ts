@@ -16,7 +16,7 @@ import MongoDBConnector from "./connector";
 
 export function registerExports(mongoDBInstance: MongoDBConnector): void {
   global.exports(
-    "insertOne",
+    "insert",
     async <T extends Document>(
       collectionName: string,
       document: OptionalUnlessRequiredId<T>
@@ -43,7 +43,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
   );
 
   exports(
-    "find",
+    "findAll",
     async <T extends Document>(
       collectionName: string,
       query: Filter<T> = {},
@@ -57,6 +57,13 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
           .collection<T>(collectionName)
           .find(query, options)
           .toArray();
+
+        for (const doc of result) {
+          if (doc._id && typeof doc._id === "object" && doc._id.toString) {
+            (doc._id as any) = doc._id.toString();
+          }
+        }
+
         return { success: true, data: result as unknown as T[] };
       } catch (error) {
         console.error(`[CFX-MongoDB Export] find error:`, error);
@@ -72,7 +79,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
   );
 
   exports(
-    "findOne",
+    "find",
     async <T extends Document>(
       collectionName: string,
       query: Filter<T> = {}
@@ -82,6 +89,20 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         if (!db) throw new Error("Database not connected");
 
         const result = await db.collection<T>(collectionName).findOne(query);
+        if (!result) {
+          return { success: false, error: "Document not found" };
+        }
+
+        if (
+          result._id &&
+          typeof result._id === "object" &&
+          result._id.toString
+        ) {
+          const idString = result._id.toString();
+          // Dann die ID als String setzen
+          (result as any)._id = idString;
+        }
+
         return { success: true, data: result as T | null };
       } catch (error) {
         console.error(`[CFX-MongoDB Export] findOne error:`, error);
@@ -95,9 +116,8 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-
   exports(
-    "updateOne",
+    "update",
     async <T extends Document>(
       collectionName: string,
       filter: Filter<T>,
@@ -107,12 +127,39 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const db = mongoDBInstance.getDb();
         if (!db) throw new Error("Database not connected");
 
+        // Konvertiere String-IDs in ObjectIDs
+        if (filter && typeof filter === "object") {
+          // ID-Konvertierungslogik für _id
+          if (filter._id && typeof filter._id === "string") {
+            try {
+              const { ObjectId } = require("mongodb");
+              if (ObjectId.isValid(filter._id)) {
+                filter._id = new ObjectId(filter._id);
+              }
+            } catch (err) {
+              console.warn(
+                "Failed to convert string _id to ObjectId:",
+                filter._id
+              );
+            }
+          }
+        }
+
+        console.log(
+          `[CFX-MongoDB] Updating with filter: ${JSON.stringify(filter)}`
+        );
+
         const updateDoc: UpdateFilter<T> =
           "$set" in update ? update : { $set: update as Partial<T> };
 
         const result = await db
           .collection<T>(collectionName)
           .updateOne(filter, updateDoc);
+
+        console.log(
+          `[CFX-MongoDB] Update result: matched=${result.matchedCount}, modified=${result.modifiedCount}`
+        );
+
         return {
           success: true,
           matchedCount: result.matchedCount,
@@ -130,9 +177,8 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-
   exports(
-    "deleteOne",
+    "delete",
     async <T extends Document>(
       collectionName: string,
       filter: Filter<T>
@@ -142,6 +188,19 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         if (!db) throw new Error("Database not connected");
 
         const result = await db.collection<T>(collectionName).deleteOne(filter);
+        if (result.deletedCount === 0) {
+          return { success: false, error: "Document not found" };
+        }
+        if (result.deletedCount > 1) {
+          console.warn(
+            `[CFX-MongoDB] Warning: More than one document deleted (${result.deletedCount})`
+          );
+        }
+        console.log(
+          `[CFX-MongoDB] Deleted document with filter: ${JSON.stringify(
+            filter
+          )}`
+        );
         return { success: true, deletedCount: result.deletedCount };
       } catch (error) {
         console.error(`[CFX-MongoDB Export] deleteOne error:`, error);
@@ -155,7 +214,32 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
+  exports(
+    "count",
+    async <T extends Document>(
+      collectionName: string,
+      filter: Filter<T> = {}
+    ): Promise<Response<number>> => {
+      try {
+        const db = mongoDBInstance.getDb();
+        if (!db) throw new Error("Database not connected");
 
+        const count = await db
+          .collection<T>(collectionName)
+          .countDocuments(filter);
+        return { success: true, data: count };
+      } catch (error) {
+        console.error(`[CFX-MongoDB Export] countDocuments error:`, error);
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
+        };
+      }
+    }
+  );
   exports("isConnected", (): boolean => {
     return mongoDBInstance?.isDbConnected() || false;
   });
@@ -188,10 +272,6 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         (error as Error).message
       );
     }
-  });
-  exports("testex", (): string => {
-    console.error("Testex");
-    return "Test Result";
   });
   console.log(
     "[CFX-MongoDB] Exports registered with TypeScript generics support"
