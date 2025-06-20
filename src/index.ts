@@ -7,7 +7,6 @@ on("onResourceStart", async (resourceName: string) => {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.connect();
       if (mongodb.isDbConnected()) {
-        //registerExports(mongodb);
         console.log("CFX-MongoDB connected successfully");
       }
       console.log(`${resourceName} started and MongoDB connected`);
