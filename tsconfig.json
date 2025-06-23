@@ -7,6 +7,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "allowJs": true,
+    "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": ".",
     "typeRoots": [
@@ -14,8 +15,12 @@
       "./node_modules/@citizenfx",
       "./src/types"
     ],
-    "sourceMap": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
