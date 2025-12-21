@@ -1,9 +1,9 @@
 fx_version 'cerulean'
-games { 'gta5', 'rdr3' }
+game  {'rdr3' , 'gta5' }
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
 
 author 'RaPSoR'
-description 'Typescript Wrapper for Cfx'
+description 'MongoDB Typescript Wrapper for CFX'
 version '1.0.0'
 
 server_script 'dist/index.js'
