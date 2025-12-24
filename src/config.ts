@@ -26,7 +26,7 @@ const config: Config = {
   dev: {
     mongoUrl: GetConvar(
       "mongodb_dev_url",
-      "mongodb://localhost:27017/redm_dev"
+      "mongodb://localhost:27017/ctf_dev"
     ),
     options: {
       useNewUrlParser: true,
@@ -37,7 +37,7 @@ const config: Config = {
   prod: {
     mongoUrl: GetConvar(
       "mongodb_prod_url",
-      "mongodb://localhost:27017/redm_prod"
+      "mongodb://localhost:27017/ctf_prod"
     ),
     options: {
       useNewUrlParser: true,
@@ -48,7 +48,7 @@ const config: Config = {
   test: {
     mongoUrl: GetConvar(
       "mongodb_test_url",
-      "mongodb://localhost:27017/redm_test"
+      "mongodb://localhost:27017/ctf_test"
     ),
     options: {
       useNewUrlParser: true,
