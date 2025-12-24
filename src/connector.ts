@@ -1,6 +1,5 @@
 import { MongoClient, Db } from "mongodb";
 import dbConfig from "./config";
-import { register } from "module";
 import { registerExports } from "./exports";
 
 class MongoDBConnector {
@@ -46,7 +45,13 @@ class MongoDBConnector {
     }
 
     try {
-      this.client = new MongoClient(this.connectionString, this.options);
+      const opts = {
+        ...(this.options || {}),
+        serverSelectionTimeoutMS:
+          (this.options && (this.options as any).serverSelectionTimeoutMS) ||
+          dbConfig.options.serverSelectionTimeoutMS,
+      } as any;
+      this.client = new MongoClient(this.connectionString, opts);
       await this.client.connect();
       this.db = this.client.db();
       this.isConnected = true;

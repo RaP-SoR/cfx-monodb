@@ -39,8 +39,17 @@ if (typeof global !== "undefined") {
 
 export default defineConfig({
   plugins: [commonjs()],
+  resolve: {
+    browserField: false,
+    mainFields: ["module", "main"],
+  },
+  define: {
+    "global.navigator": "undefined",
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
+  },
   build: {
-    target: "node16",
+    target: "node22",
+    ssr: true,
     outDir: "dist",
     minify: false,
     sourcemap: true,
@@ -50,12 +59,23 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      external: ["crypto", "fs", "path", "os", "util", "stream", "events"],
+      external: [
+        "mongodb",
+        "@citizenfx/server",
+        "@citizenfx/client",
+        "crypto",
+        "fs",
+        "path",
+        "os",
+        "util",
+        "stream",
+        "events",
+      ],
       output: {
         format: "cjs",
-        intro: polyfillCode, // Injiziert den Polyfill-Code vor allem anderen
+        exports: "named",
       },
     },
-    ssr: true,
+    emptyOutDir: false,
   },
 });

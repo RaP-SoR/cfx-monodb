@@ -10,11 +10,9 @@
     "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": ".",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@citizenfx",
-      "./src/types"
-    ],
+    "types": ["@citizenfx/server"],
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "skipLibCheck": true,
   },
   "include": [
     "src/**/*"

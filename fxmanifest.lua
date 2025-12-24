@@ -34,3 +34,5 @@ server_exports {
   'delete',
   'count'
 }
+
+node_version '22'

@@ -1,10 +1,4 @@
-import {
-  Filter,
-  OptionalUnlessRequiredId,
-  Document,
-  UpdateFilter,
-  FindOptions,
-} from "mongodb";
+import { Filter, OptionalUnlessRequiredId, Document, UpdateFilter, FindOptions } from "mongodb";
 import {
   Response,
   ErrorResponse,
@@ -15,7 +9,9 @@ import {
 import MongoDBConnector from "./connector";
 
 export function registerExports(mongoDBInstance: MongoDBConnector): void {
-  global.exports(
+  // FiveM provides global.exports at runtime; cast for TS compatibility
+  const fxExports = (globalThis as any).exports as (...args: any[]) => void;
+  fxExports(
     "insert",
     async <T extends Document>(
       collectionName: string,
@@ -42,12 +38,12 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     }
   );
 
-  exports(
+  (globalThis as any).exports(
     "findAll",
     async <T extends Document>(
       collectionName: string,
       query: Filter<T> = {},
-      options: FindOptions<T> = {}
+      options: FindOptions = {}
     ): Promise<Response<T[]>> => {
       try {
         const db = mongoDBInstance.getDb();
@@ -78,7 +74,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     }
   );
 
-  exports(
+  (globalThis as any).exports(
     "find",
     async <T extends Document>(
       collectionName: string,
@@ -116,7 +112,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-  exports(
+  (globalThis as any).exports(
     "update",
     async <T extends Document>(
       collectionName: string,
@@ -132,14 +128,14 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
           // ID-Konvertierungslogik für _id
           if (filter._id && typeof filter._id === "string") {
             try {
-              const { ObjectId } = require("mongodb");
+              const { ObjectId } = await import("mongodb");
               if (ObjectId.isValid(filter._id)) {
-                filter._id = new ObjectId(filter._id);
+                (filter as any)._id = new ObjectId(filter._id);
               }
             } catch (err) {
               console.warn(
                 "Failed to convert string _id to ObjectId:",
-                filter._id
+                (filter as any)._id
               );
             }
           }
@@ -177,7 +173,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-  exports(
+  (globalThis as any).exports(
     "delete",
     async <T extends Document>(
       collectionName: string,
@@ -214,7 +210,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-  exports(
+  (globalThis as any).exports(
     "count",
     async <T extends Document>(
       collectionName: string,

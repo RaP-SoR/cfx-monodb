@@ -1,9 +1,9 @@
 interface DatabaseConfig {
   mongoUrl: string;
   options: {
-    useNewUrlParser: boolean;
-    useUnifiedTopology: boolean;
     serverSelectionTimeoutMS: number;
+    maxPoolSize?: number;
+    minPoolSize?: number;
   };
 }
 
@@ -29,9 +29,9 @@ const config: Config = {
       "mongodb://localhost:27017/ctf_dev"
     ),
     options: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: parseInt(GetConvar("mongodb_timeout", "5000")),
+      maxPoolSize: 10,
+      minPoolSize: 0,
     },
   },
   prod: {
@@ -40,9 +40,9 @@ const config: Config = {
       "mongodb://localhost:27017/ctf_prod"
     ),
     options: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: parseInt(GetConvar("mongodb_timeout", "10000")),
+      maxPoolSize: 10,
+      minPoolSize: 0,
     },
   },
   test: {
@@ -51,9 +51,9 @@ const config: Config = {
       "mongodb://localhost:27017/ctf_test"
     ),
     options: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: parseInt(GetConvar("mongodb_timeout", "2000")),
+      maxPoolSize: 5,
+      minPoolSize: 0,
     },
   },
 };

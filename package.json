@@ -13,21 +13,30 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@citizenfx/client": "^2.0.14758-1",
-    "@citizenfx/server": "^2.0.14758-1",
-    "@types/node": "^22.15.3",
-    "typescript": "^5.8.3",
-    "vite": "4.5.1",
+    "@citizenfx/client": "^2.0.23683-1",
+    "@citizenfx/server": "^2.0.23683-1",
+    "@types/node": "^25.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
     "vite-plugin-commonjs": "^0.10.4"
   },
   "dependencies": {
-    "mongodb": "5.9.2",
+    "mongodb": "^7.0.0",
     "ts-node": "^10.9.2"
   },
   "engines": {
-    "node": "<=16.9.1"
+    "node": ">=22.0.0"
   }
 }
