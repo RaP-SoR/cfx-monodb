@@ -33,7 +33,7 @@ Sample manifests: [fxmanifest-ts-example.lua](examples/fxmanifest-ts-example.lua
 | [plans/OBSERVABILITY-PLAN.md](plans/OBSERVABILITY-PLAN.md) | Slow-query logging design (Track C) |
 | [plans/SCHEMA-VERSIONING-PLAN.md](plans/SCHEMA-VERSIONING-PLAN.md) | Schema version ledger (Track D, design) |
 | [plans/IDEAS-BACKLOG.md](plans/IDEAS-BACKLOG.md) | Collected ideas — implement later if needed |
-| [plans/QUALITY-AUDIT-2026.md](plans/QUALITY-AUDIT-2026.md) | **Quality baseline (~72%)** — compare on next audit |
+| [plans/QUALITY-AUDIT-2026.md](plans/QUALITY-AUDIT-2026.md) | **Quality baseline — Audit 2 ~86%** (2026-05-27) |
 | [archive/refactor/README.md](archive/refactor/README.md) | Multi-agent refactor playbook (Waves 1–4, archived) |
 | [archive/refactor/REFACTOR-STATUS.md](archive/refactor/REFACTOR-STATUS.md) | Final status board — merged to `dev` |
 

@@ -1,5 +1,9 @@
 # Änderungen (Changelog)
 
+## Unreleased — Quality Audit 2 (2026-05-27)
+
+- **`docs/plans/QUALITY-AUDIT-2026.md`** — Vergleich Audit 1 (~72%) → Audit 2 (**~86%**); Tracks E/F/G/I abgeschlossen; Framework-Smoke bewusst skip; stable-ready Empfehlung
+
 ## Unreleased — Track E (Automatisierung)
 
 - **`docs/CHECKLIST.md`** — Commit/PR-Checklisten nach Änderungstyp
