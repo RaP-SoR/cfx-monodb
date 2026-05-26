@@ -129,7 +129,7 @@ ConVar-first connection; `exec mongodb.local.cfg` + gitignore for multi-dev team
 
 | Item | Notes |
 |------|-------|
-| `docs/examples/patterns.md` | CTFFramework success checks, filter patterns (Track B optional) |
+| `docs/examples/patterns.md` | CTFFramework success checks, filter patterns | ✅ Track F |
 | Schema examples | When Track D ships |
 | OpenAPI/JSON schema | Machine-readable contract for codegen |
 

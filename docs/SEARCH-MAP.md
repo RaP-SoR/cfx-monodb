@@ -30,6 +30,7 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 | Agent-Regeln & Workflow | `AGENTS.md` |
 | Lua-Beispiele | `docs/examples/lua.md`, `docs/examples/server.lua` |
 | TypeScript-Beispiele | `docs/examples/typescript.md`, `docs/examples/server.ts` |
+| Consumer-Patterns (CTFFramework) | `docs/examples/patterns.md` |
 | Changelog | `docs/CHANGELOG.md` |
 | Dokumentations-Index | `docs/README.md` |
 

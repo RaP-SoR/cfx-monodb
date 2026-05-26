@@ -1,3 +1,7 @@
+/**
+ * @file Shared export response shapes — consumer contract in docs/API.md.
+ */
+
 export interface SuccessResponse<T> {
   success: true;
   data: T;

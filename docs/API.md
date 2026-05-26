@@ -123,6 +123,15 @@ Gibt ein einzelnes Dokument zurück. Wenn nicht gefunden: `{ success: true, data
 
 `_id` als String im Filter wird automatisch konvertiert.
 
+```typescript
+const one = await exports["cfx-mongodb"].find("players", { identifier: "steam:110000..." });
+if (!one.success) return console.error(one.error);
+if (one.data === null) return console.log("not found");
+// one.data._id is string
+```
+
+Weitere Patterns: [examples/patterns.md](examples/patterns.md).
+
 ### `findAll(collection, filter?, options?)`
 
 ```typescript
@@ -194,6 +203,30 @@ const version = await exports["cfx-mongodb"].getVersion();
 | `ensureIndexes(collection, specs[])` | `{ success, data: number }` | Indizes idempotent anlegen (max. 20 Specs) |
 | `health()` | `{ success, data: { ok, rttMs } }` | MongoDB ping + Round-Trip-Zeit |
 | `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel, perfEnabled, perfSlowMs, perfLogAll, perfBuffer } }` | Sichere Laufzeit-Config — **keine Secrets/URLs** |
+
+### `ensureIndexes(collection, specs[])`
+
+```typescript
+const result = await exports["cfx-mongodb"].ensureIndexes("players", [
+  { keys: { email: 1 }, options: { unique: true } },
+  { keys: { lastLogin: -1 } },
+]);
+// { success: true, data: 2 }
+```
+
+Leere Spec-Liste: `{ success: false, error: "..." }`. Siehe auch `mongodb_init_indexes` ConVar in [CONFIGURATION.md](CONFIGURATION.md).
+
+### `health()` / `config()`
+
+```typescript
+const health = await exports["cfx-mongodb"].health();
+// { success: true, data: { ok: true, rttMs: 12 } }
+
+const cfg = await exports["cfx-mongodb"].config();
+// { success: true, data: { env: "dev", timeout: 5000, perfEnabled: false, ... } }
+```
+
+`config()` liefert nie Connection-URLs — nur sichere Diagnose-Felder.
 
 ---
 
@@ -332,3 +365,4 @@ User-Input in Queries immer validieren/whitelisten — diese Resource blockiert 
 | Async | `await` / `.then()` | Citizen await pattern |
 | Events | `on("cfx-mongodb:ready", …)` | `AddEventHandler('cfx-mongodb:ready', …)` |
 | Beispiele | [examples/typescript.md](examples/typescript.md) | [examples/lua.md](examples/lua.md) |
+| Patterns | [examples/patterns.md](examples/patterns.md) | CTFFramework checks, filters, pagination |

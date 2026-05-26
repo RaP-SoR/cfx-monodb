@@ -1,3 +1,7 @@
+/**
+ * @file CRUD write exports — insert, update, delete. Contract: docs/API.md.
+ */
+
 import {
   Filter,
   OptionalUnlessRequiredId,

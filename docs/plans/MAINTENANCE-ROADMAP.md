@@ -153,7 +153,7 @@ Extend `.cursor/skills/cfx-mongodb/SKILL.md`:
 
 - [x] Define TSDoc standard in `AGENTS.md` (5–10 lines)
 - [x] Document priority modules (list above)
-- [ ] Add `docs/examples/patterns.md` optional — CTFFramework checks, filters (from prior review)
+- [x] Add `docs/examples/patterns.md` — CTFFramework checks, filters
 - [x] Optional: one test that `api.ts` exports match manifest (already have contract test)
 
 **Estimated effort:** ~2–3 hours

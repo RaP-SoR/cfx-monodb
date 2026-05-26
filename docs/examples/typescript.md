@@ -1,6 +1,6 @@
 # TypeScript Examples — cfx-mongodb
 
-> Full API: [../API.md](../API.md) · Runnable sample: [server.ts](server.ts)
+> Full API: [../API.md](../API.md) · Patterns: [patterns.md](patterns.md) · Runnable sample: [server.ts](server.ts)
 
 FiveM Node **22** required (`node_version '22'`). Wait for `cfx-mongodb:ready` before CRUD.
 

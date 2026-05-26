@@ -6,6 +6,7 @@ Copy-paste starters for **consumer resources** (not part of the `cfx-mongodb` bu
 
 | File | Description |
 |------|-------------|
+| [patterns.md](patterns.md) | **CTFFramework patterns** — success checks, filters, pagination, anti-patterns |
 | [typescript.md](typescript.md) | TypeScript snippets per export |
 | [lua.md](lua.md) | Lua snippets per export |
 | [server.ts](server.ts) | Runnable TS tour (wait for `cfx-mongodb:ready`) |

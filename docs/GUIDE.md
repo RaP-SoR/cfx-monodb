@@ -53,7 +53,7 @@ Example index ConVar:
 
 Full contract: **[API.md](API.md)**
 
-Language examples: **[examples/typescript.md](examples/typescript.md)** · **[examples/lua.md](examples/lua.md)**
+Language examples: **[examples/typescript.md](examples/typescript.md)** · **[examples/lua.md](examples/lua.md)** · **[examples/patterns.md](examples/patterns.md)** (CTFFramework)
 
 ### Response envelope
 

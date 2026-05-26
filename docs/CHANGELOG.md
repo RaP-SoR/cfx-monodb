@@ -1,5 +1,12 @@
 # Änderungen (Changelog)
 
+## Unreleased — Track F (Dokumentation)
+
+- **`docs/examples/patterns.md`** — CTFFramework success checks, Filter/Pagination, Anti-Patterns, TS-Types
+- **API.md** — Beispiele für `find`, `ensureIndexes`, `health`/`config`
+- **TSDoc `@file`** auf `bootstrap`, `config`, `responses`, Handler-Module
+- Verlinkt in GUIDE, README, examples/README, SEARCH-MAP
+
 ## Unreleased — Track G (Test-Matrix)
 
 - **Handler-Tests aufgeteilt:** `tests/handlers/{admin,read,write,lifecycle}.test.ts`

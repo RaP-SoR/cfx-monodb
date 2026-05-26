@@ -18,6 +18,7 @@ Entry point for humans and agents. **Canonical API contract:** [API.md](API.md).
 
 | Document | Code |
 |----------|------|
+| [examples/patterns.md](examples/patterns.md) | CTFFramework success checks, filters, pagination |
 | [examples/typescript.md](examples/typescript.md) | [examples/server.ts](examples/server.ts) |
 | [examples/lua.md](examples/lua.md) | [examples/server.lua](examples/server.lua) |
 

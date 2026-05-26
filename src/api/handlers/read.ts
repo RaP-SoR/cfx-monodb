@@ -1,3 +1,7 @@
+/**
+ * @file CRUD read exports — find, findAll, findById, count. Contract: docs/API.md.
+ */
+
 import { Filter, Document } from "mongodb";
 import dbConfig from "../../config";
 import { validateFilter } from "../../validateQuery";

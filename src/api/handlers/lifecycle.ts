@@ -1,3 +1,8 @@
+/**
+ * @file Connection lifecycle exports — isConnected, getDb, connect, disconnect.
+ * Prefer ConVars over connect() — see docs/API.md (Advanced).
+ */
+
 import MongoDBConnector from "../../connector";
 import { log, redactMongoUri } from "../../utils";
 import type { DbProvider } from "../../types/dbProvider";

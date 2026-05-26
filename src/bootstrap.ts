@@ -1,3 +1,8 @@
+/**
+ * @file Resource lifecycle — connect, register exports, index init, ready event.
+ * See docs/ARCHITECTURE.md and docs/examples/patterns.md (startup).
+ */
+
 import MongoDBConnector from "./connector";
 import { registerExports } from "./exports";
 import { ensureIndexesFromConvar } from "./services/indexService";

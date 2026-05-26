@@ -1,3 +1,8 @@
+/**
+ * @file Admin/diagnostic exports — health, config, ensureIndexes, getQueryStats, getVersion.
+ * Contract: docs/API.md.
+ */
+
 import dbConfig from "../../config";
 import type { Response, ErrorResponse } from "../../responses";
 import type { DbProvider } from "../../types/dbProvider";

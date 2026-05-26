@@ -1,3 +1,8 @@
+/**
+ * @file Active MongoDB profile from ConVars (`mongodb_env`, URLs, pool, timeout).
+ * Resolved once at module load — see docs/CONFIGURATION.md.
+ */
+
 interface DatabaseConfig {
   mongoUrl: string;
   options: {
