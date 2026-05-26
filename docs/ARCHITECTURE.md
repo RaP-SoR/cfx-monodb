@@ -29,6 +29,98 @@ FiveM/RedM liefern teils noch Node 16 oder 18. Diese Laufzeiten binden veraltete
 
 Exports sind nach Connect registriert (`bootstrap.ts`).
 
+### Lifecycle (Diagramm)
+
+```mermaid
+sequenceDiagram
+  participant FX as FiveM Server
+  participant Boot as bootstrap.ts
+  participant Conn as connector.ts
+  participant Idx as IndexService
+  participant Reg as registerExports.ts
+  participant Cons as Consumer Resource
+
+  FX->>Boot: onResourceStart (cfx-mongodb)
+  Boot->>Conn: connect() from ConVars
+  Conn-->>Boot: MongoClient + Db
+  Boot->>Reg: registerExports(connector)
+  Reg-->>Boot: FiveM exports registered
+  opt mongodb_init_indexes set
+    Boot->>Idx: ensureIndexesFromConvar(db)
+    Idx-->>Boot: indexes created
+  end
+  Boot->>FX: TriggerEvent(cfx-mongodb:ready)
+  Cons->>FX: AddEventHandler / on(ready)
+  Cons->>FX: exports cfx-mongodb CRUD
+```
+
+### Modulgraph (Diagramm)
+
+```mermaid
+flowchart TB
+  subgraph entry [Entry]
+    index[index.ts]
+    bootstrap[bootstrap.ts]
+  end
+
+  subgraph infra [Infrastructure]
+    connector[connector.ts]
+    config[config.ts]
+    indexSvc[services/indexService.ts]
+  end
+
+  subgraph api [Public API layer]
+    shim[exports.ts shim]
+    reg[api/registerExports.ts]
+    withDb[api/withDb.ts]
+    norm[api/normalizeIdFilter.ts]
+  end
+
+  subgraph handlers [Handlers]
+    read[handlers/read.ts]
+    write[handlers/write.ts]
+    admin[handlers/admin.ts]
+    life[handlers/lifecycle.ts]
+  end
+
+  subgraph cross [Cross-cutting]
+    validate[validateQuery.ts]
+    responses[responses.ts]
+    utils[utils.ts]
+  end
+
+  subgraph external [External]
+    fivem[FiveM exports]
+    mongo[(MongoDB)]
+  end
+
+  index --> bootstrap
+  bootstrap --> connector
+  bootstrap --> reg
+  bootstrap --> indexSvc
+  shim --> reg
+  reg --> read
+  reg --> write
+  reg --> admin
+  reg --> life
+  read --> withDb
+  write --> withDb
+  admin --> withDb
+  life --> connector
+  withDb --> connector
+  withDb --> validate
+  read --> norm
+  write --> norm
+  connector --> config
+  connector --> mongo
+  indexSvc --> connector
+  handlers --> responses
+  handlers --> utils
+  reg --> fivem
+```
+
+**Leserichtung:** Consumer rufen nur `fivem` (Exports) auf. Handler nutzen `withDb` → `connector` → MongoDB. `bootstrap` orchestriert Start; `exports.ts` ist nur ein Re-Export-Shim für stabile Imports.
+
 ## Schichten
 
 | Schicht | Datei | Verantwortung |

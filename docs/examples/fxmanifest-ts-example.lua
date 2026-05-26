@@ -7,7 +7,9 @@ version '0.0.1'
 
 dependency 'cfx-mongodb'
 
--- Build your TS to dist/example.js and reference here
+-- server.cfg: ensure cfx-mongodb before this resource
+
+-- Build docs/examples/server.ts to dist/example.js and reference here
 server_scripts {
   'dist/example.js'
 }

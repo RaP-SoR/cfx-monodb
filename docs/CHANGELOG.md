@@ -1,5 +1,11 @@
 # Änderungen (Changelog)
 
+## Docs — examples & lifecycle diagrams (dev)
+
+- Runnable `docs/examples/server.ts` and `server.lua` now wait for `cfx-mongodb:ready` (no CRUD race on consumer start).
+- Coverage matrix in `docs/examples/README.md`; `findById`, `getVersion`, not-found cases in runnable samples.
+- Mermaid lifecycle + module diagrams in `docs/ARCHITECTURE.md`.
+
 ## Docs — consolidation under `docs/` (dev)
 
 - Root MD files moved: `DOCS.md` → `docs/GUIDE.md`, `CHANGES.md` → `docs/CHANGELOG.md`, `SEARCH-MAP.md` → `docs/SEARCH-MAP.md`.

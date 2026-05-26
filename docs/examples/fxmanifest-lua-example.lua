@@ -7,6 +7,8 @@ version '0.0.1'
 
 dependency 'cfx-mongodb'
 
+-- server.cfg: ensure cfx-mongodb before this resource
+
 server_scripts {
   'server.lua'
 }
