@@ -3,7 +3,8 @@
 ## Wave 3 (refactor/staged-hardening) — Bootstrap & IndexService
 
 - **W3A:** `src/bootstrap.ts` — Lifecycle aus `index.ts`; `connector.ts` ohne `registerExports` (kein zirkulärer Import).
-- **W3B:** `src/services/indexService.ts` — gemeinsame Index-Logik für Startup (`mongodb_init_indexes`) und `ensureIndexes`-Export.
+- **W3B:** `src/services/indexService.ts` — gemeinsame Index-Logik für Startup und `ensureIndexes`-Export.
+- **W3C–W3D:** Handler in `src/api/handlers/*`, Wiring in `src/api/registerExports.ts`; `src/exports.ts` ist Shim-Re-Export.
 
 ## Wave 2 (refactor/staged-hardening) — Export pipeline & find semantics
 

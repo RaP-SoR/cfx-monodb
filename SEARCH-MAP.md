@@ -12,14 +12,15 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 
 | Aufgabe | Wo suchen |
 |---------|-----------|
-| Export hinzufügen/ändern | `src/exports.ts` → `registerExports()` |
+| Export hinzufügen/ändern | `src/api/handlers/*.ts` + `src/api/registerExports.ts` |
+| Export-Shim (Re-Export) | `src/exports.ts` |
 | Rückgabe-Typen (success/error) | `src/responses.ts` |
 | MongoDB-Verbindung / Singleton | `src/connector.ts` |
 | ConVar-Konfiguration (URLs, Pool) | `src/config.ts` |
 | Query-Sicherheit (Denylist) | `src/validateQuery.ts` |
-| findAll-Optionen (limit/skip/sort) | `src/types/options.ts`, `src/exports.ts` |
+| findAll-Optionen (limit/skip/sort) | `src/types/options.ts`, `src/api/handlers/read.ts` |
+| Resource-Start / Index-Init | `src/bootstrap.ts` |
 | FiveM-Globals (GetConvar, exports) | `src/types/fivem.d.ts` |
-| Resource-Start / Index-Init | `src/index.ts` |
 | Hilfsfunktionen (log, ObjectId) | `src/utils.ts` |
 | Manifest, server_exports, node_version | `fxmanifest.lua` |
 | Build (Vite SSR → dist/) | `vite.config.mjs`, `yarn build` |
@@ -35,18 +36,24 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 ```
 fxmanifest.lua
   └── dist/index.js  ← yarn build aus src/
-        ├── index.ts          onResourceStart/Stop, Index-Init
-        ├── connector.ts      MongoClient, connect(), registerExports()
-        ├── exports.ts        Alle FiveM-Exports (CRUD, health, …)
-        ├── config.ts         ConVar → mongoUrl + Pool-Optionen
-        ├── validateQuery.ts  Operator-Denylist
-        ├── responses.ts      Insert/Update/Delete/Response-Typen
-        └── utils.ts          log, exportFn, toObjectIdIfValid
+        ├── index.ts              import bootstrap
+        ├── bootstrap.ts          lifecycle, registerExports, index init
+        ├── connector.ts          MongoClient singleton (DbProvider)
+        ├── exports.ts            shim → api/registerExports
+        ├── api/
+        │     ├── registerExports.ts
+        │     ├── withDb.ts, normalizeIdFilter.ts
+        │     └── handlers/       read, write, admin, lifecycle
+        ├── services/indexService.ts
+        ├── config.ts             ConVar → mongoUrl + Pool
+        ├── validateQuery.ts      Operator-Denylist
+        ├── responses.ts          Response-Typen
+        └── utils.ts              log, exportFn, redactMongoUri
 ```
 
 ## Export-Register
 
-Implementiert in `src/exports.ts`, registriert in `fxmanifest.lua` → `server_exports`:
+Implementiert in `src/api/handlers/*` via `src/api/registerExports.ts` (Shim: `src/exports.ts`), registriert in `fxmanifest.lua` → `server_exports`:
 
 | Export | Kategorie | Zweck |
 |--------|-----------|-------|

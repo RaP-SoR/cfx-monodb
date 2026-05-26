@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** `8763957` (Wave 3 W3C handlers merged)  
+**Integration HEAD:** W3D pending commit (Wave 3 complete after merge)  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -13,8 +13,8 @@
 |------|-------|--------|--------|
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
 | **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🟢 Complete |
-| **3** | Architecture split | 2 + 3 + 1 staged | 🟡 W3C merged — W3D next |
-| **4** | TS6 + contract hardening | 2 parallel | ⚪ Blocked by Wave 3 |
+| **3** | Architecture split | 2 + 3 + 1 staged | 🟢 Complete |
+| **4** | TS6 + contract hardening | 2 parallel | 🔵 Ready |
 
 Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
 
@@ -74,11 +74,26 @@ yarn tsc && yarn test && yarn build && yarn lint
 | **W3C1** | Read handlers | `refactor/w3c1-handlers-read` | 🟢 | `d2ead21` |
 | **W3C2** | Write handlers | `refactor/w3c2-handlers-write` | 🟢 | `9a76cc4` |
 | **W3C3** | Admin/lifecycle | `refactor/w3c3-handlers-ops` | 🟢 | `830eb19` |
-| **W3D** | Wiring + shim | `refactor/w3d-register-exports` | 🔵 | — |
+| **W3D** | Wiring + shim | `refactor/w3d-register-exports` | 🟢 | (this commit) |
 
 **Spec:** [WAVE-3-SPEC.md](WAVE-3-SPEC.md)  
 **Order:** W3A → W3B → (W3C1 ∥ W3C2 ∥ W3C3) → W3D
 
-## Next: Wave 3 Step 4
+### Wave 3 integration gate
 
-W3D — `refactor/w3d-register-exports`: wire handlers via `registerExports.ts`, shrink `exports.ts` shim.
+```bash
+yarn tsc && yarn test && yarn build && yarn lint
+```
+
+**Result:** `yarn tsc` ✓ · **70/70 tests** · `yarn build` ✓ · `yarn lint` ✓
+
+### Wave 3 changes
+
+- [x] `bootstrap.ts` decouples lifecycle from connector
+- [x] `IndexService` shared for startup + `ensureIndexes`
+- [x] Handlers split: `read`, `write`, `admin`, `lifecycle`
+- [x] `registerExports.ts` wiring; `exports.ts` is 1-line shim
+
+## Next: Wave 4
+
+TS6 upgrade + contract hardening — see orchestrator Step 8 (`WAVE-4-SPEC.md` TBD).
