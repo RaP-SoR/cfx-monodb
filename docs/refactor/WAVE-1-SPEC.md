@@ -3,6 +3,12 @@
 **Target merge branch:** `refactor/staged-hardening`  
 **No behavior breaking changes** to CTFFramework required exports unless documented in `CHANGES.md`.
 
+### How to run (Cursor native)
+
+Prefer **Agents Window + `/multitask`**: one orchestrator message spawns 5 parallel subagents, each in an auto-created **`/worktree`**. See [README.md](README.md) for the copy-paste orchestrator prompt.
+
+Manual multi-window worktrees (`scripts/setup-worktrees-wave1.ps1`) are **fallback only**.
+
 ---
 
 ## Global rules (all Wave 1 agents)

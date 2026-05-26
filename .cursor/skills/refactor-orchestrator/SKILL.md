@@ -41,13 +41,25 @@ Full specs: [WAVE-1-SPEC.md](../../../docs/refactor/WAVE-1-SPEC.md)
 
 Suggested merge order: W1C → W1B → W1A → W2B → W2A (any order OK — no file overlap).
 
-## Worktree setup
+## Cursor native parallel agents (preferred)
+
+Use **Agents Window** (not five separate IDE windows):
+
+1. Checkout `refactor/staged-hardening`
+2. Send **`/multitask`** with the Wave prompt from `docs/refactor/README.md`
+3. Each subagent gets **`/worktree`** isolation automatically
+4. Monitor all agents in the Agents sidebar grid
+5. Review diffs → merge train into `refactor/staged-hardening`
+
+Cursor does **not** auto-merge subagent branches — that remains orchestrator work.
+
+## Manual worktree fallback
 
 ```powershell
 .\scripts\setup-worktrees-wave1.ps1
 ```
 
-One Cursor window per worktree. Orchestrator tab stays on main repo or `refactor/staged-hardening`.
+Use only if `/multitask` or parallel agents are unavailable on the current plan.
 
 ## Agent briefing (copy to implementer tab)
 
