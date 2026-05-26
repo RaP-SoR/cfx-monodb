@@ -6,13 +6,17 @@ on:
       - 'v*'
     branches:
       - dev
+      - main
   workflow_dispatch:
     inputs:
-      prerelease:
-        description: 'Mark GitHub Release as pre-release (tag pushes only)'
-        required: false
-        default: false
-        type: boolean
+      channel:
+        description: 'Build channel (dev = unstable, stable = main-style artifact)'
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - stable
 
 permissions:
   contents: write
@@ -23,6 +27,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node 22
         uses: actions/setup-node@v4
@@ -48,33 +54,62 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Resolve version label
-        id: version
+      - name: Resolve release metadata
+        id: meta
+        env:
+          RELEASE_DISPATCH_CHANNEL: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || '' }}
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            echo "label=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "label=manual-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
-          else
-            echo "label=dev-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-          fi
+          chmod +x scripts/resolve-release-meta.sh
+          ./scripts/resolve-release-meta.sh
 
       - name: Pack release zip
+        env:
+          RELEASE_VERSION: ${{ steps.meta.outputs.display_version }}
+          RELEASE_CHANNEL: ${{ steps.meta.outputs.channel }}
+          RELEASE_BRANCH: ${{ steps.meta.outputs.branch }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          RELEASE_BUILD_DATE: ${{ steps.meta.outputs.build_date }}
         run: |
           chmod +x scripts/pack-release.sh
-          ./scripts/pack-release.sh "${{ steps.version.outputs.label }}"
+          ./scripts/pack-release.sh "${{ steps.meta.outputs.zip_label }}"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cfx-mongodb-${{ steps.version.outputs.label }}
+          name: cfx-mongodb-${{ steps.meta.outputs.zip_label }}
           path: cfx-mongodb-*.zip
           retention-days: 90
 
-      - name: Publish GitHub Release
+      - name: Prepare release notes
         if: github.ref_type == 'tag'
+        run: |
+          path="${{ steps.meta.outputs.release_notes_path }}"
+          if [[ -n "$path" && -f "$path" ]]; then
+            cp "$path" RELEASE_BODY.md
+          else
+            cat > RELEASE_BODY.md << EOF
+          ## cfx-mongodb ${{ steps.meta.outputs.display_version }}
+
+          Channel: **${{ steps.meta.outputs.channel }}** (${{ steps.meta.outputs.branch }})
+
+          See [CONFIGURATION.md](https://github.com/${{ github.repository }}/blob/dev/docs/CONFIGURATION.md) for install steps.
+          EOF
+          fi
+
+      - name: Publish GitHub Release (dev pre-release)
+        if: github.ref_type == 'tag' && steps.meta.outputs.channel == 'dev'
         uses: softprops/action-gh-release@v2
         with:
           files: cfx-mongodb-*.zip
-          prerelease: ${{ inputs.prerelease == true }}
-          generate_release_notes: true
+          prerelease: true
+          body_path: RELEASE_BODY.md
+          name: cfx-mongodb ${{ steps.meta.outputs.display_version }} (dev)
+
+      - name: Publish GitHub Release (stable)
+        if: github.ref_type == 'tag' && steps.meta.outputs.channel == 'stable'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cfx-mongodb-*.zip
+          prerelease: false
+          body_path: RELEASE_BODY.md
+          name: cfx-mongodb ${{ steps.meta.outputs.display_version }}

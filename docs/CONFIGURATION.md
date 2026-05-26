@@ -56,38 +56,69 @@ No connection code in the consumer. That is intentional.
 
 ## Install from GitHub (pre-built, no local build)
 
-CI builds a **ready-to-use ZIP** (`dist/` + `fxmanifest.lua` + `node_modules/mongodb`). No `yarn build` on the server.
+CI builds a **ready-to-use ZIP** (`dist/` + stamped `fxmanifest.lua` + `node_modules/mongodb` + `BUILD_INFO.txt`). No `yarn build` on the server.
+
+### Dev vs stable
+
+| Channel | Branch | Tag example | Manifest version | GitHub Release |
+|---------|--------|-------------|------------------|----------------|
+| **dev** (unstable) | `dev` | `v1.0.0-dev` | `1.0.0-dev+abc1234` | Pre-release |
+| **stable** | `main` | `v1.0.0` | `1.0.0` | Latest (stable) |
+
+- **`dev` builds are not production-ready.** The ZIP and `getVersion()` include a `-dev` suffix (or `BUILD_INFO.txt` shows `channel: dev`).
+- **Stable** builds are published only after merging `dev` → `main` and tagging `vX.Y.Z` (no `-dev`).
+
+Inside every ZIP: read **`BUILD_INFO.txt`** (channel, branch, commit) and **`INSTALL.txt`**.
 
 ### Where to download
 
-| Trigger | Where |
-|---------|--------|
-| **Tag** `v*` (z. B. `v1.0.0`) | [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) |
-| **Push to `dev`** | Actions → latest **Release** workflow → Artifact `cfx-mongodb-dev-{sha}` |
-| **Manual** | Actions → **Release** → **Run workflow** → Artifact |
+| Trigger | Where | Channel |
+|---------|--------|---------|
+| **Tag** `vX.Y.Z-dev` on `dev` | [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) (pre-release) | dev |
+| **Tag** `vX.Y.Z` on `main` | GitHub Releases (stable) | stable |
+| **Push to `dev`** | Actions → **Release** workflow → Artifact `cfx-mongodb-1.0.0-dev-{sha}` | dev |
+| **Push to `main`** | Actions → Artifact `cfx-mongodb-1.0.0-{sha}` | stable snapshot |
+| **Manual** | Actions → **Release** → **Run workflow** → choose channel | dev or stable |
 
 ### Steps
 
 1. Download `cfx-mongodb-*.zip` from Releases or Actions artifacts  
 2. Extract into `resources/cfx-mongodb` (folder name must match)  
-3. Configure ConVars (`exec mongodb.local.cfg` or inline in `server.cfg`)  
-4. `ensure cfx-mongodb` before consumer resources  
+3. Read `BUILD_INFO.txt` — confirm channel matches your intent (dev vs stable)  
+4. Configure ConVars (`exec mongodb.local.cfg` or inline in `server.cfg`)  
+5. `ensure cfx-mongodb` before consumer resources  
 
 ### Version tags (maintainers)
 
+**Development (unstable):**
+
 ```bash
-# After changes on dev, when a build should be downloadable as a named version:
-git tag v1.0.0
-git push origin v1.0.0
+# Named dev pre-release on dev branch:
+git tag v1.0.0-dev
+git push origin v1.0.0-dev
+# → GitHub Release (pre-release), notes from docs/releases/v1.0.0-dev.md
 ```
 
-CI runs tests, builds, packs the ZIP, and publishes a **GitHub Release** automatically.
+Every push to `dev` also uploads an artifact `1.0.0-dev-{sha}` without creating a Release.
+
+**Stable (production):**
+
+```bash
+git checkout main
+git merge dev
+git tag v1.0.0
+git push origin main v1.0.0
+# → stable GitHub Release; tag must be on main (CI enforces)
+```
+
+Base semver in repo (`package.json` / source `fxmanifest.lua`) stays `X.Y.Z`; CI stamps `-dev+…` or build metadata into release ZIPs only.
+
+Release notes templates: [docs/releases/](releases/README.md).
 
 ### Check for updates (automation idea)
 
-Compare local `fxmanifest` / `GetResourceMetadata` version with latest tag:
-
-- GitHub API: `GET /repos/RaP-SoR/cfx-mongodb/releases/latest`  
+- **Stable servers:** `GET /repos/RaP-SoR/cfx-mongodb/releases/latest` (excludes pre-releases)  
+- **Dev servers:** latest pre-release or compare `getVersion()` / `BUILD_INFO.txt`  
 - Or compare tag list to deployed folder  
 
 Suitable for a small update script on the game server or in CTFFramework — not part of this resource.

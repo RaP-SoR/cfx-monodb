@@ -1,5 +1,14 @@
 # Änderungen (Changelog)
 
+## Unreleased — Dev/Stable Release-Kanäle
+
+- **Release-Kanäle:** `dev` → Version `X.Y.Z-dev+…`, Pre-Releases (`vX.Y.Z-dev`); `main` → stable `vX.Y.Z` (Tag muss auf `main` liegen)
+- **`scripts/resolve-release-meta.sh`** + erweitertes **`pack-release.sh`** — manifest/package im ZIP stempeln, `BUILD_INFO.txt`, channel-spezifisches `INSTALL.txt`
+- **Release Notes:** `docs/releases/v1.0.0-dev.md` (erstes ausführliches Pre-Release)
+- **`release.yml`:** Trigger auch `main`; stable vs dev GitHub Releases getrennt
+
+> Das frühere Tag `v1.0.0` von `dev` war nicht kanonisch — künftig **`v1.0.0-dev`** für dev, **`v1.0.0`** erst nach Merge auf `main`.
+
 ## 1.0.0 — Erstes GitHub Release (2026-05-26)
 
 - **Erstes Release-Zip** via GitHub Actions (`release.yml`) — Download ohne lokales `yarn build`
