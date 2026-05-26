@@ -1,10 +1,10 @@
 import { MongoClient, Db } from "mongodb";
 import dbConfig from "./config";
 import type { MongoOptions } from "./types/options";
-import { registerExports } from "./exports";
+import type { DbProvider } from "./types/dbProvider";
 import { log, redactMongoUri } from "./utils";
 
-class MongoDBConnector {
+class MongoDBConnector implements DbProvider {
   private static instance: MongoDBConnector;
   private isConnected: boolean = false;
   private connectionString: string;
@@ -62,7 +62,6 @@ class MongoDBConnector {
       this.isConnected = true;
       log("info", "Successfully connected");
       TriggerEvent("cfx-mongodb:connected", true);
-      registerExports(this);
     } catch (error) {
       log(
         "error",
