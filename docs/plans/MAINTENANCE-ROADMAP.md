@@ -161,11 +161,11 @@ Extend `.cursor/skills/cfx-mongodb/SKILL.md`:
 
 Summary:
 
-- Today: `health()` RTT for ping only; sporadic `debug` logs in write handler; **no CRUD timing**, **no query history**
-- **Not in scope for cfx-mongodb core:** a standalone website/dashboard in the FiveM resource bundle
-- **In scope:** opt-in timing, structured logs, optional in-memory stats export for admins
-
-Execute Track C **after** Track A/B or in parallel only for design doc — no code until ConVar contract is agreed.
+- Today: `health()` RTT for ping only; no CRUD timing, no query history
+- **Production:** perf ConVars off — no UI, no HTTP, no overhead
+- **Admin diagnostic:** operator sets ConVars consciously → logs + optional stats export
+- **Dev:** external dashboard in `tools/` on localhost only
+- Execute Track C **after** Track A/B; see [OBSERVABILITY-PLAN.md](OBSERVABILITY-PLAN.md) operating modes
 
 ---
 
