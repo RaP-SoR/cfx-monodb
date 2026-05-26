@@ -3,9 +3,11 @@
 ## Unreleased — Dev/Stable Release-Kanäle
 
 - **Release-Kanäle:** `dev` → Version `X.Y.Z-dev+…`, Pre-Releases (`vX.Y.Z-dev`); `main` → stable `vX.Y.Z` (Tag muss auf `main` liegen)
+- **`main` push:** stable-channel Artifact (ZIP + npm `.tgz`) ohne GitHub Release bis zum Tag
+- **`scripts/pack-npm.sh`:** optionales npm-Types-`.tgz` pro Release/Artifact (nicht npmjs.org)
 - **`scripts/resolve-release-meta.sh`** + erweitertes **`pack-release.sh`** — manifest/package im ZIP stempeln, `BUILD_INFO.txt`, channel-spezifisches `INSTALL.txt`
 - **Release Notes:** `docs/releases/v1.0.0-dev.md` (erstes ausführliches Pre-Release)
-- **`release.yml`:** Trigger auch `main`; stable vs dev GitHub Releases getrennt
+- **`release.yml`:** Trigger auch `main`; stable vs dev GitHub Releases getrennt; ZIP + `.tgz` Assets
 
 > Das frühere Tag `v1.0.0` von `dev` war nicht kanonisch — künftig **`v1.0.0-dev`** für dev, **`v1.0.0`** erst nach Merge auf `main`.
 

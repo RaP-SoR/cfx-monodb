@@ -9,11 +9,16 @@ GitHub Release bodies are loaded from this folder when a matching file exists:
 
 ## Channels
 
-| Channel | Source | Tag pattern | Manifest version | GitHub Release |
-|---------|--------|-------------|------------------|----------------|
-| **dev** (unstable) | `dev` branch | `vX.Y.Z-dev[.N]` | `X.Y.Z-dev+<sha>` | Pre-release |
-| **stable** | `main` branch | `vX.Y.Z` | `X.Y.Z` | Latest / stable |
+| Channel | Source | Tag pattern | Manifest version | GitHub Release | Assets |
+|---------|--------|-------------|------------------|----------------|--------|
+| **dev** (unstable) | `dev` branch | `vX.Y.Z-dev[.N]` | `X.Y.Z-dev+<sha>` | Pre-release | ZIP + npm `.tgz` |
+| **stable** | `main` branch | `vX.Y.Z` | `X.Y.Z` | Latest / stable | ZIP + npm `.tgz` |
 
-Push to `dev` → Actions artifact only (no GitHub Release).  
+Push to `dev` or **`main`** → Actions artifact (ZIP + `.tgz`), no GitHub Release unless tagged.  
 Tag on `dev` → pre-release with notes from `docs/releases/vX.Y.Z-dev.md`.  
 Merge to `main` + tag `vX.Y.Z` → stable release.
+
+### npm types package (optional)
+
+Each release/artifact includes `cfx-mongodb-<label>.tgz` — TypeScript types only (`cfx-mongodb/types`).  
+**Not** on npmjs.org; install from the GitHub Release download URL. See [CONFIGURATION.md](../CONFIGURATION.md).

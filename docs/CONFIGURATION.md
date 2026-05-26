@@ -56,7 +56,14 @@ No connection code in the consumer. That is intentional.
 
 ## Install from GitHub (pre-built, no local build)
 
-CI builds a **ready-to-use ZIP** (`dist/` + stamped `fxmanifest.lua` + `node_modules/mongodb` + `BUILD_INFO.txt`). No `yarn build` on the server.
+CI builds **two optional artifacts** per run (same version label):
+
+| Asset | Purpose |
+|-------|---------|
+| **`cfx-mongodb-*.zip`** | FiveM server resource (`dist/`, `fxmanifest`, `node_modules/mongodb`) |
+| **`cfx-mongodb-*.tgz`** | npm types package for TypeScript consumer resources (not on npmjs.org) |
+
+No `yarn build` on the game server for the ZIP.
 
 ### Dev vs stable
 
@@ -67,26 +74,49 @@ CI builds a **ready-to-use ZIP** (`dist/` + stamped `fxmanifest.lua` + `node_mod
 
 - **`dev` builds are not production-ready.** The ZIP and `getVersion()` include a `-dev` suffix (or `BUILD_INFO.txt` shows `channel: dev`).
 - **Stable** builds are published only after merging `dev` → `main` and tagging `vX.Y.Z` (no `-dev`).
+- **`main` branch pushes** also trigger CI and upload **stable-channel** artifacts (ZIP + npm `.tgz`) — same gate as `dev`, without creating a GitHub Release until you tag.
 
 Inside every ZIP: read **`BUILD_INFO.txt`** (channel, branch, commit) and **`INSTALL.txt`**.
 
 ### Where to download
 
-| Trigger | Where | Channel |
-|---------|--------|---------|
-| **Tag** `vX.Y.Z-dev` on `dev` | [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) (pre-release) | dev |
-| **Tag** `vX.Y.Z` on `main` | GitHub Releases (stable) | stable |
-| **Push to `dev`** | Actions → **Release** workflow → Artifact `cfx-mongodb-1.0.0-dev-{sha}` | dev |
-| **Push to `main`** | Actions → Artifact `cfx-mongodb-1.0.0-{sha}` | stable snapshot |
-| **Manual** | Actions → **Release** → **Run workflow** → choose channel | dev or stable |
+| Trigger | Where | Channel | Assets |
+|---------|--------|---------|--------|
+| **Tag** `vX.Y.Z-dev` on `dev` | [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) (pre-release) | dev | ZIP + `.tgz` |
+| **Tag** `vX.Y.Z` on `main` | GitHub Releases (stable) | stable | ZIP + `.tgz` |
+| **Push to `dev`** | Actions → **Release** workflow → Artifact | dev | ZIP + `.tgz` |
+| **Push to `main`** | Actions → **Release** workflow → Artifact | stable snapshot | ZIP + `.tgz` |
+| **Manual** | Actions → **Release** → **Run workflow** → choose channel | dev or stable | ZIP + `.tgz` |
 
-### Steps
+### Steps (FiveM server — ZIP)
 
 1. Download `cfx-mongodb-*.zip` from Releases or Actions artifacts  
 2. Extract into `resources/cfx-mongodb` (folder name must match)  
 3. Read `BUILD_INFO.txt` — confirm channel matches your intent (dev vs stable)  
 4. Configure ConVars (`exec mongodb.local.cfg` or inline in `server.cfg`)  
 5. `ensure cfx-mongodb` before consumer resources  
+
+### Steps (TypeScript consumer — npm `.tgz`, optional)
+
+Use the **matching** `.tgz` from the same Release or artifact (same tag / commit as the server ZIP).
+
+```bash
+# yarn (example — replace tag and filename from the Release page)
+yarn add cfx-mongodb@https://github.com/RaP-SoR/cfx-mongodb/releases/download/v1.0.0-dev/cfx-mongodb-v1.0.0-dev.tgz
+```
+
+```bash
+# npm
+npm install https://github.com/RaP-SoR/cfx-mongodb/releases/download/v1.0.0-dev/cfx-mongodb-v1.0.0-dev.tgz
+```
+
+```typescript
+import type { CfxMongoInsertResult, CfxMongoResult } from "cfx-mongodb/types";
+```
+
+- **Not published to [npmjs.org](https://www.npmjs.com/)** — install only from GitHub Release URLs or a local path (`file:./cfx-mongodb-v1.0.0-dev.tgz`).
+- Pin the **same version/channel** as the `cfx-mongodb` resource on your server.
+- Local monorepo: `"cfx-mongodb": "file:../cfx-mongodb"` also works via root `exports` (`./types`).
 
 ### Version tags (maintainers)
 
@@ -99,7 +129,9 @@ git push origin v1.0.0-dev
 # → GitHub Release (pre-release), notes from docs/releases/v1.0.0-dev.md
 ```
 
-Every push to `dev` also uploads an artifact `1.0.0-dev-{sha}` without creating a Release.
+Every push to `dev` also uploads an artifact `1.0.0-dev-{sha}` (ZIP + npm `.tgz`) without creating a Release.
+
+Every push to **`main`** uploads a **stable-channel** artifact `1.0.0-{sha}` (ZIP + `.tgz`) — use for pre-tag smoke tests on main.
 
 **Stable (production):**
 

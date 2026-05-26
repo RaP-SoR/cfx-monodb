@@ -92,8 +92,8 @@ Install guide: [CONFIGURATION.md](../CONFIGURATION.md#install-from-github-pre-bu
 
 | Item | Idea |
 |------|------|
-| **Published types** | Export `src/types/api.ts` (+ responses) as package or `types/` in repo |
-| **`.d.ts` bundle** | `yarn build:types` → consumable from CTFFramework monorepo |
+| **Published types** | ✅ `.tgz` on GitHub Releases (`scripts/pack-npm.sh`) — not npmjs.org |
+| **`.d.ts` bundle** | Optional later — current `.ts` sources in npm pack |
 | **ESLint** | Share config or `eslint-plugin`-style rules for export envelope usage |
 | **Consumer DX** | Document `CfxMongoResult<T>`, `CFX_MONGODB_EXPORTS`, new types as they ship |
 

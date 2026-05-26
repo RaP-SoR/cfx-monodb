@@ -73,11 +73,24 @@ jobs:
           chmod +x scripts/pack-release.sh
           ./scripts/pack-release.sh "${{ steps.meta.outputs.zip_label }}"
 
+      - name: Pack npm types tarball
+        env:
+          RELEASE_VERSION: ${{ steps.meta.outputs.display_version }}
+          RELEASE_CHANNEL: ${{ steps.meta.outputs.channel }}
+          RELEASE_BRANCH: ${{ steps.meta.outputs.branch }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          RELEASE_BUILD_DATE: ${{ steps.meta.outputs.build_date }}
+        run: |
+          chmod +x scripts/pack-npm.sh
+          ./scripts/pack-npm.sh "${{ steps.meta.outputs.zip_label }}"
+
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: cfx-mongodb-${{ steps.meta.outputs.zip_label }}
-          path: cfx-mongodb-*.zip
+          path: |
+            cfx-mongodb-*.zip
+            cfx-mongodb-*.tgz
           retention-days: 90
 
       - name: Prepare release notes
@@ -100,7 +113,9 @@ jobs:
         if: github.ref_type == 'tag' && steps.meta.outputs.channel == 'dev'
         uses: softprops/action-gh-release@v2
         with:
-          files: cfx-mongodb-*.zip
+          files: |
+            cfx-mongodb-*.zip
+            cfx-mongodb-*.tgz
           prerelease: true
           body_path: RELEASE_BODY.md
           name: cfx-mongodb ${{ steps.meta.outputs.display_version }} (dev)
@@ -109,7 +124,9 @@ jobs:
         if: github.ref_type == 'tag' && steps.meta.outputs.channel == 'stable'
         uses: softprops/action-gh-release@v2
         with:
-          files: cfx-mongodb-*.zip
+          files: |
+            cfx-mongodb-*.zip
+            cfx-mongodb-*.tgz
           prerelease: false
           body_path: RELEASE_BODY.md
           name: cfx-mongodb ${{ steps.meta.outputs.display_version }}

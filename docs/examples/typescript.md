@@ -149,4 +149,4 @@ Errors: `{ success: false, error: string }` — exports never throw.
 
 `getDb`, `connect`, `disconnect` bypass envelope and query validation — trusted server resources only. See [API.md](../API.md).
 
-Consumer types: import from `src/types/api.ts` in your resource (`CfxMongoResult`, `CfxMongoInsertResult`, …).
+Consumer types: import from `cfx-mongodb/types` (monorepo `file:` link) or install the matching `.tgz` from [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) — see [CONFIGURATION.md](../CONFIGURATION.md).

@@ -10,6 +10,15 @@
   "author": "RaPSoR",
   "type": "commonjs",
   "main": "dist/index.js",
+  "exports": {
+    "./types": "./src/types/api.ts",
+    "./types/options": "./src/types/options.ts",
+    "./types/*": "./src/types/*"
+  },
+  "files": [
+    "src/types",
+    "README.md"
+  ],
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
@@ -20,7 +29,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "pack": "yarn build && bash scripts/pack-release.sh"
+    "pack": "yarn build && bash scripts/pack-release.sh",
+    "pack:npm": "bash scripts/pack-npm.sh"
   },
   "devDependencies": {
     "@citizenfx/server": "^2.0.29753-1",
