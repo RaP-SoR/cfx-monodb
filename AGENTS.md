@@ -6,10 +6,8 @@
 2. **[docs/API.md](docs/API.md)** — canonical external export contract (CTFFramework)
 3. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — runtime, lifecycle, build pipeline
 4. **[docs/AI-STACK.md](docs/AI-STACK.md)** — Cursor skills, rules, agent workflows
-5. **[docs/refactor/README.md](docs/refactor/README.md)** — staged refactor waves (historical)
 
-Project skill: `.cursor/skills/cfx-mongodb/SKILL.md`  
-Refactor orchestrator: `.cursor/skills/refactor-orchestrator/SKILL.md`
+Project skill: `.cursor/skills/cfx-mongodb/SKILL.md`
 
 ## What this project is
 

@@ -43,7 +43,6 @@ Stattdessen: **strukturierte Markdown-Artefakte** als persistentes Agent-Gedäch
 | Skill | Pfad | Wann laden |
 |-------|------|------------|
 | `cfx-mongodb` | `.cursor/skills/cfx-mongodb/SKILL.md` | Export-Änderungen, CTFFramework-Kompatibilität, MongoDB-Wrapper-Arbeit |
-| `refactor-orchestrator` | `.cursor/skills/refactor-orchestrator/SKILL.md` | Parallele Refactor-Waves, Merge-Train, Worktree-Koordination |
 
 Der Skill verweist auf `reference.md` für API-Details — **progressive disclosure** (Skill kurz, Referenz ausführlich).
 
@@ -110,17 +109,11 @@ Bei Widersprüchen gilt **`docs/API.md`** + **`src/api/handlers/*`** (Implementi
 - **Exceptions aus Exports** — bricht CTFFramework
 - **node_version entfernen** — mongodb@7 bricht
 
-## Staged Refactor (Multi-Agent)
+## Refactor-Archiv (historisch)
 
-| Artefakt | Pfad |
-|----------|------|
-| Playbook | `docs/refactor/README.md` |
-| Wave 1 Spec | `docs/refactor/WAVE-1-SPEC.md` |
-| Status board | `docs/refactor/REFACTOR-STATUS.md` |
-| Target interfaces | `docs/refactor/INTERFACES.md` |
-| Worktree script | `scripts/setup-worktrees-wave1.ps1` |
-
-Branch: `refactor/staged-hardening`. Orchestrator tab loads `refactor-orchestrator` skill; implementer tabs get one worktree each.
+Waves 1–4 sind in `dev` gemerged (PR #1). Specs und Status-Board:
+[docs/archive/refactor/](archive/refactor/README.md). Orchestrator-Skill archiviert unter
+[refactor-orchestrator-SKILL.md](archive/refactor-orchestrator-SKILL.md).
 
 ## Erweiterungsmöglichkeiten (optional, später)
 

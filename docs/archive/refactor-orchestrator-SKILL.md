@@ -1,20 +1,23 @@
 ---
 name: refactor-orchestrator
 description: >-
-  Orchestrate the cfx-mongodb staged refactor across parallel Cursor agents and
-  git worktrees. Use when merging wave PRs, assigning agent briefings, updating
-  REFACTOR-STATUS.md, or planning multi-agent execution on refactor/staged-hardening.
+  Historical — orchestrated the cfx-mongodb staged refactor (Waves 1–4, merged
+  to dev via PR #1). Kept for reference only; do not load for day-to-day work.
 ---
 
-# Refactor Orchestrator — cfx-mongodb
+# Refactor Orchestrator — cfx-mongodb (archived)
+
+> **Status:** Complete — merged to `dev` (2026-05-26). Worktree scripts and
+> `.cursor/rules/refactor-boundaries.mdc` removed. Active docs:
+> [ARCHITECTURE.md](../ARCHITECTURE.md), [SEARCH-MAP.md](../SEARCH-MAP.md).
 
 You coordinate parallel agents. **You do not implement feature code** unless unblocking a merge conflict.
 
 ## Before every session
 
-1. Read [docs/refactor/REFACTOR-STATUS.md](../../../docs/refactor/REFACTOR-STATUS.md)
-2. Read the active wave spec (e.g. [WAVE-1-SPEC.md](../../../docs/refactor/WAVE-1-SPEC.md))
-3. Confirm base branch: `refactor/staged-hardening`
+1. Read [REFACTOR-STATUS.md](refactor/REFACTOR-STATUS.md)
+2. Read the active wave spec (e.g. [WAVE-1-SPEC.md](refactor/WAVE-1-SPEC.md))
+3. Confirm base branch: `refactor/staged-hardening` (historical)
 
 ## Your responsibilities
 
@@ -37,7 +40,7 @@ You coordinate parallel agents. **You do not implement feature code** unless unb
 | W2A | `refactor/w2a-manifest` | Composer Fast | `fxmanifest.lua`, `docs/API.md`, `SEARCH-MAP.md`, … |
 | W2B | `refactor/w2b-types` | Sonnet | `src/types/api.ts`, `tests/api-contract.test.ts` |
 
-Full specs: [WAVE-1-SPEC.md](../../../docs/refactor/WAVE-1-SPEC.md)
+Full specs: [WAVE-1-SPEC.md](refactor/WAVE-1-SPEC.md)
 
 Suggested merge order: W1C → W1B → W1A → W2B → W2A (any order OK — no file overlap).
 
@@ -46,7 +49,7 @@ Suggested merge order: W1C → W1B → W1A → W2B → W2A (any order OK — no 
 Use **Agents Window** (not five separate IDE windows):
 
 1. Checkout `refactor/staged-hardening`
-2. Send **`/multitask`** with the Wave prompt from `docs/refactor/README.md`
+2. Send **`/multitask`** with the Wave prompt from [refactor/README.md](refactor/README.md)
 3. Each subagent gets **`/worktree`** isolation automatically
 4. Monitor all agents in the Agents sidebar grid
 5. Review diffs → merge train into `refactor/staged-hardening`
@@ -55,16 +58,12 @@ Cursor does **not** auto-merge subagent branches — that remains orchestrator w
 
 ## Manual worktree fallback
 
-```powershell
-.\scripts\setup-worktrees-wave1.ps1
-```
-
-Use only if `/multitask` or parallel agents are unavailable on the current plan.
+Removed — use Cursor `/multitask` + `/worktree` instead.
 
 ## Agent briefing (copy to implementer tab)
 
 ```markdown
-READ: docs/refactor/WAVE-1-SPEC.md (your section), AGENTS.md, .cursor/skills/cfx-mongodb/SKILL.md
+READ: docs/archive/refactor/WAVE-1-SPEC.md (your section), AGENTS.md, .cursor/skills/cfx-mongodb/SKILL.md
 BRANCH: refactor/w1X-...
 OWNED FILES ONLY: (from spec)
 FORBIDDEN: (from spec)
@@ -93,7 +92,7 @@ DO NOT MERGE YOURSELF
 
 1. Run full gate on `refactor/staged-hardening`
 2. Mark Wave 1 🟢 in `REFACTOR-STATUS.md`
-3. Execute Wave 2 per `docs/refactor/WAVE-2-SPEC.md` (**sequential**: W2A → merge → W2B)
+3. Execute Wave 2 per [WAVE-2-SPEC.md](refactor/WAVE-2-SPEC.md) (**sequential**: W2A → merge → W2B)
 4. Do **not** merge to `dev` until all planned waves complete or explicit milestone agreed
 
 ## Wave 2 — sequential (not parallel)
@@ -103,7 +102,7 @@ DO NOT MERGE YOURSELF
 | W2A | `refactor/w2a-pipeline-infra` | `withDb`, `normalizeIdFilter`, `DbProvider` + tests — **no exports.ts** |
 | W2B | `refactor/w2b-exports-pipeline` | `exports.ts` refactor, find semantics, docs — **after W2A merge** |
 
-Prompt: `docs/refactor/README.md` → Wave 2 `/multitask` block.
+Prompt: [refactor/README.md](refactor/README.md) → Wave 2 `/multitask` block.
 
 ## Wave 3 — staged architecture split
 
@@ -114,8 +113,8 @@ Prompt: `docs/refactor/README.md` → Wave 2 `/multitask` block.
 | W3C1 ∥ W3C2 ∥ W3C3 | `w3c1/2/3-*` | handler files only — after W3B |
 | W3D | `refactor/w3d-register-exports` | `registerExports.ts` + shim — after W3C |
 
-Full spec: `docs/refactor/WAVE-3-SPEC.md`  
-Prompts: `docs/refactor/README.md` → Wave 3 Steps 1–4.
+Full spec: [WAVE-3-SPEC.md](refactor/WAVE-3-SPEC.md)  
+Prompts: [refactor/README.md](refactor/README.md) → Wave 3 Steps 1–4.
 
 ## Wave 4 — TypeScript 6 + contract hardening (parallel)
 
@@ -124,8 +123,8 @@ Prompts: `docs/refactor/README.md` → Wave 3 Steps 1–4.
 | W4A | `refactor/w4a-typescript6` | `typescript@6`, `tsconfig.json`, eslint TS deps |
 | W4B | `refactor/w4b-contract-ci` | `api-contract.test.ts`, manifest helper, CI workflow |
 
-Full spec: `docs/refactor/WAVE-4-SPEC.md`  
-Prompt: `docs/refactor/README.md` → Wave 4 `/multitask` block.
+Full spec: [WAVE-4-SPEC.md](refactor/WAVE-4-SPEC.md)  
+Prompt: [refactor/README.md](refactor/README.md) → Wave 4 `/multitask` block.
 
 After Wave 4: PR `refactor/staged-hardening` → `dev`.
 
@@ -140,6 +139,6 @@ From `.cursor/skills/cfx-mongodb/SKILL.md`:
 
 ## Additional resources
 
-- [docs/refactor/README.md](../../../docs/refactor/README.md)
-- [INTERFACES.md](../../../docs/refactor/INTERFACES.md) — Wave 2–3 target shapes
-- [docs/AI-STACK.md](../../../docs/AI-STACK.md)
+- [refactor/README.md](refactor/README.md)
+- [INTERFACES.md](refactor/INTERFACES.md) — Wave 2–3 target shapes
+- [AI-STACK.md](../AI-STACK.md)

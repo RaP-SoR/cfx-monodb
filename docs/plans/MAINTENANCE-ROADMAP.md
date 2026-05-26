@@ -2,6 +2,7 @@
 
 > **Status:** Planning (post-refactor, on `dev`)  
 > **Last updated:** 2026-05-26  
+> **Track A:** Complete  
 > **No release target yet** — execute in phases, merge to `dev` incrementally.
 
 After Waves 1–4 (refactor, TS6, docs consolidation), three tracks remain:
@@ -85,12 +86,12 @@ docs/
 
 ### A5. Track A checklist
 
-- [ ] Delete 4 worktree scripts
-- [ ] Move `docs/refactor/` → `docs/archive/refactor/`
-- [ ] Delete `refactor-boundaries.mdc`
-- [ ] Slim `AGENTS.md` + `AI-STACK.md`
-- [ ] Fix broken internal links (grep `docs/refactor`, `scripts/setup-worktrees`)
-- [ ] Optional: merge `INTERFACES.md` useful bits into `ARCHITECTURE.md`, then drop duplicate
+- [x] Delete 4 worktree scripts
+- [x] Move `docs/refactor/` → `docs/archive/refactor/`
+- [x] Delete `refactor-boundaries.mdc`
+- [x] Slim `AGENTS.md` + `AI-STACK.md`
+- [x] Fix broken internal links (grep `docs/refactor`, `scripts/setup-worktrees`)
+- [x] Optional: merge `INTERFACES.md` useful bits into `ARCHITECTURE.md` — skipped; ARCHITECTURE already documents module layout
 
 **Gate:** `yarn tsc && yarn test && yarn build && yarn lint` (no runtime changes expected)
 

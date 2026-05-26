@@ -1,4 +1,8 @@
-# Shared interfaces — Wave 2–3 (spec only)
+# Shared interfaces — Wave 2–3 (archived spec)
+
+> **Archived.** Target shapes were implemented on `dev`. See
+> [ARCHITECTURE.md](../../ARCHITECTURE.md) for the current module layout and
+> [src/api/withDb.ts](../../../src/api/withDb.ts) for the live pipeline.
 
 > **Do not implement in Wave 1.** Architects and Wave 2/3 agents use this as the contract target.
 

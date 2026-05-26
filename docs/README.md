@@ -22,13 +22,14 @@ Entry point for humans and agents. **Canonical API contract:** [API.md](API.md).
 
 Sample manifests: [fxmanifest-ts-example.lua](examples/fxmanifest-ts-example.lua), [fxmanifest-lua-example.lua](examples/fxmanifest-lua-example.lua).
 
-## Refactor (historical)
+## Plans & archive
 
 | Document | Purpose |
 |----------|---------|
-| [refactor/README.md](refactor/README.md) | Multi-agent playbook (Waves 1–4) |
-| [refactor/REFACTOR-STATUS.md](refactor/REFACTOR-STATUS.md) | Status board — merged to `dev` |
 | [plans/MAINTENANCE-ROADMAP.md](plans/MAINTENANCE-ROADMAP.md) | Post-refactor cleanup, TSDoc, observability |
+| [plans/OBSERVABILITY-PLAN.md](plans/OBSERVABILITY-PLAN.md) | Slow-query logging design (Track C) |
+| [archive/refactor/README.md](archive/refactor/README.md) | Multi-agent refactor playbook (Waves 1–4, archived) |
+| [archive/refactor/REFACTOR-STATUS.md](archive/refactor/REFACTOR-STATUS.md) | Final status board — merged to `dev` |
 
 ## Root (repo)
 

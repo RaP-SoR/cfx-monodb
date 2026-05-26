@@ -1,4 +1,8 @@
-# Staged Refactor — Multi-Agent Playbook
+# Staged Refactor — Multi-Agent Playbook (archived)
+
+> **Archived 2026-05-26.** Refactor merged to `dev` via PR #1. Worktree scripts
+> (`scripts/setup-worktrees-wave*.ps1`) and active Cursor refactor rules/skills
+> removed. For current layout see [ARCHITECTURE.md](../../ARCHITECTURE.md).
 
 Orchestrated hardening and architecture refactor on branch `refactor/staged-hardening`.
 
