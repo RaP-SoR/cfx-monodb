@@ -5,7 +5,7 @@ import {
   UpdateFilter,
 } from "mongodb";
 import { validateFilter, validateUpdate } from "../../validateQuery";
-import { log } from "../../utils";
+import { log, extractFilterKeys } from "../../utils";
 import type {
   InsertResponse,
   UpdateResponse,
@@ -31,7 +31,7 @@ export function registerWriteHandlers(
           .collection<T>(collectionName)
           .insertOne(document);
         return String(inserted.insertedId);
-      });
+      }, { exportName: "insert", collection: collectionName });
       if (!result.success) return result;
       return { success: true, insertedId: result.data };
     }
@@ -66,6 +66,10 @@ export function registerWriteHandlers(
           matchedCount: updated.matchedCount,
           modifiedCount: updated.modifiedCount,
         };
+      }, {
+        exportName: "update",
+        collection: collectionName,
+        filterKeys: extractFilterKeys(filter),
       });
       if (!result.success) return result;
       return {
@@ -89,6 +93,10 @@ export function registerWriteHandlers(
           .collection<T>(collectionName)
           .deleteOne(normalized);
         return deleted.deletedCount;
+      }, {
+        exportName: "delete",
+        collection: collectionName,
+        filterKeys: extractFilterKeys(filter),
       });
       if (!result.success) return result;
       if (result.data === 0) {

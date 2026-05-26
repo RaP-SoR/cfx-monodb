@@ -110,6 +110,7 @@ yarn lint
 - Connection fails: check URI, firewall, `mongodb_log_level debug`, call `health()`
 - Wrong Node version: confirm `node_version '22'` in manifest
 - Consumer timing: ensure `cfx-mongodb:ready` fired before CRUD
+- Slow queries: enable `mongodb_perf_enabled 1` and tune `mongodb_perf_slow_ms` (default 100). Warnings appear at `warn` level — set `mongodb_log_level warn` or lower. For verbose staging logs add `mongodb_perf_log_all 1` and `mongodb_log_level debug`. Production: leave perf off unless consciously diagnosing latency.
 
 ## Changelog
 

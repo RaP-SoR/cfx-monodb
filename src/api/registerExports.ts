@@ -1,3 +1,8 @@
+/**
+ * @file Registers all FiveM export handlers — wiring only, no business logic.
+ * Handler behavior is documented in docs/API.md.
+ */
+
 import MongoDBConnector from "../connector";
 import { exportFn, log } from "../utils";
 import { registerReadHandlers } from "./handlers/read";

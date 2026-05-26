@@ -3,6 +3,8 @@
 > **Status:** Planning (post-refactor, on `dev`)  
 > **Last updated:** 2026-05-26  
 > **Track A:** Complete  
+> **Track B:** Complete (patterns.md optional, skipped)  
+> **Track C1:** Complete (slow query log)  
 > **No release target yet** — execute in phases, merge to `dev` incrementally.
 
 After Waves 1–4 (refactor, TS6, docs consolidation), three tracks remain:
@@ -147,10 +149,10 @@ Extend `.cursor/skills/cfx-mongodb/SKILL.md`:
 
 ### Track B checklist
 
-- [ ] Define TSDoc standard in `AGENTS.md` (5–10 lines)
-- [ ] Document priority modules (list above)
+- [x] Define TSDoc standard in `AGENTS.md` (5–10 lines)
+- [x] Document priority modules (list above)
 - [ ] Add `docs/examples/patterns.md` optional — CTFFramework checks, filters (from prior review)
-- [ ] Optional: one test that `api.ts` exports match manifest (already have contract test)
+- [x] Optional: one test that `api.ts` exports match manifest (already have contract test)
 
 **Estimated effort:** ~2–3 hours
 
@@ -162,7 +164,7 @@ Extend `.cursor/skills/cfx-mongodb/SKILL.md`:
 
 Summary:
 
-- **First target:** MySQL-style **slow query warnings** (`mongodb_perf_enabled`, `mongodb_perf_slow_ms`) — ConVar-gated, default off
+- **C1 (done):** MySQL-style **slow query warnings** (`mongodb_perf_enabled`, `mongodb_perf_slow_ms`) — ConVar-gated, default off
 - **UI & full monitoring:** deferred — finalize plan later
 - **Production (100+):** perf ConVars aus unless admin consciously enables slow-query logging
 - **Staging (~10–20):** slow log useful for tuning; UI comes later

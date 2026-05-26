@@ -119,7 +119,7 @@ flowchart TB
   reg --> fivem
 ```
 
-**Leserichtung:** Consumer rufen nur `fivem` (Exports) auf. Handler nutzen `withDb` → `connector` → MongoDB. `bootstrap` orchestriert Start; `exports.ts` ist nur ein Re-Export-Shim für stabile Imports.
+**Leserichtung:** Consumer rufen nur `fivem` (Exports) auf. Handler nutzen `withDb` → `connector` → MongoDB. Optional: `withDb` misst Dauer und loggt Slow Queries (`mongodb_perf_enabled`). `bootstrap` orchestriert Start; `exports.ts` ist nur ein Re-Export-Shim für stabile Imports.
 
 ## Schichten
 
@@ -130,7 +130,8 @@ flowchart TB
 | Connector | `connector.ts` | Singleton, MongoClient, Pool (`DbProvider`) |
 | API wiring | `api/registerExports.ts` | Handler registration only |
 | Handlers | `api/handlers/*.ts` | CRUD, admin, lifecycle exports |
-| Pipeline | `api/withDb.ts` | Response envelope, error handling |
+| Pipeline | `api/withDb.ts` | Response envelope, error handling, slow-query timing |
+| Perf | `perf.ts` | ConVar-gated slow query warnings |
 | Index | `services/indexService.ts` | Shared index creation |
 | Config | `config.ts` | ConVar → URI + Pool-Optionen |
 | Validation | `validateQuery.ts` | Operator-Denylist |

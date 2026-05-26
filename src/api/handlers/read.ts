@@ -1,7 +1,11 @@
 import { Filter, Document } from "mongodb";
 import dbConfig from "../../config";
 import { validateFilter } from "../../validateQuery";
-import { serializeDocumentId, toObjectIdIfValid } from "../../utils";
+import {
+  serializeDocumentId,
+  toObjectIdIfValid,
+  extractFilterKeys,
+} from "../../utils";
 import type { FindAllOptions } from "../../types/options";
 import type { Response } from "../../responses";
 import type { DbProvider } from "../../types/dbProvider";
@@ -19,37 +23,45 @@ export function registerReadHandlers(
       query: Filter<T> = {},
       options: FindAllOptions = {}
     ): Promise<Response<T[]>> => {
-      const result = await withDb(provider, async (db) => {
-        validateFilter(query);
-        const { projection, sort } = options;
-        const limit = Math.max(1, Math.min(1000, options.limit ?? 100));
-        const skip = Math.max(0, Math.min(1_000_000, options.skip ?? 0));
+      const result = await withDb(
+        provider,
+        async (db) => {
+          validateFilter(query);
+          const { projection, sort } = options;
+          const limit = Math.max(1, Math.min(1000, options.limit ?? 100));
+          const skip = Math.max(0, Math.min(1_000_000, options.skip ?? 0));
 
-        const ac = new AbortController();
-        const timer = setTimeout(
-          () => ac.abort(),
-          dbConfig.options.serverSelectionTimeoutMS
-        );
+          const ac = new AbortController();
+          const timer = setTimeout(
+            () => ac.abort(),
+            dbConfig.options.serverSelectionTimeoutMS
+          );
 
-        const docs = await db
-          .collection<T>(collectionName)
-          .find(query, {
-            projection,
-            sort,
-            signal: ac.signal as unknown as AbortSignal,
-          })
-          .limit(limit)
-          .skip(skip)
-          .toArray();
+          const docs = await db
+            .collection<T>(collectionName)
+            .find(query, {
+              projection,
+              sort,
+              signal: ac.signal as unknown as AbortSignal,
+            })
+            .limit(limit)
+            .skip(skip)
+            .toArray();
 
-        clearTimeout(timer);
+          clearTimeout(timer);
 
-        for (const doc of docs as Array<Record<string, unknown>>) {
-          serializeDocumentId(doc);
+          for (const doc of docs as Array<Record<string, unknown>>) {
+            serializeDocumentId(doc);
+          }
+
+          return docs as unknown as T[];
+        },
+        {
+          exportName: "findAll",
+          collection: collectionName,
+          filterKeys: extractFilterKeys(query),
         }
-
-        return docs as unknown as T[];
-      });
+      );
       return result;
     }
   );
@@ -60,16 +72,24 @@ export function registerReadHandlers(
       collectionName: string,
       query: Filter<T> = {}
     ): Promise<Response<T | null>> => {
-      const result = await withDb(provider, async (db) => {
-        validateFilter(query);
-        const filter = normalizeIdFilter(query);
-        const doc = await db.collection<T>(collectionName).findOne(filter);
-        if (!doc) {
-          return null;
+      const result = await withDb(
+        provider,
+        async (db) => {
+          validateFilter(query);
+          const filter = normalizeIdFilter(query);
+          const doc = await db.collection<T>(collectionName).findOne(filter);
+          if (!doc) {
+            return null;
+          }
+          serializeDocumentId(doc as Record<string, unknown>);
+          return doc as T;
+        },
+        {
+          exportName: "find",
+          collection: collectionName,
+          filterKeys: extractFilterKeys(query),
         }
-        serializeDocumentId(doc as Record<string, unknown>);
-        return doc as T;
-      });
+      );
       if (!result.success) return result;
       return { success: true, data: result.data };
     }
@@ -86,18 +106,22 @@ export function registerReadHandlers(
         return { success: false, error: "Invalid id" };
       }
 
-      const result = await withDb(provider, async (db) => {
-        const filter = { _id: toObjectIdIfValid(id) } as Filter<T>;
-        const doc = await db.collection<T>(collectionName).findOne(
-          filter,
-          projection ? { projection } : undefined
-        );
-        if (!doc) {
-          return null;
-        }
-        serializeDocumentId(doc as Record<string, unknown>);
-        return doc as T;
-      });
+      const result = await withDb(
+        provider,
+        async (db) => {
+          const filter = { _id: toObjectIdIfValid(id) } as Filter<T>;
+          const doc = await db.collection<T>(collectionName).findOne(
+            filter,
+            projection ? { projection } : undefined
+          );
+          if (!doc) {
+            return null;
+          }
+          serializeDocumentId(doc as Record<string, unknown>);
+          return doc as T;
+        },
+        { exportName: "findById", collection: collectionName }
+      );
       if (!result.success) return result;
       return { success: true, data: result.data };
     }
@@ -109,10 +133,18 @@ export function registerReadHandlers(
       collectionName: string,
       filter: Filter<T> = {}
     ): Promise<Response<number>> => {
-      const result = await withDb(provider, async (db) => {
-        validateFilter(filter);
-        return db.collection<T>(collectionName).countDocuments(filter);
-      });
+      const result = await withDb(
+        provider,
+        async (db) => {
+          validateFilter(filter);
+          return db.collection<T>(collectionName).countDocuments(filter);
+        },
+        {
+          exportName: "count",
+          collection: collectionName,
+          filterKeys: extractFilterKeys(filter),
+        }
+      );
       return result;
     }
   );

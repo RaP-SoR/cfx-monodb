@@ -45,6 +45,12 @@ In FiveM: folder `cfx-mongodb`, `ensure cfx-mongodb` in server.cfg.
 - `camelCase` functions/vars, `PascalCase` classes, `kebab-case.ts` files
 - Keep public export APIs typed and minimal
 
+## In-code documentation (TSDoc)
+
+- **Consumer contract** stays in `docs/API.md` — do not duplicate export signatures in handler files.
+- **Pipeline / infra modules** (`withDb`, `validateQuery`, `connector`, `indexService`, `perf`): module `@file` header + `@param`/`@returns` on public functions.
+- Handlers: one-line module header linking to `docs/API.md` is enough; no per-export TSDoc unless non-obvious.
+
 ## Export change checklist
 
 - [ ] `src/api/handlers/*.ts` + `src/api/registerExports.ts` + `src/responses.ts`

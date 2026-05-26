@@ -3,6 +3,11 @@ import type { Response, ErrorResponse } from "../../responses";
 import type { DbProvider } from "../../types/dbProvider";
 import { withDb } from "../withDb";
 import { ensureIndexesForCollection } from "../../services/indexService";
+import {
+  getPerfSlowMs,
+  isPerfEnabled,
+  isPerfLogAll,
+} from "../../perf";
 
 export function registerAdminHandlers(
   provider: DbProvider,
@@ -19,7 +24,7 @@ export function registerAdminHandlers(
     ): Promise<Response<number> | ErrorResponse> => {
       const result = await withDb(provider, async (db) =>
         ensureIndexesForCollection(db, collectionName, indexes)
-      );
+      , { exportName: "ensureIndexes", collection: collectionName });
       return result;
     }
   );
@@ -36,7 +41,7 @@ export function registerAdminHandlers(
         const start = Date.now();
         await db.command({ ping: 1 });
         return { ok: true, rttMs: Date.now() - start };
-      });
+      }, { exportName: "health" });
       return result;
     }
   );
@@ -51,6 +56,9 @@ export function registerAdminHandlers(
           maxPoolSize: dbConfig.options.maxPoolSize,
           minPoolSize: dbConfig.options.minPoolSize,
           logLevel: GetConvar("mongodb_log_level", "info"),
+          perfEnabled: isPerfEnabled(),
+          perfSlowMs: getPerfSlowMs(),
+          perfLogAll: isPerfLogAll(),
         };
         return { success: true, data: cfg };
       } catch (error) {

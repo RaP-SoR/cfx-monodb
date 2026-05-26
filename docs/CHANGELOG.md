@@ -1,5 +1,12 @@
 # Änderungen (Changelog)
 
+## Maintenance — Track B (TSDoc) & Track C1 (slow query log) (dev)
+
+- **TSDoc:** Module headers on `withDb`, `validateQuery`, `connector`, `indexService`, `registerExports`, `perf`; TSDoc standard in `AGENTS.md`.
+- **Slow queries:** Opt-in ConVars `mongodb_perf_enabled`, `mongodb_perf_slow_ms`, `mongodb_perf_log_all` — MySQL-style `SLOW QUERY` warnings via `withDb` (default off, no overhead when disabled).
+- **`config()` export:** Returns `perfEnabled`, `perfSlowMs`, `perfLogAll` for admin diagnostics.
+- **Tests:** `tests/perf.test.ts` + slow-query case in `withDb.test.ts` (83 tests total).
+
 ## Docs — examples & lifecycle diagrams (dev)
 
 - Runnable `docs/examples/server.ts` and `server.lua` now wait for `cfx-mongodb:ready` (no CRUD race on consumer start).

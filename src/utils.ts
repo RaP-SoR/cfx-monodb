@@ -42,6 +42,7 @@ export function exportFn(name: string, fn: Function): void {
 
 const MONGO_URI_PREFIX = /^(mongodb(?:\+srv)?:\/\/)(.+)$/;
 
+/** Redact credentials in a MongoDB URI for safe logging. */
 export function redactMongoUri(uri: string): string {
   const match = uri.match(MONGO_URI_PREFIX);
   if (!match) return uri;
@@ -57,6 +58,7 @@ export function redactMongoUri(uri: string): string {
   return `${prefix}***:***@${authority.slice(atIndex + 1)}${suffix}`;
 }
 
+/** Normalize unknown thrown values to a string error message. */
 export function formatError(err: unknown): string {
   if (err instanceof Error) return err.message;
   if (typeof err === "string") return err;
@@ -69,6 +71,14 @@ export function formatError(err: unknown): string {
     return (err as { message: string }).message;
   }
   return "An unknown error occurred";
+}
+
+/** Top-level filter keys for perf logs (values never logged). */
+export function extractFilterKeys(filter: unknown): string[] | undefined {
+  if (!filter || typeof filter !== "object" || Array.isArray(filter)) {
+    return undefined;
+  }
+  return Object.keys(filter as Record<string, unknown>).slice(0, 10);
 }
 
 export function parseInitIndexes(): Record<string, Array<{ keys: Record<string, 1 | -1>; options?: Record<string, unknown> }>> | null {

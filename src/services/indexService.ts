@@ -1,3 +1,8 @@
+/**
+ * @file Index creation from ConVar JSON and ensureIndexes export.
+ * Limits: 50 collections, 20 indexes per collection (see parseInitIndexes).
+ */
+
 import type { Db, IndexDescription } from "mongodb";
 import { log, parseInitIndexes } from "../utils";
 
@@ -8,6 +13,11 @@ export type IndexSpec = {
 
 const MAX_INDEXES_PER_COLLECTION = 20;
 
+/**
+ * Create indexes on a collection (capped at {@link MAX_INDEXES_PER_COLLECTION}).
+ *
+ * @returns Number of index models applied
+ */
 export async function ensureIndexesForCollection(
   db: Db,
   collectionName: string,
@@ -29,6 +39,7 @@ export async function ensureIndexesForCollection(
   return models.length;
 }
 
+/** Apply indexes from `mongodb_init_indexes` ConVar at startup. */
 export async function ensureIndexesFromConvar(db: Db): Promise<void> {
   const specs = parseInitIndexes();
   if (!specs) return;

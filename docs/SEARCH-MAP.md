@@ -22,6 +22,7 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 | Resource-Start / Index-Init | `src/bootstrap.ts` |
 | FiveM-Globals (GetConvar, exports) | `src/types/fivem.d.ts` |
 | Hilfsfunktionen (log, ObjectId) | `src/utils.ts` |
+| Slow-query-Logging (ConVar) | `src/perf.ts`, `src/api/withDb.ts` |
 | Manifest, server_exports, node_version | `fxmanifest.lua` |
 | Build (Vite SSR → dist/) | `vite.config.mjs`, `yarn build` |
 | Externe API (Vertrag) | `docs/API.md` |
@@ -48,6 +49,7 @@ fxmanifest.lua
         ├── services/indexService.ts
         ├── config.ts             ConVar → mongoUrl + Pool
         ├── validateQuery.ts      Operator-Denylist
+        ├── perf.ts               Slow-query timing (ConVar-gated)
         ├── responses.ts          Response-Typen
         └── utils.ts              log, exportFn, redactMongoUri
 ```

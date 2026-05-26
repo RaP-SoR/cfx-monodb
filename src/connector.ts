@@ -1,3 +1,8 @@
+/**
+ * @file MongoDB singleton connector — implements {@link DbProvider}.
+ * One MongoClient per resource lifecycle; pool options from config ConVars.
+ */
+
 import { MongoClient, Db } from "mongodb";
 import dbConfig from "./config";
 import type { MongoOptions } from "./types/options";

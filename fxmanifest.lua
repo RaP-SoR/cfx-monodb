@@ -17,7 +17,10 @@ convar_category 'MongoDB' {
     { "mongodb_dev_url", "mongodb://localhost:27017/ctf_dev", "MongoDB-Verbindungsstring für Entwicklung", "CV_STRING" },
     { "mongodb_prod_url", "mongodb://localhost:27017/ctf_prod", "MongoDB-Verbindungsstring für Produktion", "CV_STRING" },
     { "mongodb_test_url", "mongodb://localhost:27017/ctf_test", "MongoDB-Verbindungsstring für Tests", "CV_STRING" },
-    { "mongodb_timeout", "5000", "Timeout für MongoDB-Verbindung in Millisekunden", "CV_STRING" }
+    { "mongodb_timeout", "5000", "Timeout für MongoDB-Verbindung in Millisekunden", "CV_STRING" },
+    { "mongodb_perf_enabled", "0", "Slow-query-Timing aktivieren (0=aus, 1=an)", "CV_STRING" },
+    { "mongodb_perf_slow_ms", "100", "Schwellwert für Slow-Query-Warnung in ms", "CV_STRING" },
+    { "mongodb_perf_log_all", "0", "Alle Queries bei debug loggen (Staging)", "CV_STRING" }
   }
 }
 

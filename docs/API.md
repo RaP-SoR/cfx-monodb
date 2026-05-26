@@ -187,7 +187,7 @@ const version = await exports["cfx-mongodb"].getVersion();
 |--------|----------|--------------|
 | `ensureIndexes(collection, specs[])` | `{ success, data: number }` | Indizes idempotent anlegen (max. 20 Specs) |
 | `health()` | `{ success, data: { ok, rttMs } }` | MongoDB ping + Round-Trip-Zeit |
-| `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel } }` | Sichere Laufzeit-Config — **keine Secrets/URLs** |
+| `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel, perfEnabled, perfSlowMs, perfLogAll } }` | Sichere Laufzeit-Config — **keine Secrets/URLs** |
 
 ---
 
@@ -275,6 +275,19 @@ on("cfx-mongodb:ready", () => {
 | `mongodb_min_pool` | 0 | Min pool (0–20) |
 | `mongodb_log_level` | `info` | `error\|warn\|info\|debug` |
 | `mongodb_init_indexes` | — | JSON: Collection → Index-Specs |
+| `mongodb_perf_enabled` | `0` | Slow-query-Timing (0=aus) |
+| `mongodb_perf_slow_ms` | `100` | Schwellwert für `SLOW QUERY`-Warnung (ms) |
+| `mongodb_perf_log_all` | `0` | Alle Ops bei `debug` loggen (Staging) |
+
+**Slow queries (optional):**
+
+```cfg
+set mongodb_perf_enabled 1
+set mongodb_perf_slow_ms 150
+# set mongodb_log_level warn
+```
+
+Log-Zeilen erscheinen als `[CFX-MongoDB] SLOW QUERY find players 142ms (threshold 150ms)`. Filter-Werte werden nicht geloggt — nur Schlüssel bei `update`/`delete`/`find`.
 
 ---
 

@@ -18,6 +18,7 @@ describe("withDb", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.stubGlobal("GetConvar", (name: string, defaultValue: string) => defaultValue);
   });
 
   it("returns disconnected envelope when getDb is null", async () => {
@@ -59,5 +60,29 @@ describe("withDb", () => {
         throw "raw failure";
       })
     ).resolves.toEqual({ success: false, error: "raw failure" });
+  });
+
+  it("records slow query when perf enabled", async () => {
+    vi.stubGlobal("GetConvar", (name: string, defaultValue: string) => {
+      if (name === "mongodb_perf_enabled") return "1";
+      if (name === "mongodb_perf_slow_ms") return "50";
+      return defaultValue;
+    });
+
+    vi.spyOn(Date, "now")
+      .mockReturnValueOnce(1000)
+      .mockReturnValueOnce(1200);
+
+    const db = {} as Db;
+    await withDb(
+      makeProvider(db),
+      async () => "ok",
+      { exportName: "find", collection: "players" }
+    );
+
+    expect(utils.log).toHaveBeenCalledWith(
+      "warn",
+      "SLOW QUERY find players 200ms (threshold 50ms)"
+    );
   });
 });

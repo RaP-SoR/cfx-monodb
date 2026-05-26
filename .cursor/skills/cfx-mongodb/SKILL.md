@@ -41,6 +41,12 @@ Framework success checks:
 | Connection logic | `src/connector.ts` |
 | Query safety | `src/validateQuery.ts` |
 | findAll options | `src/types/options.ts`, `src/api/handlers/read.ts` |
+| Slow query perf | `src/perf.ts`, `src/api/withDb.ts` |
+
+## Documentation
+
+- Pipeline/security modules → add/update TSDoc when editing (see AGENTS.md).
+- Export behavior changes → update `docs/API.md` + examples, not handler comments.
 
 ## Build verify
 

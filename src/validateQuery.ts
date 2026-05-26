@@ -1,3 +1,8 @@
+/**
+ * @file Query/update shape validation — operator denylist and size limits.
+ * Not a full sandbox; consumers must still whitelist user input. See docs/API.md.
+ */
+
 import type { Document } from "mongodb";
 
 const DENY_OPERATORS = new Set([
@@ -72,10 +77,12 @@ function validateShape(
   walk(value, 1, { visited: 0 }, label);
 }
 
+/** Validate filter document shape and reject denied operators. */
 export function validateFilter(filter: unknown): asserts filter is Document {
   validateShape(filter, "filter");
 }
 
+/** Validate update document shape and deny dangerous operators. */
 export function validateUpdate(update: unknown): asserts update is Document {
   if (!isPlainObject(update)) throw new Error("Invalid update shape");
   if (Object.keys(update as Record<string, unknown>).length === 0) {
