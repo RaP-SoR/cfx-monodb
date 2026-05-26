@@ -40,6 +40,37 @@ export function exportFn(name: string, fn: Function): void {
   fx(name, fn);
 }
 
+const MONGO_URI_PREFIX = /^(mongodb(?:\+srv)?:\/\/)(.+)$/;
+
+export function redactMongoUri(uri: string): string {
+  const match = uri.match(MONGO_URI_PREFIX);
+  if (!match) return uri;
+
+  const [, prefix, rest] = match;
+  const pathStart = rest.search(/[/?#]/);
+  const authority = pathStart === -1 ? rest : rest.slice(0, pathStart);
+  const suffix = pathStart === -1 ? "" : rest.slice(pathStart);
+  const atIndex = authority.lastIndexOf("@");
+
+  if (atIndex === -1) return uri;
+
+  return `${prefix}***:***@${authority.slice(atIndex + 1)}${suffix}`;
+}
+
+export function formatError(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string") return err;
+  if (
+    err !== null &&
+    typeof err === "object" &&
+    "message" in err &&
+    typeof (err as { message: unknown }).message === "string"
+  ) {
+    return (err as { message: string }).message;
+  }
+  return "An unknown error occurred";
+}
+
 export function parseInitIndexes(): Record<string, Array<{ keys: Record<string, 1 | -1>; options?: Record<string, unknown> }>> | null {
   const raw = GetConvar("mongodb_init_indexes", "");
   if (!raw) return null;
