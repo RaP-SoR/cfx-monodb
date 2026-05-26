@@ -96,4 +96,14 @@ yarn tsc && yarn test && yarn build && yarn lint
 
 ## Next: Wave 4
 
-TS6 upgrade + contract hardening — see orchestrator Step 8 (`WAVE-4-SPEC.md` TBD).
+TS6 upgrade + contract hardening — [WAVE-4-SPEC.md](WAVE-4-SPEC.md). Run `/multitask` with prompt in [README.md](README.md).
+
+## Wave 4 — agents
+
+| ID | Role | Branch | Status | Merge |
+|----|------|--------|--------|-------|
+| **W4A** | TypeScript 6 + tsconfig | `refactor/w4a-typescript6` | 🔵 | — |
+| **W4B** | Contract tests + CI | `refactor/w4b-contract-ci` | 🔵 | — |
+
+**Spec:** [WAVE-4-SPEC.md](WAVE-4-SPEC.md)  
+**Order:** W4A ∥ W4B → integration gate → PR to `dev`

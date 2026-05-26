@@ -10,6 +10,7 @@ Orchestrated hardening and architecture refactor on branch `refactor/staged-hard
 | [WAVE-1-SPEC.md](WAVE-1-SPEC.md) | Wave 1: security, logging, cleanup (5 parallel agents) |
 | [WAVE-2-SPEC.md](WAVE-2-SPEC.md) | Wave 2: withDb pipeline + find semantics (2 sequential agents) |
 | [WAVE-3-SPEC.md](WAVE-3-SPEC.md) | Wave 3: bootstrap, IndexService, handler split (2 + 3 + 1 agents) |
+| [WAVE-4-SPEC.md](WAVE-4-SPEC.md) | Wave 4: TypeScript 6 + contract/CI hardening (2 parallel agents) |
 | [INTERFACES.md](INTERFACES.md) | Shared types for Wave 2–3 (read-only until merged) |
 
 ## Quick start — native Cursor (recommended)
@@ -170,6 +171,39 @@ Update SEARCH-MAP.md, docs/ARCHITECTURE.md, CHANGES.md.
 Gate: yarn tsc && yarn test && yarn build && yarn lint
 Commit: refactor(w3d): split exports into handler modules and registerExports wiring
 Do NOT merge — notify orchestrator.
+```
+
+## Wave 4 — TypeScript 6 + contract hardening (2 parallel agents)
+
+**Order:** W4A ∥ W4B (merge any order)
+
+Full spec: [WAVE-4-SPEC.md](WAVE-4-SPEC.md)
+
+Optional worktrees: `.\scripts\setup-worktrees-wave4.ps1`
+
+### Wave 4 — `/multitask` (both agents in parallel)
+
+```
+/multitask
+
+Wave 4 — cfx-mongodb on refactor/staged-hardening. PARALLEL — 2 subagents.
+
+Read docs/refactor/WAVE-4-SPEC.md in full.
+
+Subagent W4A — branch refactor/w4a-typescript6 (use /worktree)
+Upgrade typescript to ^6.0.0. Modernize tsconfig.json:
+  target ES2022, moduleResolution bundler, lib ES2022 only (remove dom), remove baseUrl.
+Bump @typescript-eslint/* if needed. Update CHANGES.md (toolchain).
+FORBIDDEN: tests/api-contract.test.ts, .github/workflows/*, src/api/handlers/*
+
+Subagent W4B — branch refactor/w4b-contract-ci (use /worktree)
+Add tests/helpers/manifest-exports.ts — parse fxmanifest server_exports.
+Extend tests/api-contract.test.ts: manifest ↔ CFX_MONGODB_EXPORTS sync + envelope invariants.
+Update .github/workflows/build.yml: branches main, dev, node22, refactor/staged-hardening + yarn npm audit step.
+FORBIDDEN: package.json, tsconfig.json, yarn.lock, src/**
+
+Each: yarn tsc && yarn test && yarn build && yarn lint, commit, do NOT merge.
+Orchestrator merges W4A + W4B → final gate → PR to dev.
 ```
 
 ## Fallback — manual worktrees (optional)

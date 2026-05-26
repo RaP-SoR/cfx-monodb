@@ -117,6 +117,18 @@ Prompt: `docs/refactor/README.md` → Wave 2 `/multitask` block.
 Full spec: `docs/refactor/WAVE-3-SPEC.md`  
 Prompts: `docs/refactor/README.md` → Wave 3 Steps 1–4.
 
+## Wave 4 — TypeScript 6 + contract hardening (parallel)
+
+| Step | Branch | Owns |
+|------|--------|------|
+| W4A | `refactor/w4a-typescript6` | `typescript@6`, `tsconfig.json`, eslint TS deps |
+| W4B | `refactor/w4b-contract-ci` | `api-contract.test.ts`, manifest helper, CI workflow |
+
+Full spec: `docs/refactor/WAVE-4-SPEC.md`  
+Prompt: `docs/refactor/README.md` → Wave 4 `/multitask` block.
+
+After Wave 4: PR `refactor/staged-hardening` → `dev`.
+
 ## Invariants (never break)
 
 From `.cursor/skills/cfx-mongodb/SKILL.md`:
