@@ -25,17 +25,27 @@ Unit tests use **mock DB** — they cannot measure real MongoDB latency.
 
 ## Operating modes (decision)
 
-Observability and any UI **never run by default on a production game server**. Three explicit modes:
+**Default:** all perf/UI ConVars **off** — production behaviour unchanged, no extra overhead.
 
-| Mode | Who | ConVars | What runs | Website / UI |
-|------|-----|---------|-----------|--------------|
-| **Production** | Live server | All `mongodb_perf_*` **off** (default) | Normal CRUD only | **None** — no HTTP, no bundled UI in `cfx-mongodb` |
-| **Admin diagnostic** | Server operator | Admin **consciously sets** ConVars (e.g. `mongodb_perf_enabled 1`) | Timing logs + optional in-memory stats / `getQueryStats` | **None inside FiveM** — read server console or call admin export from trusted resource |
-| **Development** | Local / CI | Perf ConVars optional | Same as diagnostic + external tooling | **`tools/query-dashboard/`** on localhost only — separate from `dist/index.js`, not deployed to prod |
+Admins **decide consciously** via ConVars what to enable. Scale matters:
 
-**Hard rule:** `cfx-mongodb` does **not** embed a website, HTTP server, or static assets in the FiveM resource bundle. Charts/dashboards live in `tools/` for dev machines, or admins use logs/stats when ConVars are enabled.
+| Server profile | Typical load | Perf logging | Admin UI (NUI/CEF) |
+|----------------|--------------|--------------|---------------------|
+| **Production** | 100–200+ players | **Off** (default) | **Off** — UI overhead not appropriate at scale |
+| **Staging / test** | ~10–20 players | Optional (`mongodb_perf_enabled 1`) | **Optional** (`mongodb_perf_ui 1`) — ideal for system testing |
+| **Local dev** | 0–5 | Optional | `tools/` localhost **or** ingame NUI |
 
-Production servers stay lean: **zero perf overhead** until an admin opts in via ConVar.
+Three modes:
+
+| Mode | Who | ConVars | What runs |
+|------|-----|---------|-----------|
+| **Production** | Live server | Defaults (`mongodb_perf_*` = `0`) | CRUD only |
+| **Admin diagnostic** | Operator | Sets `mongodb_perf_enabled 1` (+ optional `mongodb_perf_ui 1`) | Timing, stats export, optional ingame dashboard |
+| **Development** | Local / CI | Optional | Above + `tools/query-dashboard/` on localhost |
+
+**Principle:** Not forbidden — **opt-in**. Admins know their server; documentation must warn clearly: UI + perf collection is useful on small test servers, **not recommended** on high-population live servers.
+
+When all perf ConVars are `0`, timing/UI code paths are no-ops (single boolean check).
 
 ---
 
@@ -43,18 +53,20 @@ Production servers stay lean: **zero perf overhead** until an admin opts in via 
 
 ### Goals
 
-1. **Opt-in** observability (ConVar) — zero overhead when disabled
-2. **Server-side only** — no client exposure of query data
-3. **Redaction** — no full URIs, no large document bodies in logs
-4. **Compatible with CTFFramework** — no change to existing export return shapes (unless additive optional export)
+1. **Opt-in** observability and UI (ConVar) — zero overhead when disabled
+2. **Admin choice** — suitable for test/staging (~10–20 players); documented risk at 100+ pop
+3. **Server-side data** — stats collected server-side; UI is a view, not a second DB path
+4. **Redaction** — no full URIs, no document bodies in logs/UI
+5. **Compatible with CTFFramework** — no change to existing export return shapes (additive optional export/UI only)
 
 ### Non-goals
 
-1. **Any UI or HTTP server** inside the FiveM resource (production or admin mode)
-2. **Auto-enabling perf** in prod — ConVars default off; admin must switch explicitly
-3. **Persistent query store** on disk (complexity, PII, FiveM I/O)
+1. **Auto-enabling perf or UI** — ConVars default off
+2. **UI recommended for high-pop production** — warn, do not block
+3. **Persistent query store** on disk
 4. **Full MongoDB profiler replacement**
 5. **Automatic slow-query killing**
+6. **Public/client-facing perf UI** — admin-only (ACE / command gated)
 
 ---
 
@@ -65,10 +77,11 @@ Production servers stay lean: **zero perf overhead** until an admin opts in via 
 | **C1 — Debug log timing in `withDb`** | Minimal code, uses existing `log()` | Unstructured; hard to chart | Good **Phase 1** |
 | **C2 — In-memory ring buffer + `getQueryStats()` export** | Queryable from server; testable | Memory bound; needs admin export | Good **Phase 2** |
 | **C3 — JSON lines to console** | Easy to ship logs to Loki/ELK | noisy; needs external stack | Optional ConVar mode |
-| **C4 — Separate Node dev dashboard** | Rich UI, charts | Not in FiveM runtime | **`tools/` only** — localhost dev, never prod bundle |
-| **C5 — CI perf job vs real MongoDB** | Regression detection | Needs Mongo service in CI; flaky | Optional CI job |
+| **C4 — External dev dashboard** | Rich UI, charts | Outside FiveM | `tools/` — localhost dev |
+| **C5 — Admin NUI (CEF)** | Ingame panel for test servers | Needs client scripts + CEF; load at scale | **Optional Phase C3b** — ConVar + ACE |
+| **C6 — CI perf job vs real MongoDB** | Regression detection | CI only | Optional |
 
-**Recommendation:** C1 → C2 → optionally C4 as `tools/query-dashboard/` **outside** `dist/index.js`.
+**Recommendation:** C1 → C2 → **C3b (optional NUI)** for staging/test admins → C4 for local dev → C6 optional CI.
 
 ---
 
@@ -91,9 +104,11 @@ if (perfEnabled) {
 
 | ConVar | Default | Description |
 |--------|---------|-------------|
-| `mongodb_perf_enabled` | `0` | Master switch — **must be `1` for any perf feature** |
-| `mongodb_perf_log` | `0` | Log each op at `info` (only if `mongodb_perf_enabled 1`) |
+| `mongodb_perf_enabled` | `0` | Master switch — timing + buffer |
+| `mongodb_perf_log` | `0` | Log each op at `info` (requires `mongodb_perf_enabled 1`) |
 | `mongodb_perf_slow_ms` | `100` | Mark/log slow ops |
+| `mongodb_perf_ui` | `0` | Enable admin NUI dashboard (requires `mongodb_perf_enabled 1`) |
+| `mongodb_perf_ui_ace` | `mongodb.perf_ui` | ACE permission to open UI (draft) |
 
 When `mongodb_perf_enabled` is `0` (production default), the timing wrapper is a no-op — no buffer, no extra logs, no measurable overhead beyond a single boolean check.
 
@@ -142,29 +157,41 @@ getQueryStats(): {
 
 ---
 
-### Phase C3 — External visualization (development only)
+### Phase C3a — External visualization (local dev)
 
-**Never part of the FiveM resource runtime.** Lives under `tools/` and runs on a **developer machine** (or admin workstation tailing logs while diagnostic ConVars are on):
+Lives under `tools/` on a **developer machine**:
 
 ```
 tools/
-  perf-log-parser/     # Read server console or JSON lines
-  query-dashboard/     # Vite SPA — bind 127.0.0.1 only
+  perf-log-parser/
+  query-dashboard/     # Vite SPA — 127.0.0.1
 ```
-
-Data flow (dev or admin diagnostic session):
-
-```
-FiveM server console  →  file tail / Docker logs  →  parser  →  chart (browser on localhost)
-```
-
-Optional: trusted admin resource calls `getQueryStats()` while `mongodb_perf_enabled 1` and forwards to local tooling — still **no server-hosted UI**.
-
-**Production deployment:** do not ship `tools/` to game servers; do not set perf ConVars unless actively debugging.
 
 ---
 
-### Phase C4 — CI performance benchmarks (optional)
+### Phase C3b — Optional admin NUI (CEF, ingame)
+
+For **staging / test servers** (~10–20 players) where admins want ingame visibility without leaving the client.
+
+**Activation:** `mongodb_perf_enabled 1` **and** `mongodb_perf_ui 1` in `server.cfg` — conscious operator decision.
+
+**Implementation sketch:**
+
+```
+ui/perf/           # HTML/CSS/JS (CEF) — charts, query table from getQueryStats
+client/perf.lua    # Open/close NUI, NUI callbacks (minimal)
+server command     # e.g. mongodb_perf_ui — ACE restricted
+```
+
+- Data: server polls ring buffer / `getQueryStats()` → `SendNUIMessage` to **admin client only**
+- **No** separate Node HTTP server in production path — uses FiveM **NUI/CEF** (Chromium embedded)
+- `fxmanifest.lua`: `ui_page` + optional `client_scripts` only when UI bundle is shipped; document that UI is inactive unless ConVars set
+- **ACE:** only admins with permission can open panel
+- **Not for 100–200 player live servers** — document CPU/memory/CEF cost; startup log warning when `mongodb_perf_ui 1`
+
+**Alternative (cleaner split):** optional sibling resource `cfx-mongodb-monitor` depends on `cfx-mongodb`, holds all UI/client code — keeps core resource `server_only`. Decide during implementation.
+
+**Production deployment:** leave `mongodb_perf_ui 0`; use logs or external tools only if perf is enabled at all.
 
 ```yaml
 # .github/workflows/perf.yml (optional, manual dispatch)
@@ -185,6 +212,8 @@ services:
 - At `debug`, optional redacted filter hash or keys-only: `{ keys: ["_id", "email"] }`
 - Never log document contents
 - `getQueryStats` / perf ConVars documented as **server admin only**
+- NUI panel: **ACE-gated**; no query data to non-admin clients
+- Log warning on resource start if `mongodb_perf_ui 1`: *"Perf UI enabled — intended for test/staging servers, not high-population production"*
 
 ---
 
@@ -217,7 +246,8 @@ services:
 
 **Resolved:**
 
-- ~~Embedded website in production?~~ **No** — UI only in `tools/` for dev; prod/admin use ConVar-gated logs + optional stats export only.
+- ~~Embedded website in production?~~ **Admin choice via ConVar** — default off; NUI/CEF optional for test/staging (~10–20 players); strongly discouraged at 100+ pop; external `tools/` dashboard for local dev.
+- ~~Hard ban on UI in resource?~~ **No** — optional Phase C3b (NUI) or separate monitor resource; core stays lean when ConVars off.
 
 ---
 
@@ -227,7 +257,8 @@ services:
 |-------|--------|
 | C1 timing + ConVars | 4–6 h |
 | C2 stats export | 4–6 h |
-| C3 dev dashboard | 8–16 h (optional, separate folder) |
+| C3a dev dashboard (`tools/`) | 8–16 h (optional) |
+| C3b admin NUI (CEF) | 12–20 h (optional, ConVar + ACE) |
 | C4 CI bench | 4–8 h (optional) |
 
 **Start with C1 only** after Track A cleanup merge.

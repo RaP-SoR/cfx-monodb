@@ -162,10 +162,10 @@ Extend `.cursor/skills/cfx-mongodb/SKILL.md`:
 Summary:
 
 - Today: `health()` RTT for ping only; no CRUD timing, no query history
-- **Production:** perf ConVars off — no UI, no HTTP, no overhead
-- **Admin diagnostic:** operator sets ConVars consciously → logs + optional stats export
-- **Dev:** external dashboard in `tools/` on localhost only
-- Execute Track C **after** Track A/B; see [OBSERVABILITY-PLAN.md](OBSERVABILITY-PLAN.md) operating modes
+- **Production (100+ Spieler):** Perf/UI ConVars aus — kein Overhead
+- **Staging/Test (~10–20):** Admin kann `mongodb_perf_enabled 1` und optional **`mongodb_perf_ui 1`** (NUI/CEF) setzen
+- **Dev:** `tools/` localhost oder ingame NUI
+- Details: [OBSERVABILITY-PLAN.md](OBSERVABILITY-PLAN.md) — Admin-Entscheidung, kein Hard-Ban
 
 ---
 
