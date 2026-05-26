@@ -1,6 +1,7 @@
 # Observability & Performance Plan — cfx-mongodb
 
-> **Status:** Design only — do not implement until Track A cleanup is done and this plan is reviewed.  
+> **Status:** Design only — **UI & full monitoring: final planning later.**  
+> **First implementation target:** MySQL-style **slow query warnings** (ConVar-gated).  
 > **Parent:** [MAINTENANCE-ROADMAP.md](MAINTENANCE-ROADMAP.md) Track C
 
 ## Problem
@@ -20,6 +21,19 @@ Today we only have:
 | Update filter log | `handlers/write.ts` | Single path, no timing |
 
 Unit tests use **mock DB** — they cannot measure real MongoDB latency.
+
+### Priority: slow query warnings (MySQL analogy)
+
+Like MySQL’s **`slow_query_log`** / `long_query_time`: log operations that exceed a threshold so admins can tune indexes and queries without a dashboard.
+
+| MySQL | cfx-mongodb (planned) |
+|-------|------------------------|
+| `slow_query_log` | `mongodb_perf_enabled 1` |
+| `long_query_time` (seconds) | `mongodb_perf_slow_ms` (milliseconds) |
+| Log line with duration + query | Log: export, collection, duration, `slow` flag — **redacted** filter (keys only at `info`) |
+
+**Default:** all off — no timing until admin opts in.  
+**UI / NUI / charts:** deferred — separate planning session; not part of first ship.
 
 ---
 
@@ -81,22 +95,27 @@ When all perf ConVars are `0`, timing/UI code paths are no-ops (single boolean c
 | **C5 — Admin NUI (CEF)** | Ingame panel for test servers | Needs client scripts + CEF; load at scale | **Optional Phase C3b** — ConVar + ACE |
 | **C6 — CI perf job vs real MongoDB** | Regression detection | CI only | Optional |
 
-**Recommendation:** C1 → C2 → **C3b (optional NUI)** for staging/test admins → C4 for local dev → C6 optional CI.
+**Recommendation (revised):** **C1 slow-query log first** → optional C2 ring buffer / `getQueryStats` → **UI (C3b/C4) later** when monitoring is finalized.
 
 ---
 
 ## Proposed design (phased)
 
-### Phase C1 — Timing wrapper (low risk)
+### Phase C1 — Slow query log (first ship)
 
-Extend `withDb` (or thin `withDbTimed` used only when enabled):
+MySQL-style: measure each `withDb` operation; **warn when duration ≥ threshold**.
 
 ```typescript
 // Pseudocode — not implemented
 if (perfEnabled) {
   const t0 = Date.now();
   const result = await op(db);
-  record({ op: "withDb", ms: Date.now() - t0, exportName?, collection? });
+  const ms = Date.now() - t0;
+  if (ms >= slowMs) {
+    log("warn", `slow query ${exportName} ${collection} ${ms}ms`);
+  } else if (perfLogAll) {
+    log("debug", `perf ${exportName} ${collection} ${ms}ms`);
+  }
 }
 ```
 
@@ -104,20 +123,28 @@ if (perfEnabled) {
 
 | ConVar | Default | Description |
 |--------|---------|-------------|
-| `mongodb_perf_enabled` | `0` | Master switch — timing + buffer |
-| `mongodb_perf_log` | `0` | Log each op at `info` (requires `mongodb_perf_enabled 1`) |
-| `mongodb_perf_slow_ms` | `100` | Mark/log slow ops |
-| `mongodb_perf_ui` | `0` | Enable admin NUI dashboard (requires `mongodb_perf_enabled 1`) |
-| `mongodb_perf_ui_ace` | `mongodb.perf_ui` | ACE permission to open UI (draft) |
+| `mongodb_perf_enabled` | `0` | Master switch — enable timing |
+| `mongodb_perf_slow_ms` | `100` | **Slow query threshold** (ms) — log at `warn` when exceeded |
+| `mongodb_perf_log_all` | `0` | If `1`, log every op at `debug` (verbose; staging only) |
 
-When `mongodb_perf_enabled` is `0` (production default), the timing wrapper is a no-op — no buffer, no extra logs, no measurable overhead beyond a single boolean check.
+Legacy name in earlier draft: `mongodb_perf_log` → renamed to `mongodb_perf_log_all` for clarity vs slow-only mode.
 
-**Log line example (redacted):**
+**Typical prod/staging config (slow only):**
+
+```cfg
+set mongodb_perf_enabled 1
+set mongodb_perf_slow_ms 150
+# mongodb_perf_log_all 0  → only slow queries appear (warn)
+```
+
+**Slow query log line (redacted):**
 
 ```
-[CFX-MongoDB] perf find players 23ms ok
-[CFX-MongoDB] perf update players 142ms slow
+[CFX-MongoDB] SLOW QUERY find players 142ms (threshold 100ms)
+[CFX-MongoDB] SLOW QUERY update users 89ms filter_keys=_id,email
 ```
+
+When `mongodb_perf_enabled` is `0`, no timing — no overhead beyond one boolean check.
 
 **Changes:** `withDb.ts`, `utils.ts`, `config.ts`, `docs/API.md` Configuration, tests for record helper.
 
@@ -125,9 +152,9 @@ Handlers pass **export name + collection** into wrapper (small signature change 
 
 ---
 
-### Phase C2 — Stats export (admin)
+### Phase C2 — Stats export (optional, after C1)
 
-New **optional** export (manifest + API.md + contract test):
+Ring buffer + `getQueryStats()` for admins who want aggregates without reading console — still ConVar-gated, no UI required.
 
 ```typescript
 getQueryStats(): {
@@ -157,7 +184,28 @@ getQueryStats(): {
 
 ---
 
-### Phase C3a — External visualization (local dev)
+### Phase C3+ — UI & monitoring (deferred)
+
+**Final planning later** — not part of the first implementation.
+
+Includes:
+
+- **C3a** — `tools/query-dashboard/` (localhost dev)
+- **C3b** — Admin NUI/CEF (ConVar `mongodb_perf_ui`, ACE, staging servers)
+- Full monitoring dashboards, charts, ingame panels
+
+Depends on C1 slow-query log (+ optional C2 stats) being stable first.
+
+ConVars reserved for later (draft, not implemented yet):
+
+| ConVar | Purpose |
+|--------|---------|
+| `mongodb_perf_ui` | Enable admin NUI |
+| `mongodb_perf_ui_ace` | ACE permission |
+
+---
+
+### Phase C3a — External visualization (local dev) — *deferred*
 
 Lives under `tools/` on a **developer machine**:
 
@@ -169,7 +217,7 @@ tools/
 
 ---
 
-### Phase C3b — Optional admin NUI (CEF, ingame)
+### Phase C3b — Optional admin NUI (CEF, ingame) — *deferred*
 
 For **staging / test servers** (~10–20 players) where admins want ingame visibility without leaving the client.
 
@@ -253,12 +301,11 @@ services:
 
 ## Estimated effort
 
-| Phase | Effort |
-|-------|--------|
-| C1 timing + ConVars | 4–6 h |
-| C2 stats export | 4–6 h |
-| C3a dev dashboard (`tools/`) | 8–16 h (optional) |
-| C3b admin NUI (CEF) | 12–20 h (optional, ConVar + ACE) |
-| C4 CI bench | 4–8 h (optional) |
+| Phase | Effort | When |
+|-------|--------|------|
+| **C1 slow query log** | 4–6 h | After Track A — **first ship** |
+| C2 stats export | 4–6 h | Optional after C1 |
+| C3+ UI & monitoring | TBD | **Deferred** — finalize plan later |
+| C4 CI bench | 4–8 h | Optional |
 
-**Start with C1 only** after Track A cleanup merge.
+**Start with C1 only** (MySQL-style slow query warnings).

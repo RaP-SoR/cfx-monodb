@@ -161,11 +161,12 @@ Extend `.cursor/skills/cfx-mongodb/SKILL.md`:
 
 Summary:
 
-- Today: `health()` RTT for ping only; no CRUD timing, no query history
-- **Production (100+ Spieler):** Perf/UI ConVars aus — kein Overhead
-- **Staging/Test (~10–20):** Admin kann `mongodb_perf_enabled 1` und optional **`mongodb_perf_ui 1`** (NUI/CEF) setzen
-- **Dev:** `tools/` localhost oder ingame NUI
-- Details: [OBSERVABILITY-PLAN.md](OBSERVABILITY-PLAN.md) — Admin-Entscheidung, kein Hard-Ban
+- **First target:** MySQL-style **slow query warnings** (`mongodb_perf_enabled`, `mongodb_perf_slow_ms`) — ConVar-gated, default off
+- **UI & full monitoring:** deferred — finalize plan later
+- **Production (100+):** perf ConVars aus unless admin consciously enables slow-query logging
+- **Staging (~10–20):** slow log useful for tuning; UI comes later
+
+Execute Track C **after** Track A; implement **C1 only** first.
 
 ---
 
