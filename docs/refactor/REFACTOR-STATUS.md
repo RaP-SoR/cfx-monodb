@@ -13,7 +13,7 @@
 |------|-------|--------|--------|
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
 | **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🟢 Complete |
-| **3** | Architecture split | 3–6 parallel | 🔵 Ready to start |
+| **3** | Architecture split | 2 + 3 + 1 staged | 🔵 Ready to start |
 | **4** | TS6 + contract hardening | 2 parallel | ⚪ Blocked by Wave 3 |
 
 Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
@@ -63,8 +63,22 @@ yarn tsc && yarn test && yarn build && yarn lint
 - [x] W2B implemented
 - [x] 0 todos in test suite
 - [x] `REFACTOR-STATUS.md` updated
-- [ ] `WAVE-3-SPEC.md` created (architecture split)
+- [x] `WAVE-3-SPEC.md` created
+
+## Wave 3 — agents (ready)
+
+| ID | Role | Branch | Status | Merge |
+|----|------|--------|--------|-------|
+| **W3A** | Bootstrap | `refactor/w3a-bootstrap` | 🔵 | — |
+| **W3B** | IndexService | `refactor/w3b-index-service` | 🔵 | — |
+| **W3C1** | Read handlers | `refactor/w3c1-handlers-read` | 🔵 | — |
+| **W3C2** | Write handlers | `refactor/w3c2-handlers-write` | 🔵 | — |
+| **W3C3** | Admin/lifecycle | `refactor/w3c3-handlers-ops` | 🔵 | — |
+| **W3D** | Wiring + shim | `refactor/w3d-register-exports` | 🔵 | — |
+
+**Spec:** [WAVE-3-SPEC.md](WAVE-3-SPEC.md)  
+**Order:** W3A → W3B → (W3C1 ∥ W3C2 ∥ W3C3) → W3D
 
 ## Next: Wave 3
 
-Bootstrap + IndexService + handler split — see orchestrator skill.
+Start with W3A bootstrap — `/multitask` prompt in `docs/refactor/README.md`.

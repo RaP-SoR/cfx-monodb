@@ -105,6 +105,18 @@ DO NOT MERGE YOURSELF
 
 Prompt: `docs/refactor/README.md` → Wave 2 `/multitask` block.
 
+## Wave 3 — staged architecture split
+
+| Step | Branch | Owns |
+|------|--------|------|
+| W3A | `refactor/w3a-bootstrap` | `bootstrap.ts`, `index.ts`, `connector.ts` decouple |
+| W3B | `refactor/w3b-index-service` | `services/indexService.ts` — after W3A |
+| W3C1 ∥ W3C2 ∥ W3C3 | `w3c1/2/3-*` | handler files only — after W3B |
+| W3D | `refactor/w3d-register-exports` | `registerExports.ts` + shim — after W3C |
+
+Full spec: `docs/refactor/WAVE-3-SPEC.md`  
+Prompts: `docs/refactor/README.md` → Wave 3 Steps 1–4.
+
 ## Invariants (never break)
 
 From `.cursor/skills/cfx-mongodb/SKILL.md`:

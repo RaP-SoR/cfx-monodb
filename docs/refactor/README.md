@@ -9,6 +9,7 @@ Orchestrated hardening and architecture refactor on branch `refactor/staged-hard
 | [REFACTOR-STATUS.md](REFACTOR-STATUS.md) | Living board — wave/agent/branch/PR status |
 | [WAVE-1-SPEC.md](WAVE-1-SPEC.md) | Wave 1: security, logging, cleanup (5 parallel agents) |
 | [WAVE-2-SPEC.md](WAVE-2-SPEC.md) | Wave 2: withDb pipeline + find semantics (2 sequential agents) |
+| [WAVE-3-SPEC.md](WAVE-3-SPEC.md) | Wave 3: bootstrap, IndexService, handler split (2 + 3 + 1 agents) |
 | [INTERFACES.md](INTERFACES.md) | Shared types for Wave 2–3 (read-only until merged) |
 
 ## Quick start — native Cursor (recommended)
@@ -71,6 +72,104 @@ Resolve it.todo in tests/api-contract.test.ts. Update docs/API.md + CHANGES.md.
 Replace emitNet with TriggerEvent in connect/disconnect.
 Gate: yarn tsc && yarn test && yarn build && yarn lint
 Commit: refactor(w2b): wire withDb pipeline and align find not-found semantics
+```
+
+## Wave 3 — staged architecture split
+
+**Order:** W3A → W3B → (W3C1 + W3C2 + W3C3 parallel) → W3D
+
+Full spec: [WAVE-3-SPEC.md](WAVE-3-SPEC.md)
+
+### Wave 3 Step 1 — `/multitask` (W3A bootstrap only)
+
+```
+/multitask
+
+Wave 3 STEP 1 — cfx-mongodb on refactor/staged-hardening.
+
+Read docs/refactor/WAVE-3-SPEC.md section W3A.
+Read AGENTS.md and .cursor/skills/cfx-mongodb/SKILL.md.
+
+Branch: refactor/w3a-bootstrap (use /worktree)
+
+Tasks:
+- Create src/bootstrap.ts — move onResourceStart/Stop from index.ts
+- index.ts becomes: import "./bootstrap"
+- Remove registerExports() from connector.ts connect()
+- Call registerExports(connector) from bootstrap after connect()
+- MongoDBConnector implements DbProvider
+
+FORBIDDEN: src/api/handlers/*, shrinking exports.ts
+
+Gate: yarn tsc && yarn test && yarn build && yarn lint
+Commit: refactor(w3a): extract bootstrap and decouple connector from exports
+Do NOT merge — notify orchestrator.
+```
+
+### Wave 3 Step 2 — `/multitask` (W3B IndexService, after W3A merge)
+
+```
+/multitask
+
+Wave 3 STEP 2 — after W3A merged.
+
+Read docs/refactor/WAVE-3-SPEC.md section W3B.
+
+Branch: refactor/w3b-index-service (use /worktree)
+
+Create src/services/indexService.ts + tests/indexService.test.ts
+Wire bootstrap.ts and ensureIndexes export to IndexService.
+Dedupe index init logic.
+
+Gate: yarn tsc && yarn test && yarn build
+Commit: refactor(w3b): add IndexService and dedupe index initialization
+Do NOT merge — notify orchestrator.
+```
+
+### Wave 3 Step 3 — `/multitask` (3 parallel handler agents, after W3B merge)
+
+```
+/multitask
+
+Wave 3 STEP 3 — spawn 3 PARALLEL subagents after W3B merged.
+Read docs/refactor/WAVE-3-SPEC.md sections W3C1/W3C2/W3C3.
+
+Subagent W3C1 — branch refactor/w3c1-handlers-read
+Create ONLY src/api/handlers/read.ts
+Move find, findAll, findById, count from exports.ts into registerReadHandlers().
+Do NOT edit exports.ts or other handler files.
+
+Subagent W3C2 — branch refactor/w3c2-handlers-write
+Create ONLY src/api/handlers/write.ts
+Move insert, update, delete into registerWriteHandlers().
+
+Subagent W3C3 — branch refactor/w3c3-handlers-ops
+Create ONLY src/api/handlers/admin.ts and src/api/handlers/lifecycle.ts
+Move health, config, ensureIndexes, getVersion, connect, disconnect, isConnected, getDb.
+
+Each: yarn tsc && yarn test && yarn build, commit, do NOT merge.
+```
+
+Optional worktrees: `.\scripts\setup-worktrees-wave3.ps1`
+
+### Wave 3 Step 4 — `/multitask` (W3D wiring, after W3C1/2/3 merge)
+
+```
+/multitask
+
+Wave 3 STEP 4 — after W3C1, W3C2, W3C3 merged.
+
+Read docs/refactor/WAVE-3-SPEC.md section W3D.
+
+Branch: refactor/w3d-register-exports (use /worktree)
+
+Create src/api/registerExports.ts wiring all handler register functions.
+Shrink src/exports.ts to re-export shim only.
+Update SEARCH-MAP.md, docs/ARCHITECTURE.md, CHANGES.md.
+
+Gate: yarn tsc && yarn test && yarn build && yarn lint
+Commit: refactor(w3d): split exports into handler modules and registerExports wiring
+Do NOT merge — notify orchestrator.
 ```
 
 ## Fallback — manual worktrees (optional)
