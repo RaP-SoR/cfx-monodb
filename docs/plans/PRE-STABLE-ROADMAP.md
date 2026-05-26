@@ -35,19 +35,19 @@
 
 ---
 
-## Step 2 — Security fixes
+## Step 2 — Security fixes ✅ (SF-1, SF-2, SF-4)
 
-Implement per [SECURITY-FIXES-PLAN.md](SECURITY-FIXES-PLAN.md):
+Implemented per [SECURITY-FIXES-PLAN.md](SECURITY-FIXES-PLAN.md):
 
-- **Minimum:** SF-1 + SF-2 (insert validation + tests)
-- **Optional:** SF-4 before stable
-- **Defer:** SF-5, SF-6
+- ✅ **SF-1 + SF-2** — `validateDocument` on insert + tests (130 unit tests)
+- ✅ **SF-4** — `config()` effective log level
+- 📋 **SF-3** — collection-name examples — **deferred** to examples-docs skill / later merge
 
 ```bash
 yarn scout
 ```
 
-Commit on `dev` when green.
+**Next:** Step 3 manual practice test.
 
 ---
 

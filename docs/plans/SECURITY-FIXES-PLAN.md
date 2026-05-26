@@ -10,10 +10,10 @@
 
 | ID | Fix | Priority | Breaking? | Default recommendation |
 |----|-----|----------|-----------|------------------------|
-| **SF-1** | Call `validateDocument()` on `insert` payload | **P0** | Low* | **Do** — closes `$operator` insert gap |
-| **SF-2** | Tests: insert rejects `$where` / depth overflow in document | **P0** | No | **Do** with SF-1 |
-| **SF-3** | Document collection-name rule in examples (no code change) | **P1** | No | **Do** in SECURITY + patterns |
-| **SF-4** | `config()` uses `getLogLevel()` not raw ConVar | **P2** | No | Optional (Track K4) |
+| **SF-1** | Call `validateDocument()` on `insert` payload | **P0** | Low* | ✅ Done |
+| **SF-2** | Tests: insert rejects `$where` / depth overflow in document | **P0** | No | ✅ Done |
+| **SF-3** | Document collection-name rule in examples (no code change) | **P1** | No | 📋 Deferred — examples-docs skill |
+| **SF-4** | `config()` uses `getLogLevel()` not raw ConVar | **P2** | No | ✅ Done |
 | **SF-5** | Tiered limits / caller context | **P3** | Maybe | **Defer** post-stable — design below |
 | **SF-6** | `connect()` return envelope instead of throw/event-only | **P3** | Yes | **Defer** — documented advanced API |
 

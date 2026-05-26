@@ -83,7 +83,7 @@ Documented for expectations management — **not gaps**, by design:
 | Change streams | ❌ | same |
 | `updateMany` / `deleteMany` | ❌ — only `updateOne` / `deleteOne` | API.md § limitations |
 | SQL `JOIN` | ❌ — link collections manually | queries.md §3.7, §8 |
-| `insert` operator denylist | ⚠️ **not applied today** — SF-1 planned | [SECURITY.md](SECURITY.md), [plans/SECURITY-FIXES-PLAN.md](plans/SECURITY-FIXES-PLAN.md) |
+| `insert` operator denylist | ✅ `validateDocument` on insert (SF-1) | [SECURITY.md](SECURITY.md) |
 | `validateDocument` exists in code | unused on `insert` path | note for future hardening |
 
 ---

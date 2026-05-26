@@ -354,7 +354,7 @@ Log-Zeilen erscheinen als `[CFX-MongoDB] SLOW QUERY find players 142ms (threshol
 |---------|-----------|
 | Aggregation (`aggregate`), Transactions, Change Streams | Nicht als Export — nur vertrauenswürdig über `getDb()` + Treiber |
 | `update` / `delete` | Immer **ein** Dokument (`updateOne` / `deleteOne`) |
-| `insert` | **Keine** `validateDocument`-Prüfung auf dem Insert-Pfad (Stand 2026-05) — Filter/Updates werden validiert |
+| `insert` | `validateDocument` wird auf dem Insert-Pfad angewendet — blockiert `$operator`-Payloads und zu tiefe/zu große Dokumente |
 | Filter/Update-Größe | Max. Tiefe **8**, max. **100** Knoten — sonst `{ success: false, error }` |
 
 Beispiele & JOIN-Ersatz: [examples/lua/queries.md](examples/lua/queries.md). Audit: [DOCUMENTATION-AUDIT-2026.md](DOCUMENTATION-AUDIT-2026.md).

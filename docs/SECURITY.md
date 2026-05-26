@@ -173,7 +173,7 @@ Pool exhaustion from **many concurrent exports** is mitigated by pool size; ther
 
 | Gap | Risk | Owner | Planned |
 |-----|------|-------|---------|
-| **`insert` skips `validateDocument`** | `$`-operators or huge nested docs in insert payload | Core fix candidate | [SECURITY-FIXES-PLAN.md](plans/SECURITY-FIXES-PLAN.md) |
+| **`insert` skips `validateDocument`** | ~~$operators in insert~~ | Core | ✅ **SF-1** shipped |
 | **No caller ACL on exports** | Any resource can CRUD | Platform / server cfg (`ensure` order, trust resources) | Document only |
 | **Collection name = caller string** | Typo or injection into wrong collection | Consumer — never pass raw client input as collection name | Document + examples |
 | **No export rate limiting** | Loop calling `findAll` / `update` → load | Consumer — batch, cache, debounce | Optional future ConVar |

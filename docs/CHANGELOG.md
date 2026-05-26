@@ -1,5 +1,12 @@
 # Änderungen (Changelog)
 
+## Unreleased — Security fixes (SF-1, SF-2, SF-4)
+
+- **`insert`:** `validateDocument()` before `insertOne` — blocks `$operator` payloads and depth/size overflow
+- **Tests:** +4 insert/config cases — **130** unit tests total
+- **`config()`:** `logLevel` uses effective `getLogLevel()` after invalid ConVar
+- **SF-3** (collection-name patterns in examples) deferred to examples-docs skill
+
 ## Unreleased — Security concept finalized (2026-05-27)
 
 - **`docs/SECURITY.md`** — trust model, caller tiers, configurable limits (ConVar / consumer code), operator choice

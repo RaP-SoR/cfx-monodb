@@ -10,6 +10,27 @@ describe("write handlers", () => {
   });
 
   describe("insert", () => {
+    it("inserts a plain document successfully", async () => {
+      const collection = createMockCollection({
+        insertOne: vi.fn().mockResolvedValue({ insertedId: new ObjectId() }),
+      });
+      registerWithDb({ collections: { players: collection } });
+
+      const insert = getExport<
+        (
+          name: string,
+          doc: object
+        ) => Promise<{ success: boolean; insertedId?: string; error?: string }>
+      >("insert");
+
+      const doc = { name: "Alex", level: 5 };
+      const result = await insert("players", doc);
+
+      expect(result.success).toBe(true);
+      expect(result.insertedId).toMatch(/^[0-9a-f]{24}$/i);
+      expect(collection.insertOne).toHaveBeenCalledWith(doc);
+    });
+
     it("returns driver error as envelope", async () => {
       const collection = createMockCollection({
         insertOne: vi.fn().mockRejectedValue(new Error("duplicate key")),
@@ -23,6 +44,58 @@ describe("write handlers", () => {
       const result = await insert("players", { email: "taken@example.com" });
 
       expect(result).toEqual({ success: false, error: "duplicate key" });
+    });
+
+    it("rejects documents with dangerous operators", async () => {
+      const collection = createMockCollection({
+        insertOne: vi.fn(),
+      });
+      registerWithDb({ collections: { players: collection } });
+
+      const insert = getExport<
+        (
+          name: string,
+          doc: object
+        ) => Promise<{ success: boolean; error?: string }>
+      >("insert");
+
+      const result = await insert("players", {
+        profile: {
+          $where: "this.level > 0",
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("$where");
+      expect(collection.insertOne).not.toHaveBeenCalled();
+    });
+
+    it("rejects documents that exceed depth limits", async () => {
+      const collection = createMockCollection({
+        insertOne: vi.fn(),
+      });
+      registerWithDb({ collections: { players: collection } });
+
+      const insert = getExport<
+        (
+          name: string,
+          doc: object
+        ) => Promise<{ success: boolean; error?: string }>
+      >("insert");
+
+      const deepDocument: Record<string, unknown> = {};
+      let current: Record<string, unknown> = deepDocument;
+      for (let i = 0; i < 8; i += 1) {
+        const next: Record<string, unknown> = {};
+        current[`level${i}`] = next;
+        current = next;
+      }
+
+      const result = await insert("players", deepDocument);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("depth exceeded");
+      expect(collection.insertOne).not.toHaveBeenCalled();
     });
   });
 

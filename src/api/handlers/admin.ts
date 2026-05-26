@@ -8,6 +8,7 @@ import type { Response, ErrorResponse } from "../../responses";
 import type { DbProvider } from "../../types/dbProvider";
 import { withDb } from "../withDb";
 import { ensureIndexesForCollection } from "../../services/indexService";
+import { getLogLevel } from "../../utils";
 import {
   getPerfBufferSize,
   getPerfSlowMs,
@@ -62,7 +63,7 @@ export function registerAdminHandlers(
           timeout: dbConfig.options.serverSelectionTimeoutMS,
           maxPoolSize: dbConfig.options.maxPoolSize,
           minPoolSize: dbConfig.options.minPoolSize,
-          logLevel: GetConvar("mongodb_log_level", "info"),
+          logLevel: getLogLevel(),
           perfEnabled: isPerfEnabled(),
           perfSlowMs: getPerfSlowMs(),
           perfLogAll: isPerfLogAll(),

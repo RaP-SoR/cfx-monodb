@@ -8,7 +8,11 @@ import {
   Document,
   UpdateFilter,
 } from "mongodb";
-import { validateFilter, validateUpdate } from "../../validateQuery";
+import {
+  validateDocument,
+  validateFilter,
+  validateUpdate,
+} from "../../validateQuery";
 import { log, extractFilterKeys } from "../../utils";
 import type {
   InsertResponse,
@@ -31,6 +35,7 @@ export function registerWriteHandlers(
       document: OptionalUnlessRequiredId<T>
     ): Promise<InsertResponse | ErrorResponse> => {
       const result = await withDb(provider, async (db) => {
+        validateDocument(document as Record<string, unknown>);
         const inserted = await db
           .collection<T>(collectionName)
           .insertOne(document);

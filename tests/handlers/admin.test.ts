@@ -34,6 +34,26 @@ describe("admin handlers", () => {
       expect(typeof result.data?.perfBuffer).toBe("number");
     });
 
+    it("falls back to info for invalid log level", () => {
+      vi.stubGlobal("GetConvar", (name: string, defaultValue: string) => {
+        if (name === "mongodb_log_level") return "verbose";
+        return defaultValue;
+      });
+
+      registerWithDb({ collections: {} });
+
+      const config = getExport<
+        () => { success: boolean; data?: Record<string, unknown> }
+      >("config");
+
+      const result = config();
+
+      expect(result.success).toBe(true);
+      expect(result.data?.logLevel).toBe("info");
+
+      vi.stubGlobal("GetConvar", (name: string, defaultValue: string) => defaultValue);
+    });
+
     it("reflects perf ConVars when enabled", () => {
       vi.stubGlobal(
         "GetConvar",
