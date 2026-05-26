@@ -1,31 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ObjectId, type Db } from "mongodb";
-import { registerExports } from "../src/exports";
-import {
-  clearExports,
-  getExport,
-  installExportCapture,
-} from "./helpers/export-registry";
+import { ObjectId } from "mongodb";
+import { getExport } from "./helpers/export-registry";
 import {
   createMockCollection,
-  createMockConnector,
-  createMockDb,
-  type MockDbState,
 } from "./helpers/mock-db";
-
-function registerWithDb(state: MockDbState, connected = true) {
-  const db = connected ? createMockDb(state) : null;
-  const connector = createMockConnector(db, connected);
-  clearExports();
-  installExportCapture();
-  registerExports(connector);
-  return { db, state };
-}
+import { registerWithDb } from "./helpers/register-exports";
 
 describe("cfx-mongodb export API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    clearExports();
   });
 
   describe("insert", () => {

@@ -1,5 +1,12 @@
 # Änderungen (Changelog)
 
+## Unreleased — Track G (Test-Matrix)
+
+- **Handler-Tests aufgeteilt:** `tests/handlers/{admin,read,write,lifecycle}.test.ts`
+- **Neu abgedeckt:** `config`, `ensureIndexes`, `connect`/`disconnect`, Bootstrap-Fehlerpfade, `findAll`-Clamping, Update/Count-Validierung, Driver-Fehler als Envelope
+- **Helper:** `tests/helpers/register-exports.ts`
+- **118 Tests** (vorher 89)
+
 ## Unreleased — Dev/Stable Release-Kanäle
 
 - **Release-Kanäle:** `dev` → Version `X.Y.Z-dev+…`, Pre-Releases (`vX.Y.Z-dev`); `main` → stable `vX.Y.Z` (Tag muss auf `main` liegen)
