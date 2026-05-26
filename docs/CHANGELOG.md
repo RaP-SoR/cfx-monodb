@@ -1,106 +1,66 @@
 # Änderungen (Changelog)
 
-## Unreleased — Examples cleanup + SF-3 + fixlist
+## 1.0.1 — Examples, security, integration (2026-05-27)
 
-- **SF-3** — collection-name literals + insert validation notes in `lua/patterns.md` and `typescript/patterns.md`
-- **Removed** root example stubs (`docs/examples/server.*`, root manifests); canonical paths under `lua/` and `typescript/`
-- **Removed** thin wrappers `scripts/gate.sh`, `scripts/scout.sh` — use `yarn gate` / `yarn scout`
-- **`docs/plans/PRE-STABLE-FIXLIST.md`** — build checklist, bug list, pre-merge gates
-- **`docs/plans/PRE-STABLE-ROADMAP.md`** — revised order (examples → verify → bug tour → practice test → stable)
+> **Dev pre-release:** tag [`v1.0.1-dev`](releases/v1.0.1-dev.md) · **130** unit tests · Node 22 + `mongodb@7`
 
-## Unreleased — Perf validation scripts (P1/P2)
+Patch release on **`dev`**: consumer documentation, security hardening, integration CI, and maintainer tooling since [`v1.0.0`](#100--erstes-github-release-2026-05-26).
 
-- **`yarn seed:test-data`** / **`yarn bench:crud`** — local Mongo stress without framework
-- **`tests/integration/batch-update.test.ts`** — 200 export updates (&lt;30s threshold)
-- **`tests/fixtures/perf-seed.json`** · **`scripts/README.md`**
-
-## Unreleased — Security fixes (SF-1, SF-2, SF-4)
+### Security
 
 - **`insert`:** `validateDocument()` before `insertOne` — blocks `$operator` payloads and depth/size overflow
-- **Tests:** +4 insert/config cases — **130** unit tests total
 - **`config()`:** `logLevel` uses effective `getLogLevel()` after invalid ConVar
-- **SF-3** — collection-name patterns in examples ✅
+- **`docs/SECURITY.md`** — trust model, caller tiers, configurable limits (ConVar / consumer code)
+- **Examples (SF-3):** collection-name literals + insert validation in `lua/patterns.md` and `typescript/patterns.md`
+- **Plans:** `SECURITY-FIXES-PLAN.md` (SF-1…4 done), `PRE-STABLE-FIXLIST.md`, revised `PRE-STABLE-ROADMAP.md`
 
-## Unreleased — Security concept finalized (2026-05-27)
+### Examples & documentation
 
-- **`docs/SECURITY.md`** — trust model, caller tiers, configurable limits (ConVar / consumer code), operator choice
-- **`docs/plans/SECURITY-FIXES-PLAN.md`** — SF-1 insert validation next; SF-5 optional ConVar quotas post-stable
-- **`docs/plans/PRE-STABLE-ROADMAP.md`** — path to `main` / v1.0.0
-- **`docs/plans/DATA-PERF-VALIDATION-PLAN.md`** — step 2: seed/bench scripts (after security fixes)
-- Audit 3 updates in **`QUALITY-AUDIT-2026.md`** (~92%)
+- **Language split:** `docs/examples/lua/` and `docs/examples/typescript/` — snippets, queries, patterns, use-cases, runnable `server.lua` / `server.ts`
+- **`sample-resource/`** — copyable multi-file Lua consumer (accounts, characters, vehicles, items)
+- **FiveM flows:** export coverage tables, JOIN analogy, time zones, `datetime-helpers.*`
+- **`yarn doc-audit`** · **examples-docs** skill · `DOCUMENTATION-AUDIT-2026.md` · API limitations / denylist
+- **Cleanup:** removed root example stubs; use `yarn gate` / `yarn scout` (dropped `scripts/gate.sh`, `scripts/scout.sh`)
+- Root redirect stubs: `lua.md`, `typescript.md`, `queries.md`, `patterns.md` → language folders
 
-## Unreleased — Examples-docs skill + doc-audit script
+### Testing & integration
 
-- **Skill:** `.cursor/skills/examples-docs/` — Lua+TS parallel routine, TEMPLATE.md
-- **Rule:** `.cursor/rules/examples-docs.mdc` for `docs/examples/**`
-- **`yarn doc-audit`** — lists `server_exports` and doc files to verify; wired into `yarn scout` reminders
+- **130** unit tests — handler modules (`admin`, `read`, `write`, `lifecycle`), contract sync, logging
+- **Integration:** `connector.test.ts`, `crud-roundtrip.test.ts`, `batch-update.test.ts` (200 export updates &lt;30s)
+- **`.github/workflows/integration.yml`**
 
-## Unreleased — Documentation audit (2026-05)
+### Performance & observability
 
-- **`docs/DOCUMENTATION-AUDIT-2026.md`** — export ↔ docs matrix, limitations, reading order
-- **API.md** — limitations section; full denylist (`$expr`, `$jsonSchema`); `cfx-mongodb:disconnected` event
+- **`yarn seed:test-data`** / **`yarn bench:crud`** — local Mongo stress without a framework
+- **`tests/fixtures/perf-seed.json`** · `scripts/README.md`
+- Slow-query logging + **`getQueryStats`** (ConVars; see [CONFIGURATION.md](CONFIGURATION.md))
 
-## Unreleased — Examples split by language
+### Tooling & CI
 
-- **`docs/examples/lua/`** — Lua-only snippets, patterns, query cookbook, `server.lua`, manifest
-- **`docs/examples/typescript/`** — TypeScript-only equivalents
-- **`lua/use-cases.md`** · **`typescript/use-cases.md`** — FiveM flows (accounts, characters, vehicles, items); export coverage table for all `server_exports`
-- **`docs/examples/sample-resource/`** — copyable multi-file Lua consumer (accounts, characters, vehicles, items)
-- **“What this does”** blurbs before code in `lua/queries.md`, `lua/patterns.md`, `lua/snippets.md`, `lua/use-cases.md`, commented `lua/server.lua`
-- **JOIN analogy** (account → characters → vehicles/items/clothing) with numbered steps in `lua/queries.md` §3.7
-- **Time zones** — UTC storage + EU/US/Asia offset table; `datetime-helpers.lua` / `datetime-helpers.ts`
-- Root `lua.md`, `typescript.md`, `queries.md`, `patterns.md` → redirect stubs; old paths documented in [examples/README.md](examples/README.md)
+- **`yarn gate`**, **`yarn scout`**, **`docs/CHECKLIST.md`**, PR template
+- **Release channels:** `dev` → `vX.Y.Z-dev` pre-releases; `main` → stable `vX.Y.Z`
+- **Quality audit 3:** ~92% in `QUALITY-AUDIT-2026.md` (Tracks E–K)
 
-## Unreleased — Pre-stable: Track J + K (Integration & Logging)
+### Upgrade from v1.0.0
 
-- **Stable `v1.0.0` zurückgestellt** — Integration ~8%, Logging ~62% sind Blocker
-- **`docs/plans/PARALLEL-REVIEW-WORKFLOW.md`** — zwei parallele Agent-Reviews
-- **`docs/plans/INTEGRATION-REVIEW-PLAN.md`** (Track J) · **`LOGGING-REVIEW-PLAN.md`** (Track K)
-- Skills: `.cursor/skills/integration-review/`, `.cursor/skills/logging-review/`
+- No breaking export API changes — same `server_exports` and response envelopes
+- **`insert`** now rejects documents with forbidden operators (same rules as filters/updates)
+- Example paths moved under `docs/examples/lua/` and `docs/examples/typescript/` (root stubs removed)
 
-## Unreleased — Quality Audit 2 (2026-05-27)
-
-- **`docs/plans/QUALITY-AUDIT-2026.md`** — Vergleich Audit 1 (~72%) → Audit 2 (**~86%**); Tracks E/F/G/I abgeschlossen; Framework-Smoke bewusst skip; stable-ready Empfehlung
-
-## Unreleased — Track E (Automatisierung)
-
-- **`docs/CHECKLIST.md`** — Commit/PR-Checklisten nach Änderungstyp
-- **`yarn gate`** — lint → tsc → test → build
-- **`yarn scout`** / **`scripts/scout.mjs`** — Diff-Reminders + gate (Windows + CI)
-- **Skill:** `.cursor/skills/post-change-scout/SKILL.md`
-- **PR template:** `.github/pull_request_template.md`
-
-## Unreleased — Track F (Dokumentation)
-
-- **`docs/examples/patterns.md`** — CTFFramework success checks, Filter/Pagination, Anti-Patterns, TS-Types
-- **API.md** — Beispiele für `find`, `ensureIndexes`, `health`/`config`
-- **TSDoc `@file`** auf `bootstrap`, `config`, `responses`, Handler-Module
-- Verlinkt in GUIDE, README, examples/README, SEARCH-MAP
-
-## Unreleased — Track G (Test-Matrix)
-
-- **Handler-Tests aufgeteilt:** `tests/handlers/{admin,read,write,lifecycle}.test.ts`
-- **Neu abgedeckt:** `config`, `ensureIndexes`, `connect`/`disconnect`, Bootstrap-Fehlerpfade, `findAll`-Clamping, Update/Count-Validierung, Driver-Fehler als Envelope
-- **Helper:** `tests/helpers/register-exports.ts`
-- **118 Tests** (vorher 89)
-
-## Unreleased — Dev/Stable Release-Kanäle
-
-- **Release-Kanäle:** `dev` → Version `X.Y.Z-dev+…`, Pre-Releases (`vX.Y.Z-dev`); `main` → stable `vX.Y.Z` (Tag muss auf `main` liegen)
-- **`main` push:** stable-channel Artifact (ZIP + npm `.tgz`) ohne GitHub Release bis zum Tag
-- **`scripts/pack-npm.sh`:** optionales npm-Types-`.tgz` pro Release/Artifact (nicht npmjs.org)
-- **`scripts/resolve-release-meta.sh`** + erweitertes **`pack-release.sh`** — manifest/package im ZIP stempeln, `BUILD_INFO.txt`, channel-spezifisches `INSTALL.txt`
-- **Release Notes:** `docs/releases/v1.0.0-dev.md` (erstes ausführliches Pre-Release)
-- **`release.yml`:** Trigger auch `main`; stable vs dev GitHub Releases getrennt; ZIP + `.tgz` Assets
-
-> Das frühere Tag `v1.0.0` von `dev` war nicht kanonisch — künftig **`v1.0.0-dev`** für dev, **`v1.0.0`** erst nach Merge auf `main`.
+---
 
 ## 1.0.0 — Erstes GitHub Release (2026-05-26)
+
+> **Stable baseline** on `main` · tag `v1.0.0` · dev pre-release was `v1.0.0-dev`
 
 - **Erstes Release-Zip** via GitHub Actions (`release.yml`) — Download ohne lokales `yarn build`
 - Refactor (Handler-Split, `withDb`, Node 22, MongoDB v7), Slow-Query-Log, `getQueryStats`
 - Doku: `docs/CONFIGURATION.md`, API, Examples, Quality-Audit-Baseline
 - **89 Tests**, Contract-Sync manifest ↔ `CFX_MONGODB_EXPORTS`
+
+## Earlier development (archive)
+
+> Entries below predate the **v1.0.0** GitHub release and are kept for history.
 
 ## Docs — GitHub Release CI (Track I)
 
@@ -165,21 +125,11 @@
 - **`SEARCH-MAP.md`:** Export-Tabelle bereinigt und mit Manifest synchronisiert.
 - **`doc-lua.md` / `doc-typescript.md`:** Event-Handler-Beispiele und Internal-Export-Hinweise ergänzt.
 
-## 1.0.1 – CTFFramework-Kompatibilität, Node-22-only, Dependency-Updates
+### Legacy — CTFFramework compatibility track (pre-1.0.0)
 
-- **Version:** `1.0.1` (experimentell — kein 2.x-Sprung)
-- **Laufzeit:** Offiziell nur noch **Node 22** (`node_version '22'`, `engines: >=22 <23`). Kein Support für FiveM/RedM Node 16/18 — veraltete, sicherheitskritische Paketketten.
+- **Laufzeit:** Offiziell nur noch **Node 22** (`node_version '22'`, `engines: >=22 <23`). Kein Support für FiveM/RedM Node 16/18.
 - **API:** `getVersion()` Export; CTFFramework-Contract (`insertedId` als String, `modifiedCount`, `deletedCount`, `findAll`-Options)
-- **Dependencies** (Minor/Patch, keine Major-Breaks):
-  - `mongodb` 7.0.0 → 7.2.0
-  - `vite` 7.3.0 → 7.3.3
-  - `@typescript-eslint/*` 8.50.1 → 8.60.0
-  - `@citizenfx/client|server` 2.0.23683-1 → 2.0.29753-1
-  - `@types/node` 25.0.3 → 25.9.1, `eslint` 9.39.2 → 9.39.4, `prettier` 3.7.4 → 3.8.3
-- **Bewusst nicht aktualisiert** (Major, Breaking): `eslint@10`, `vite@8`
-- **Wave 4:** `typescript@6` (siehe Wave-4-Abschnitt oben)
-- **CI:** Node-16-Matrix entfernt; Build nur noch auf Node 22
-- **Docs:** Search Map, API-Referenz, Cursor Skills/Rules für Agent-Arbeit
+- **Dependencies** (Minor/Patch): `mongodb` 7.0.0 → 7.2.0, `vite` 7.3.0 → 7.3.3, `@typescript-eslint/*` 8.50.1 → 8.60.0, …
 - **Neu:** `findById`, `getDb` Exports implementiert; alle Registrierungen über `exportFn`
 - **Tests:** Vitest-Suite unter `tests/exports.test.ts` (19 Tests für Export-API)
 
@@ -229,4 +179,3 @@
 ## Breaking Changes
 - Erfordert Node 22-Laufzeit (siehe `fxmanifest.lua`).
 - Einige API-Beispiele in den alten Docs wurden auf aktuelle Exportnamen (`insert`, `findAll`, `update`, `delete`) angepasst.
-

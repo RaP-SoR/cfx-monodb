@@ -14,7 +14,7 @@
 [4] Fixlist + full build/test       ← PRE-STABLE-FIXLIST.md (gate, doc-audit, CI)
 [5] Bug-fix tour                    ← from fixlist “Open bugs”
 [6] Manual practice test            ← deferred — user runs after [5]
-[7] dev → main, tag v1.0.0          ← stable ZIP + .tgz
+[7] dev → main, tag v1.0.1          ← stable ZIP + .tgz
 ```
 
 Track progress: **[PRE-STABLE-FIXLIST.md](PRE-STABLE-FIXLIST.md)**
@@ -90,9 +90,9 @@ Not required to be CTFFramework. Run **after** bug-fix tour, **before** merge to
 ## Step 7 — Stable release
 
 1. Merge `dev` → `main`
-2. Tag `v1.0.0` on `main` (CI enforces stable channel)
+2. Tag `v1.0.1` on `main` (CI enforces stable channel)
 3. GitHub Release: ZIP + types `.tgz`
-4. Update [CHANGELOG.md](../CHANGELOG.md) — move Unreleased → v1.0.0
+4. Update [CHANGELOG.md](../CHANGELOG.md) — v1.0.1 on main
 
 ---
 

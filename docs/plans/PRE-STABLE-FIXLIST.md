@@ -1,6 +1,6 @@
 # Pre-stable fixlist — build, docs, bugs
 
-> **Purpose:** Single checklist from “examples done” through bug-fix tour to `main` / `v1.0.0`.  
+> **Purpose:** Single checklist from “examples done” through bug-fix tour to `main` / `v1.0.1`.  
 > **Manual practice test:** deferred until after this list is green (see [PRE-STABLE-ROADMAP.md](PRE-STABLE-ROADMAP.md)).
 
 ---
@@ -13,7 +13,7 @@
 [C] Verification (commands below)
 [D] Bug-fix tour (items under “Open bugs”)
 [E] Manual practice test          ← later
-[F] dev → main, tag v1.0.0
+[F] dev → main, tag v1.0.1
 ```
 
 ---
@@ -80,9 +80,9 @@ _Populate from failed checks or manual review. Close with commit + test._
 - [ ] All Phase C checks green (integration on CI at minimum)
 - [ ] Phase D empty or all items closed
 - [ ] [QUALITY-AUDIT-2026.md](QUALITY-AUDIT-2026.md) stable criteria met
-- [ ] [CHANGELOG.md](../CHANGELOG.md) Unreleased → v1.0.0
+- [ ] [CHANGELOG.md](../CHANGELOG.md) — v1.0.1 section current
 - [ ] Manual practice test (user) — **after** D
-- [ ] Merge `dev` → `main`, tag `v1.0.0`, push tag
+- [ ] Merge `dev` → `main`, tag `v1.0.1`, push tag
 
 ---
 

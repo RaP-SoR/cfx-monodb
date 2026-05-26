@@ -4,7 +4,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 author 'RaPSoR'
 description 'MongoDB Typescript Wrapper for CFX'
-version '1.0.0'
+version '1.0.1'
 
 server_script 'dist/index.js'
 
