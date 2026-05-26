@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** `b9f8693` (Wave 1 complete + status board)  
+**Integration HEAD:** `b6dc6f9` (Wave 2 W2A pipeline infra merged)  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -12,7 +12,7 @@
 | Wave | Focus | Agents | Status |
 |------|-------|--------|--------|
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
-| **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🔵 Ready to start |
+| **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🟡 W2A merged — W2B next |
 | **3** | Architecture split | 3–6 parallel | ⚪ Blocked by Wave 2 |
 | **4** | TS6 + contract hardening | 2 parallel | ⚪ Blocked by Wave 3 |
 
@@ -36,11 +36,11 @@ Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
 
 ---
 
-## Wave 2 — agents (ready)
+## Wave 2 — agents
 
 | ID | Role | Branch | Owned files | Status | Merge |
 |----|------|--------|-------------|--------|-------|
-| **W2A** | Pipeline infra | `refactor/w2a-pipeline-infra` | `src/api/*`, `src/types/dbProvider.ts`, tests | 🔵 | — |
+| **W2A** | Pipeline infra | `refactor/w2a-pipeline-infra` | `src/api/*`, `src/types/dbProvider.ts`, tests | 🟢 | `b6dc6f9` |
 | **W2B** | Exports wire-up | `refactor/w2b-exports-pipeline` | `exports.ts`, connector logs, docs, contract test | 🔵 | — |
 
 **Spec:** [WAVE-2-SPEC.md](WAVE-2-SPEC.md)  
@@ -62,7 +62,7 @@ Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
 
 ## Checklist — Wave 2 complete
 
-- [ ] W2A merged
+- [x] W2A merged
 - [ ] W2B merged
 - [ ] 0 todos in test suite (or documented deferrals)
 - [ ] `REFACTOR-STATUS.md` Wave 2 → 🟢
