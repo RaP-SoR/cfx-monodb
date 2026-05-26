@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** Wave 4 pending commit  
+**Integration HEAD:** `902ed98` (Wave 4 complete — TS6 + contract/CI)  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -98,8 +98,8 @@ yarn tsc && yarn test && yarn build && yarn lint
 
 | ID | Role | Branch | Status | Merge |
 |----|------|--------|--------|-------|
-| **W4A** | TypeScript 6 + tsconfig | `refactor/w4a-typescript6` | 🟢 | (this commit) |
-| **W4B** | Contract tests + CI | `refactor/w4b-contract-ci` | 🟢 | (this commit) |
+| **W4A** | TypeScript 6 + tsconfig | `refactor/w4a-typescript6` | 🟢 | `902ed98` |
+| **W4B** | Contract tests + CI | `refactor/w4b-contract-ci` | 🟢 | `902ed98` |
 
 **Spec:** [WAVE-4-SPEC.md](WAVE-4-SPEC.md)  
 **Order:** W4A ∥ W4B → integration gate → PR to `dev`
