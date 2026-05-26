@@ -1,12 +1,13 @@
 import { MongoClient, Db } from "mongodb";
 import dbConfig from "./config";
+import type { MongoOptions } from "./types/options";
 import { registerExports } from "./exports";
 
 class MongoDBConnector {
   private static instance: MongoDBConnector;
   private isConnected: boolean = false;
   private connectionString: string;
-  private options: any;
+  private options: MongoOptions | undefined;
   private client: MongoClient | null = null;
   private db: Db | null = null;
 
@@ -25,7 +26,7 @@ class MongoDBConnector {
     return MongoDBConnector.instance;
   }
 
-  public async connect(url?: string, options?: object): Promise<void> {
+  public async connect(url?: string, options?: MongoOptions): Promise<void> {
     if (url) {
       if (this.isConnected) {
         MongoDBConnector.getInstance().disconnect();
@@ -45,13 +46,16 @@ class MongoDBConnector {
     }
 
     try {
-      const opts = {
+      const opts: MongoOptions = {
         ...(this.options || {}),
         serverSelectionTimeoutMS:
-          (this.options && (this.options as any).serverSelectionTimeoutMS) ||
+          (this.options && this.options.serverSelectionTimeoutMS) ||
           dbConfig.options.serverSelectionTimeoutMS,
-      } as any;
-      this.client = new MongoClient(this.connectionString, opts);
+      };
+      this.client = new MongoClient(
+        this.connectionString,
+        opts as import("mongodb").MongoClientOptions
+      );
       await this.client.connect();
       this.db = this.client.db();
       this.isConnected = true;

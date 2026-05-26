@@ -1,4 +1,9 @@
-import { Filter, OptionalUnlessRequiredId, Document, UpdateFilter, FindOptions } from "mongodb";
+import { Filter, OptionalUnlessRequiredId, Document, UpdateFilter } from "mongodb";
+import type { IndexDescription } from "mongodb";
+import dbConfig from "./config";
+import { validateFilter, validateUpdate } from "./validateQuery";
+import { exportFn, log, toObjectIdIfValid } from "./utils";
+import type { FindAllOptions } from "./types/options";
 import {
   Response,
   ErrorResponse,
@@ -10,7 +15,7 @@ import MongoDBConnector from "./connector";
 
 export function registerExports(mongoDBInstance: MongoDBConnector): void {
   // FiveM provides global.exports at runtime; cast for TS compatibility
-  const fxExports = (globalThis as any).exports as (...args: any[]) => void;
+  const fxExports = (globalThis as unknown as { exports: (...args: unknown[]) => void }).exports;
   fxExports(
     "insert",
     async <T extends Document>(
@@ -38,25 +43,68 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     }
   );
 
-  (globalThis as any).exports(
+  // ensureIndexes export: create multiple indexes on a collection
+  exportFn(
+    "ensureIndexes",
+    async (
+      collectionName: string,
+      indexes: Array<{ keys: Record<string, 1 | -1>; options?: Record<string, unknown> }>
+    ): Promise<Response<number> | ErrorResponse> => {
+      try {
+        const db = mongoDBInstance.getDb();
+        if (!db) throw new Error("Database not connected");
+        if (!Array.isArray(indexes) || indexes.length === 0)
+          throw new Error("No index specs provided");
+
+        const models = indexes.slice(0, 20).map((it) => ({
+          key: it.keys,
+          ...(it.options ? { ...it.options } : {}),
+        }));
+
+        const created = await db
+          .collection(collectionName)
+          .createIndexes(models as IndexDescription[]);
+        log("info", `Indexes ensured for ${collectionName}: ${models.length}`);
+        return { success: true, data: models.length };
+      } catch (error) {
+        log("error", `[ensureIndexes] ${String((error as Error).message)}`);
+        return { success: false, error: (error as Error).message };
+      }
+    }
+  );
+
+  exportFn(
     "findAll",
     async <T extends Document>(
       collectionName: string,
       query: Filter<T> = {},
-      options: FindOptions = {}
+      options: FindAllOptions = {}
     ): Promise<Response<T[]>> => {
       try {
         const db = mongoDBInstance.getDb();
         if (!db) throw new Error("Database not connected");
 
+        validateFilter(query);
+        const { projection, sort } = options;
+        const limit = Math.max(1, Math.min(1000, options.limit ?? 100));
+        const skip = Math.max(0, Math.min(1_000_000, options.skip ?? 0));
+
+        const ac = new AbortController();
+        const timer = setTimeout(() => ac.abort(), ((dbConfig as unknown) as { timeout?: number }).timeout ?? 5000);
+
         const result = await db
           .collection<T>(collectionName)
-          .find(query, options)
+          .find(query, { projection, sort, signal: ac.signal as unknown as AbortSignal })
+          .limit(limit)
+          .skip(skip)
           .toArray();
 
-        for (const doc of result) {
-          if (doc._id && typeof doc._id === "object" && doc._id.toString) {
-            (doc._id as any) = doc._id.toString();
+        clearTimeout(timer);
+
+        for (const doc of result as Array<Record<string, unknown>>) {
+          const id = doc._id as unknown as { toString?: () => string };
+          if (id && typeof id === "object" && typeof id.toString === "function") {
+            doc._id = id.toString();
           }
         }
 
@@ -74,7 +122,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     }
   );
 
-  (globalThis as any).exports(
+  exportFn(
     "find",
     async <T extends Document>(
       collectionName: string,
@@ -84,19 +132,18 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const db = mongoDBInstance.getDb();
         if (!db) throw new Error("Database not connected");
 
+        validateFilter(query);
         const result = await db.collection<T>(collectionName).findOne(query);
         if (!result) {
           return { success: false, error: "Document not found" };
         }
 
-        if (
-          result._id &&
-          typeof result._id === "object" &&
-          result._id.toString
-        ) {
-          const idString = result._id.toString();
-          // Dann die ID als String setzen
-          (result as any)._id = idString;
+        if (result) {
+          const r = result as Record<string, unknown>;
+          const id = r._id as unknown as { toString?: () => string };
+          if (id && typeof id === "object" && typeof id.toString === "function") {
+            r._id = id.toString();
+          }
         }
 
         return { success: true, data: result as T | null };
@@ -112,7 +159,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-  (globalThis as any).exports(
+  exportFn(
     "update",
     async <T extends Document>(
       collectionName: string,
@@ -126,24 +173,13 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         // Konvertiere String-IDs in ObjectIDs
         if (filter && typeof filter === "object") {
           // ID-Konvertierungslogik für _id
-          if (filter._id && typeof filter._id === "string") {
-            try {
-              const { ObjectId } = await import("mongodb");
-              if (ObjectId.isValid(filter._id)) {
-                (filter as any)._id = new ObjectId(filter._id);
-              }
-            } catch (err) {
-              console.warn(
-                "Failed to convert string _id to ObjectId:",
-                (filter as any)._id
-              );
-            }
-          }
+          const rec = filter as Record<string, unknown>;
+          if (rec._id) rec._id = toObjectIdIfValid(rec._id);
         }
 
-        console.log(
-          `[CFX-MongoDB] Updating with filter: ${JSON.stringify(filter)}`
-        );
+        validateFilter(filter);
+        validateUpdate(update as Record<string, unknown>);
+        log("debug", `Updating with filter: ${JSON.stringify(filter)}`);
 
         const updateDoc: UpdateFilter<T> =
           "$set" in update ? update : { $set: update as Partial<T> };
@@ -173,7 +209,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-  (globalThis as any).exports(
+  exportFn(
     "delete",
     async <T extends Document>(
       collectionName: string,
@@ -183,20 +219,17 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const db = mongoDBInstance.getDb();
         if (!db) throw new Error("Database not connected");
 
-        const result = await db.collection<T>(collectionName).deleteOne(filter);
+        validateFilter(filter);
+        const result = await db
+          .collection<T>(collectionName)
+          .deleteOne(filter);
         if (result.deletedCount === 0) {
           return { success: false, error: "Document not found" };
         }
         if (result.deletedCount > 1) {
-          console.warn(
-            `[CFX-MongoDB] Warning: More than one document deleted (${result.deletedCount})`
-          );
+          log("warn", `More than one document deleted (${result.deletedCount})`);
         }
-        console.log(
-          `[CFX-MongoDB] Deleted document with filter: ${JSON.stringify(
-            filter
-          )}`
-        );
+        log("info", `Deleted document with filter: ${JSON.stringify(filter as Record<string, unknown>)}`);
         return { success: true, deletedCount: result.deletedCount };
       } catch (error) {
         console.error(`[CFX-MongoDB Export] deleteOne error:`, error);
@@ -210,7 +243,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-  (globalThis as any).exports(
+  exportFn(
     "count",
     async <T extends Document>(
       collectionName: string,
@@ -220,6 +253,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const db = mongoDBInstance.getDb();
         if (!db) throw new Error("Database not connected");
 
+        validateFilter(filter);
         const count = await db
           .collection<T>(collectionName)
           .countDocuments(filter);
@@ -236,11 +270,52 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
+
+  // Health check: ping the server and return basic timings
+  exportFn(
+    "health",
+    async (): Promise<Response<{ ok: boolean; rttMs: number }>> => {
+      try {
+        const db = mongoDBInstance.getDb();
+        if (!db) throw new Error("Database not connected");
+        const start = Date.now();
+        // ping via admin command
+        await db.command({ ping: 1 });
+        const rttMs = Date.now() - start;
+        return { success: true, data: { ok: true, rttMs } };
+      } catch (error) {
+        return { success: false, error: (error as Error).message };
+      }
+    }
+  );
+
+  // Expose current effective config (safe, no secrets)
+  exportFn(
+    "config",
+    (): Response<Record<string, unknown>> => {
+      try {
+        const cfgBase = dbConfig as unknown as {
+          timeout?: number;
+          options?: { serverSelectionTimeoutMS?: number; maxPoolSize?: number; minPoolSize?: number };
+        };
+        const cfg = {
+          env: GetConvar("mongodb_env", "dev"),
+          timeout: cfgBase.timeout ?? cfgBase.options?.serverSelectionTimeoutMS,
+          maxPoolSize: cfgBase.options?.maxPoolSize,
+          minPoolSize: cfgBase.options?.minPoolSize,
+          logLevel: GetConvar("mongodb_log_level", "info"),
+        };
+        return { success: true, data: cfg };
+      } catch (error) {
+        return { success: false, error: (error as Error).message };
+      }
+    }
+  );
   exports("isConnected", (): boolean => {
     return mongoDBInstance?.isDbConnected() || false;
   });
 
-  exports("connect", async (connectionURL: string, options?: object) => {
+  exports("connect", async (connectionURL: string, options?: import("./types/options").MongoOptions) => {
     try {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.connect(connectionURL, options);

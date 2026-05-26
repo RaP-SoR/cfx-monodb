@@ -1,6 +1,15 @@
 # MongoDB API für TypeScript
 
-Diese Dokumentation enthält Beispiele für die Verwendung der MongoDB-Schnittstelle in RedM mit TypeScript.
+Hinweise für Node 22 und konfigurierbare Performance/Sicherheit.
+
+## Runtime & Konfiguration
+- Node 22 aktivieren: `node_version '22'` in `fxmanifest.lua`.
+- Ressource: Ordner `cfx-mongodb`, in `server.cfg`: `ensure cfx-mongodb`.
+- Wichtige ConVars:
+  - `mongodb_env` (`dev|prod|test`), `mongodb_*_url`
+  - `mongodb_timeout` (ms), `mongodb_max_pool`, `mongodb_min_pool`
+  - `mongodb_log_level` (`error|warn|info|debug`)
+  - `mongodb_init_indexes` (JSON): z. B. `{ "users": [{ "keys": { "email": 1 }, "options": { "unique": true } }] }`
 
 ## Verbindungsstatus prüfen
 
@@ -26,7 +35,7 @@ const playerDoc: Player = {
   inventory: [{id: 'revolver', count: 1}, {id: 'ammo', count: 12}]
 };
 
-const result = await exports['cfx-mongodb'].insertOne('players', playerDoc);
+const result = await exports['cfx-mongodb'].insert('players', playerDoc);
 if (result.success) {
   console.log(`Spieler eingefügt mit ID: ${result.insertedId}`);
 } else {
@@ -38,7 +47,7 @@ if (result.success) {
 
 ```typescript
 // Alle Dokumente in einer Sammlung finden
-const allPlayers = await exports['cfx-mongodb'].find('players');
+const allPlayers = await exports['cfx-mongodb'].findAll('players');
 if (allPlayers.success) {
   console.log(`${allPlayers.data.length} Spieler gefunden`);
   allPlayers.data.forEach((player: Player) => {
@@ -49,7 +58,7 @@ if (allPlayers.success) {
 }
 
 // Mit Filter und Optionen
-const highLevelPlayers = await exports['cfx-mongodb'].find('players', 
+const highLevelPlayers = await exports['cfx-mongodb'].findAll('players', 
   { level: { $gt: 5 } },  // Filter: Spieler mit Level über 5
   { sort: { level: -1 }, limit: 10 }  // Optionen: Nach Level absteigend sortiert, max. 10 Ergebnisse
 );
@@ -59,7 +68,7 @@ const highLevelPlayers = await exports['cfx-mongodb'].find('players',
 
 ```typescript
 // Einen bestimmten Spieler finden
-const player = await exports['cfx-mongodb'].findOne('players', { identifier: 'steam:123456789' });
+const player = await exports['cfx-mongodb'].find('players', { identifier: 'steam:123456789' });
 if (player.success && player.data) {
   console.log(`Spieler gefunden: ${player.data.name}`);
 } else if (player.success) {
@@ -73,14 +82,14 @@ if (player.success && player.data) {
 
 ```typescript
 // Spieler-Level erhöhen
-const updateResult = await exports['cfx-mongodb'].updateOne(
+const updateResult = await exports['cfx-mongodb'].update(
   'players',
   { identifier: 'steam:123456789' },  // Filter
   { $set: { level: 11 } }  // Aktualisierung mit Operator
 );
 
 // Alternative Syntax ohne expliziten $set Operator
-const simpleUpdate = await exports['cfx-mongodb'].updateOne(
+const simpleUpdate = await exports['cfx-mongodb'].update(
   'players',
   { identifier: 'steam:123456789' },
   { level: 12, lastUpdated: new Date() }
@@ -95,7 +104,7 @@ if (updateResult.success) {
 ## Dokument löschen
 
 ```typescript
-const deleteResult = await exports['cfx-mongodb'].deleteOne(
+const deleteResult = await exports['cfx-mongodb'].delete(
   'players',
   { identifier: 'steam:123456789' }
 );
@@ -116,10 +125,12 @@ Alle Funktionen (außer `isConnected`) geben ein Objekt mit mindestens einem `su
 
 ### Rückgabetypen im Detail
 
-- insertOne: `{success: true, insertedId: ObjectId}` oder `{success: false, error: string}`
-- find: `{success: true, data: T[]}` oder `{success: false, error: string}`
-- findOne: `{success: true, data: T | null}` oder `{success: false, error: string}`
-- updateOne: `{success: true, matchedCount: number, modifiedCount: number}` oder `{success: false, error: string}`
-- deleteOne: `{success: true, deletedCount: number}` oder `{success: false, error: string}`
+- insert: `{success: true, insertedId: ObjectId|string}`
+- findAll: `{success: true, data: T[]}`
+- find: `{success: true, data: T | null}`
+- update: `{success: true, matchedCount: number, modifiedCount: number}`
+- delete: `{success: true, deletedCount: number}`
 - isConnected: `boolean`
+
+Zusätzlich verfügbare Exporte: `count`, `ensureIndexes`, `health`, `config`.
 ```

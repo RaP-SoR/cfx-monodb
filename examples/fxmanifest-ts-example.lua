@@ -1,0 +1,14 @@
+fx_version 'cerulean'
+game { 'gta5', 'rdr3' }
+
+name 'cfx-mongodb-example-ts'
+author 'YourName'
+version '0.0.1'
+
+dependency 'cfx-mongodb'
+
+-- Build your TS to dist/example.js and reference here
+server_scripts {
+  'dist/example.js'
+}
+

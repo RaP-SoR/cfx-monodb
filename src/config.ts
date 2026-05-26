@@ -30,8 +30,8 @@ const config: Config = {
     ),
     options: {
       serverSelectionTimeoutMS: parseInt(GetConvar("mongodb_timeout", "5000")),
-      maxPoolSize: 10,
-      minPoolSize: 0,
+      maxPoolSize: Math.min(50, Math.max(0, parseInt(GetConvar("mongodb_max_pool", "10")))),
+      minPoolSize: Math.min(20, Math.max(0, parseInt(GetConvar("mongodb_min_pool", "0")))),
     },
   },
   prod: {
@@ -41,8 +41,8 @@ const config: Config = {
     ),
     options: {
       serverSelectionTimeoutMS: parseInt(GetConvar("mongodb_timeout", "10000")),
-      maxPoolSize: 10,
-      minPoolSize: 0,
+      maxPoolSize: Math.min(50, Math.max(0, parseInt(GetConvar("mongodb_max_pool", "10")))),
+      minPoolSize: Math.min(20, Math.max(0, parseInt(GetConvar("mongodb_min_pool", "0")))),
     },
   },
   test: {
@@ -52,8 +52,8 @@ const config: Config = {
     ),
     options: {
       serverSelectionTimeoutMS: parseInt(GetConvar("mongodb_timeout", "2000")),
-      maxPoolSize: 5,
-      minPoolSize: 0,
+      maxPoolSize: Math.min(50, Math.max(0, parseInt(GetConvar("mongodb_max_pool", "5")))),
+      minPoolSize: Math.min(20, Math.max(0, parseInt(GetConvar("mongodb_min_pool", "0")))),
     },
   },
 };

@@ -1,15 +1,15 @@
-# MongoDB API für Lua
+# MongoDB API for Lua
 
-Diese Dokumentation enthält Beispiele für die Verwendung der MongoDB-Schnittstelle in RedM mit Lua.
+English quick guide to use the MongoDB wrapper from Lua in FiveM/RedM.
 
-## Verbindungsstatus prüfen
+## Check connection state
 
 ```lua
 local isConnected = exports['cfx-mongodb']:isConnected()
-print('Ist die Datenbank verbunden?', isConnected)
+print('DB connected?', isConnected)
 ```
 
-## Dokument einfügen
+## Insert a document
 
 ```lua
 local playerDoc = {
@@ -22,100 +22,96 @@ local playerDoc = {
   }
 }
 
-local result = exports['cfx-mongodb']:insertOne('players', playerDoc)
+local result = exports['cfx-mongodb']:insert('players', playerDoc)
 if result.success then
-  print('Spieler eingefügt mit ID:', result.insertedId)
+  print('Inserted with ID:', result.insertedId)
 else
-  print('Fehler beim Einfügen:', result.error)
+  print('Insert error:', result.error)
 end
 ```
 
-## Dokumente finden
+## Find documents
 
 ```lua
--- Alle Dokumente in einer Sammlung finden
-local allPlayers = exports['cfx-mongodb']:find('players')
+-- List all documents in a collection
+local allPlayers = exports['cfx-mongodb']:findAll('players')
 if allPlayers.success then
-  print(#allPlayers.data, 'Spieler gefunden')
-  for _, player in ipairs(allPlayers.data) do
-    print('Spieler:', player.name, 'Level:', player.level)
-  end
+  print(#allPlayers.data, 'players found')
 else
-  print('Fehler bei der Suche:', allPlayers.error)
+  print('Find error:', allPlayers.error)
 end
 
--- Mit Filter und Optionen
-local highLevelPlayers = exports['cfx-mongodb']:find(
+-- With filter and options
+local highLevelPlayers = exports['cfx-mongodb']:findAll(
   'players', 
-  {level = {['$gt'] = 5}},  -- Filter: Spieler mit Level über 5
-  {sort = {level = -1}, limit = 10}  -- Optionen: Nach Level absteigend sortiert, max. 10 Ergebnisse
+  {level = {['$gt'] = 5}},
+  {sort = {level = -1}, limit = 10}
 )
 ```
 
-## Ein Dokument finden
+## Find one document
 
 ```lua
--- Einen bestimmten Spieler finden
-local player = exports['cfx-mongodb']:findOne('players', {identifier = 'steam:123456789'})
+local player = exports['cfx-mongodb']:find('players', {identifier = 'steam:123456789'})
 if player.success and player.data then
-  print('Spieler gefunden:', player.data.name)
+  print('Player found:', player.data.name)
 elseif player.success then
-  print('Spieler nicht gefunden')
+  print('Player not found')
 else
-  print('Fehler beim Suchen:', player.error)
+  print('Find error:', player.error)
 end
 ```
 
-## Dokument aktualisieren
+## Update a document
 
 ```lua
--- Spieler-Level erhöhen
-local updateResult = exports['cfx-mongodb']:updateOne(
+-- Using operator
+local updateResult = exports['cfx-mongodb']:update(
   'players',
-  {identifier = 'steam:123456789'},  -- Filter
-  {['$set'] = {level = 11}}  -- Aktualisierung mit Operator
+  {identifier = 'steam:123456789'},
+  {['$set'] = {level = 11}}
 )
 
--- Alternative Syntax ohne expliziten $set Operator
-local simpleUpdate = exports['cfx-mongodb']:updateOne(
+-- Or partial object (auto-wraps with $set)
+local simpleUpdate = exports['cfx-mongodb']:update(
   'players',
   {identifier = 'steam:123456789'},
   {level = 12, lastUpdated = os.time()}
 )
 
 if updateResult.success then
-  print('Übereinstimmende Dokumente:', updateResult.matchedCount)
-  print('Geänderte Dokumente:', updateResult.modifiedCount)
+  print('Matched:', updateResult.matchedCount)
+  print('Modified:', updateResult.modifiedCount)
 end
 ```
 
-## Dokument löschen
+## Delete a document
 
 ```lua
-local deleteResult = exports['cfx-mongodb']:deleteOne(
+local deleteResult = exports['cfx-mongodb']:delete(
   'players',
   {identifier = 'steam:123456789'}
 )
 
 if deleteResult.success then
-  print('Gelöschte Dokumente:', deleteResult.deletedCount)
+  print('Deleted:', deleteResult.deletedCount)
 else
-  print('Fehler beim Löschen:', deleteResult.error)
+  print('Delete error:', deleteResult.error)
 end
 ```
 
-## Rückgabewerte
+## Return values
 
-Alle Funktionen (außer `isConnected`) geben ein Tabelle mit mindestens einem `success`-Feld zurück:
-- Bei Erfolg: `{success = true, ...}` mit zusätzlichen Daten je nach Funktion
-- Bei Fehler: `{success = false, error = 'Fehlermeldung'}`
+All functions (except `isConnected`) return a table with `success`:
+- Success: `{ success = true, ... }`
+- Error: `{ success = false, error = 'message' }`
 
-### Rückgabetypen im Detail
+### Details by export
 
-- insertOne: `{success = true, insertedId = string}` oder `{success = false, error = string}`
-- find: `{success = true, data = Array<Table>}` oder `{success = false, error = string}`
-- findOne: `{success = true, data = Table|nil}` oder `{success = false, error = string}`
-- updateOne: `{success = true, matchedCount = number, modifiedCount = number}` oder `{success = false, error = string}`
-- deleteOne: `{success = true, deletedCount = number}` oder `{success = false, error = string}`
+- insert: `{ success = true, insertedId = string }`
+- findAll: `{ success = true, data = Array<Table> }`
+- find: `{ success = true, data = Table|nil }`
+- update: `{ success = true, matchedCount = number, modifiedCount = number }`
+- delete: `{ success = true, deletedCount = number }`
 - isConnected: `boolean`
 ```

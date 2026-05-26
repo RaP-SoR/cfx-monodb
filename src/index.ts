@@ -1,5 +1,6 @@
 import MongoDBConnector from "./connector";
 import { registerExports } from "./exports";
+import { log, parseInitIndexes } from "./utils";
 
 on("onResourceStart", async (resourceName: string) => {
   if (resourceName === GetCurrentResourceName()) {
@@ -7,11 +8,31 @@ on("onResourceStart", async (resourceName: string) => {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.connect();
       if (mongodb.isDbConnected()) {
-        console.log("CFX-MongoDB connected successfully");
+        log("info", "Connected successfully");
+        // Auto index initialization via convar
+        const specs = parseInitIndexes();
+        if (specs) {
+          const db = mongodb.getDb();
+          if (db) {
+            for (const [colName, indexes] of Object.entries(specs)) {
+              try {
+                const models = indexes.map((it: { keys: Record<string, 1 | -1>; options?: Record<string, unknown> }) => ({ key: it.keys, ...(it.options ? { ...it.options } : {}) }));
+                await db
+                  .collection(colName)
+                  .createIndexes(models as import("mongodb").IndexDescription[]);
+                log("info", `Indexes ensured for ${colName}: ${indexes.length}`);
+              } catch (e) {
+                log("warn", `Failed to ensure indexes for ${colName}: ${(e as Error).message}`);
+              }
+            }
+          }
+        }
       }
-      console.log(`${resourceName} started and MongoDB connected`);
+      log("info", `${resourceName} started and MongoDB connected`);
+      // Emit ready event for other resources
+      TriggerEvent("cfx-mongodb:ready");
     } catch (error) {
-      console.error(`Failed to start ${resourceName}:`, error);
+      log("error", `Failed to start ${resourceName}: ${(error as Error).message}`);
     }
   }
 });
@@ -21,9 +42,9 @@ on("onResourceStop", async (resourceName: string) => {
     try {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.disconnect();
-      console.log(`${resourceName} stopped and MongoDB disconnected`);
+      log("info", `${resourceName} stopped and MongoDB disconnected`);
     } catch (error) {
-      console.error(`Error while stopping ${resourceName}:`, error);
+      log("error", `Error while stopping ${resourceName}: ${(error as Error).message}`);
     }
   }
 });
