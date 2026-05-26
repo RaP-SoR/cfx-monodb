@@ -85,7 +85,7 @@ Diese Signaturen **müssen** exakt erfüllt werden:
 | `update` | `(collection, filter, update)` | `{ success: true, modifiedCount: number }` |
 | `delete` | `(collection, filter)` | `{ success: true, deletedCount: number }` |
 | `count` | `(collection, filter)` | `{ success: true, data: number }` |
-| `getVersion` | `()` | `Promise<string>` (Semver, z.B. `"1.0.1"`) |
+| `getVersion` | `()` | `Promise<string>` (Semver, z.B. `"1.0.0"`) |
 | `findById` | `(collection, id, projection?)` | `{ success: true, data: doc \| null }` |
 
 ### `findById(collection, id, projection?)`
@@ -174,7 +174,7 @@ const result = await exports["cfx-mongodb"].count("players", { active: true });
 
 ```typescript
 const version = await exports["cfx-mongodb"].getVersion();
-// "1.0.1" — aus fxmanifest.lua version '...'
+// "1.0.0" — aus fxmanifest.lua version '...'
 ```
 
 ---

@@ -276,7 +276,7 @@ describe("cfx-mongodb export API", () => {
 
       const getVersion = getExport<() => Promise<string>>("getVersion");
 
-      await expect(getVersion()).resolves.toBe("1.0.1");
+      await expect(getVersion()).resolves.toBe("1.0.0");
     });
   });
 

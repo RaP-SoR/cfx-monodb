@@ -70,7 +70,7 @@ All CRUD exports return `{ success: boolean, ... }`. On error: `{ success: false
 | `update(collection, filter, update)` | `{ success: true, modifiedCount, matchedCount }` |
 | `delete(collection, filter)` | `{ success: true, deletedCount }` or `{ success: false, error }` if not found |
 | `count(collection, filter?)` | `{ success: true, data: number }` |
-| `getVersion()` | `"1.0.1"` (Semver string, no envelope) |
+| `getVersion()` | `"1.0.0"` (Semver string, no envelope) |
 
 ### findAll options
 

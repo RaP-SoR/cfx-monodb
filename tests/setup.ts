@@ -5,7 +5,7 @@ vi.stubGlobal("GetCurrentResourceName", () => "cfx-mongodb");
 vi.stubGlobal(
   "GetResourceMetadata",
   (_resource: string, key: string, _index: number) =>
-    key === "version" ? "1.0.1" : ""
+    key === "version" ? "1.0.0" : ""
 );
 vi.stubGlobal("emitNet", vi.fn());
 vi.stubGlobal("TriggerEvent", vi.fn());

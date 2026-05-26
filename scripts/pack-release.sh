@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build a FiveM-ready resource zip (dist + fxmanifest + prod node_modules).
 # Usage: ./scripts/pack-release.sh [version-label]
-# Example: yarn build && ./scripts/pack-release.sh v1.0.1
+# Example: yarn build && ./scripts/pack-release.sh v1.0.0
 
 set -euo pipefail
 

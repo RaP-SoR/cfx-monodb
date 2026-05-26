@@ -62,7 +62,7 @@ CI builds a **ready-to-use ZIP** (`dist/` + `fxmanifest.lua` + `node_modules/mon
 
 | Trigger | Where |
 |---------|--------|
-| **Tag** `v*` (e.g. `v1.0.1`) | [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) |
+| **Tag** `v*` (z. B. `v1.0.0`) | [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) |
 | **Push to `dev`** | Actions → latest **Release** workflow → Artifact `cfx-mongodb-dev-{sha}` |
 | **Manual** | Actions → **Release** → **Run workflow** → Artifact |
 
@@ -77,8 +77,8 @@ CI builds a **ready-to-use ZIP** (`dist/` + `fxmanifest.lua` + `node_modules/mon
 
 ```bash
 # After changes on dev, when a build should be downloadable as a named version:
-git tag v1.0.2
-git push origin v1.0.2
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 CI runs tests, builds, packs the ZIP, and publishes a **GitHub Release** automatically.

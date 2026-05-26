@@ -1,5 +1,12 @@
 # Änderungen (Changelog)
 
+## 1.0.0 — Erstes GitHub Release (2026-05-26)
+
+- **Erstes Release-Zip** via GitHub Actions (`release.yml`) — Download ohne lokales `yarn build`
+- Refactor (Handler-Split, `withDb`, Node 22, MongoDB v7), Slow-Query-Log, `getQueryStats`
+- Doku: `docs/CONFIGURATION.md`, API, Examples, Quality-Audit-Baseline
+- **89 Tests**, Contract-Sync manifest ↔ `CFX_MONGODB_EXPORTS`
+
 ## Docs — GitHub Release CI (Track I)
 
 - **`.github/workflows/release.yml`** — gate + ZIP on `dev` push, tag `v*`, manual dispatch
