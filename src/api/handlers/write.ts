@@ -52,7 +52,10 @@ export function registerWriteHandlers(
         const normalized = normalizeIdFilter(filter);
         validateFilter(normalized);
         validateUpdate(update as Record<string, unknown>);
-        log("debug", `Updating with filter: ${JSON.stringify(normalized)}`);
+        log(
+          "debug",
+          `Updating (filter_keys=${extractFilterKeys(normalized)?.join(",") ?? "none"})`
+        );
 
         const updateDoc: UpdateFilter<T> =
           "$set" in update ? update : { $set: update as Partial<T> };
@@ -111,7 +114,7 @@ export function registerWriteHandlers(
       }
       log(
         "info",
-        `Deleted document with filter: ${JSON.stringify(filter as Record<string, unknown>)}`
+        `Deleted document (filter_keys=${extractFilterKeys(filter)?.join(",") ?? "none"})`
       );
       return { success: true, deletedCount: result.data };
     }

@@ -47,7 +47,7 @@ Framework success checks:
 ## Documentation
 
 - Pipeline/security modules → add/update TSDoc when editing (see AGENTS.md).
-- Export behavior changes → update `docs/API.md` + examples, not handler comments.
+- Export behavior changes → update `docs/API.md` + **both** `docs/examples/lua/` and `docs/examples/typescript/` (skill: `examples-docs`).
 
 ## Build verify
 

@@ -1,5 +1,27 @@
 # Änderungen (Changelog)
 
+## Unreleased — Examples-docs skill + doc-audit script
+
+- **Skill:** `.cursor/skills/examples-docs/` — Lua+TS parallel routine, TEMPLATE.md
+- **Rule:** `.cursor/rules/examples-docs.mdc` for `docs/examples/**`
+- **`yarn doc-audit`** — lists `server_exports` and doc files to verify; wired into `yarn scout` reminders
+
+## Unreleased — Documentation audit (2026-05)
+
+- **`docs/DOCUMENTATION-AUDIT-2026.md`** — export ↔ docs matrix, limitations, reading order
+- **API.md** — limitations section; full denylist (`$expr`, `$jsonSchema`); `cfx-mongodb:disconnected` event
+
+## Unreleased — Examples split by language
+
+- **`docs/examples/lua/`** — Lua-only snippets, patterns, query cookbook, `server.lua`, manifest
+- **`docs/examples/typescript/`** — TypeScript-only equivalents
+- **`lua/use-cases.md`** · **`typescript/use-cases.md`** — FiveM flows (accounts, characters, vehicles, items); export coverage table for all `server_exports`
+- **`docs/examples/sample-resource/`** — copyable multi-file Lua consumer (accounts, characters, vehicles, items)
+- **“What this does”** blurbs before code in `lua/queries.md`, `lua/patterns.md`, `lua/snippets.md`, `lua/use-cases.md`, commented `lua/server.lua`
+- **JOIN analogy** (account → characters → vehicles/items/clothing) with numbered steps in `lua/queries.md` §3.7
+- **Time zones** — UTC storage + EU/US/Asia offset table; `datetime-helpers.lua` / `datetime-helpers.ts`
+- Root `lua.md`, `typescript.md`, `queries.md`, `patterns.md` → redirect stubs; old paths documented in [examples/README.md](examples/README.md)
+
 ## Unreleased — Pre-stable: Track J + K (Integration & Logging)
 
 - **Stable `v1.0.0` zurückgestellt** — Integration ~8%, Logging ~62% sind Blocker

@@ -62,7 +62,7 @@ Full checklist: **[docs/CHECKLIST.md](docs/CHECKLIST.md)**. After edits run **`y
 - [ ] CTFFramework contract in `docs/API.md`
 - [ ] `fxmanifest.lua` → `server_exports` if new export
 - [ ] `yarn gate` (or `yarn scout`)
-- [ ] Update `docs/examples/typescript.md` / `docs/examples/lua.md` on behavior change
+- [ ] Update `docs/examples/typescript/` **and** `docs/examples/lua/` on behavior change (skill: `.cursor/skills/examples-docs/`, `yarn doc-audit`)
 
 ## Invariants
 

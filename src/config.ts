@@ -3,6 +3,8 @@
  * Resolved once at module load — see docs/CONFIGURATION.md.
  */
 
+import { log } from "./utils";
+
 interface DatabaseConfig {
   mongoUrl: string;
   options: {
@@ -68,6 +70,6 @@ const environment = GetConvar(
   isDevelopmentServer() ? "dev" : "prod"
 ) as "dev" | "prod" | "test";
 
-console.log(`[CFX-MongoDB] Environment: ${environment}`);
+log("info", `Environment: ${environment}`);
 
 export default config[environment];

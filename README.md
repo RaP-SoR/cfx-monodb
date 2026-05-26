@@ -10,7 +10,9 @@ CitizenFX (FiveM/RedM) MongoDB TypeScript Wrapper
 | [docs/GUIDE.md](docs/GUIDE.md) | Overview, troubleshooting |
 | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | **Installation, ConVars, dev/prod profiles** |
 | [docs/SEARCH-MAP.md](docs/SEARCH-MAP.md) | AI agents & maintainers — navigation |
-| [docs/examples/typescript.md](docs/examples/typescript.md) / [lua.md](docs/examples/lua.md) | Language examples |
+| [docs/examples/lua/use-cases.md](docs/examples/lua/use-cases.md) | FiveM use cases — every export |
+| `yarn doc-audit` / skill `examples-docs` | Doc routine after export/merge — Lua+TS in parallel |
+| [docs/examples/lua/](docs/examples/lua/README.md) / [typescript/](docs/examples/typescript/README.md) | Language examples (separate folders) |
 | [AGENTS.md](AGENTS.md) | Cursor/CI contributor guidelines |
 
 Changelog: [docs/CHANGELOG.md](docs/CHANGELOG.md)
@@ -70,5 +72,5 @@ yarn lint
 
 ## Examples
 
-- [docs/examples/typescript.md](docs/examples/typescript.md) · [server.ts](docs/examples/server.ts)
-- [docs/examples/lua.md](docs/examples/lua.md) · [server.lua](docs/examples/server.lua)
+- [docs/examples/typescript/](docs/examples/typescript/README.md) · [server.ts](docs/examples/typescript/server.ts)
+- [docs/examples/lua/](docs/examples/lua/README.md) · [server.lua](docs/examples/lua/server.lua)

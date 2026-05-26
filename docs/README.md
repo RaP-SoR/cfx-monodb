@@ -17,13 +17,16 @@ Entry point for humans and agents. **Canonical API contract:** [API.md](API.md).
 
 ## Examples
 
-| Document | Code |
-|----------|------|
-| [examples/patterns.md](examples/patterns.md) | CTFFramework success checks, filters, pagination |
-| [examples/typescript.md](examples/typescript.md) | [examples/server.ts](examples/server.ts) |
-| [examples/lua.md](examples/lua.md) | [examples/server.lua](examples/server.lua) |
+| Document | Purpose |
+|----------|---------|
+| [DOCUMENTATION-AUDIT-2026.md](DOCUMENTATION-AUDIT-2026.md) | **Export ↔ docs audit** (coverage matrix, limitations) |
+| [examples/README.md](examples/README.md) | Examples hub + reading order |
+| [examples/lua/use-cases.md](examples/lua/use-cases.md) | FiveM flows, all exports (Lua) |
+| [examples/lua/queries.md](examples/lua/queries.md) | Query cookbook, JOIN analogy, time zones |
+| [examples/sample-resource/](examples/sample-resource/README.md) | Copyable multi-file Lua consumer |
+| [examples/typescript/](examples/typescript/README.md) | TypeScript mirror of the above |
 
-Sample manifests: [fxmanifest-ts-example.lua](examples/fxmanifest-ts-example.lua), [fxmanifest-lua-example.lua](examples/fxmanifest-lua-example.lua).
+Manifests: [lua/fxmanifest-lua-example.lua](examples/lua/fxmanifest-lua-example.lua), [typescript/fxmanifest-ts-example.lua](examples/typescript/fxmanifest-ts-example.lua).
 
 ## Plans & archive
 

@@ -361,9 +361,12 @@ Use only when:
 |-----|---------|
 | [API.md](API.md) | Full ConVar table + export reference |
 | [GUIDE.md](GUIDE.md) | Overview, troubleshooting |
-| [examples/typescript.md](examples/typescript.md) | TS consumer patterns |
-| [examples/lua.md](examples/lua.md) | Lua consumer patterns |
+| [examples/typescript/](examples/typescript/README.md) | TS consumer examples |
+| [examples/lua/](examples/lua/README.md) | Lua consumer examples |
 | [examples/config/README.md](examples/config/README.md) | Profile templates |
+| [LOGGING.md](LOGGING.md) | Log levels, PII policy, filter redaction |
+
+**Contributors:** integration tests — `yarn test:integration` with `TEST_MONGODB_URI` (see [tests/integration/README.md](../tests/integration/README.md)).
 
 ---
 

@@ -43,8 +43,7 @@ Stattdessen: **strukturierte Markdown-Artefakte** als persistentes Agent-Gedäch
 | Skill | Pfad | Wann laden |
 |-------|------|------------|
 | `cfx-mongodb` | `.cursor/skills/cfx-mongodb/SKILL.md` | Export-Änderungen, CTFFramework-Kompatibilität, MongoDB-Wrapper-Arbeit |
-| Skill | Pfad | Wann laden |
-|-------|------|------------|
+| `examples-docs` | `.cursor/skills/examples-docs/SKILL.md` | Consumer-Beispiele Lua+TS, Cookbook, Doc-Audit nach Merge/Commit |
 | `post-change-scout` | `.cursor/skills/post-change-scout/SKILL.md` | Vor Commit/Push — `yarn scout`, Checklist, Drift-Check |
 | `integration-review` | `.cursor/skills/integration-review/SKILL.md` | Track J — real Mongo tests, CI integration job |
 | `logging-review` | `.cursor/skills/logging-review/SKILL.md` | Track K — log policy, redaction, tests |
@@ -62,6 +61,7 @@ Der Skill verweist auf `reference.md` für API-Details — **progressive disclos
 |------|-------|-------|
 | `exports-api.mdc` | `src/exports.ts`, `src/responses.ts` | Response-Envelope, keine Exceptions |
 | `node22-runtime.mdc` | `**/*` (always) | Node 22 + Build-Pflicht |
+| `examples-docs.mdc` | `docs/examples/**`, `docs/API.md` | Lua+TS examples parallel, TEMPLATE |
 
 Rules sind **kurz (<50 Zeilen)** und ergänzen AGENTS.md um datei-spezifische Invarianten.
 
@@ -82,15 +82,15 @@ Rules sind **kurz (<50 Zeilen)** und ergänzen AGENTS.md um datei-spezifische In
 | 1 | `docs/API.md` | Externe Consumer, CTFFramework |
 | 2 | `docs/SEARCH-MAP.md` | Agents, Maintainer |
 | 3 | `AGENTS.md` | Cursor/CI Contributors |
-| 4 | `docs/examples/typescript.md` / `lua.md` | Sprach-spezifische Beispiele |
+| 4 | `docs/examples/typescript/` / `lua/` | Sprach-spezifische Beispiele (getrennte Ordner) |
 | 5 | `docs/GUIDE.md` / `README.md` | Menschliche Übersicht |
-| 6 | `docs/examples/server.*` | Copy-Paste-Starter |
+| 6 | `docs/examples/lua/server.lua` / `typescript/server.ts` | Copy-Paste-Starter |
 
 Bei Widersprüchen gilt **`docs/API.md`** + **`src/api/handlers/*`** (Implementierung).
 
 ## Agent-Workflows (Checklisten)
 
-**Canonical:** [CHECKLIST.md](CHECKLIST.md) · **Automated:** `yarn gate` / `yarn scout`
+**Canonical:** [CHECKLIST.md](CHECKLIST.md) · **Automated:** `yarn gate` / `yarn scout` / `yarn doc-audit` · **Examples skill:** `.cursor/skills/examples-docs/`
 
 ### Export ändern
 - [ ] See [CHECKLIST.md — Export / API](CHECKLIST.md#export--api-behavior-change)

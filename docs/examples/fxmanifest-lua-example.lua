@@ -1,15 +1,1 @@
-fx_version 'cerulean'
-game { 'gta5', 'rdr3' }
-
-name 'cfx-mongodb-example-lua'
-author 'YourName'
-version '0.0.1'
-
-dependency 'cfx-mongodb'
-
--- server.cfg: ensure cfx-mongodb before this resource
-
-server_scripts {
-  'server.lua'
-}
-
+-- Moved to docs/examples/lua/fxmanifest-lua-example.lua (use with lua/server.lua)

@@ -130,7 +130,7 @@ if (one.data === null) return console.log("not found");
 // one.data._id is string
 ```
 
-Weitere Patterns: [examples/patterns.md](examples/patterns.md).
+Weitere Patterns: [examples/lua/patterns.md](examples/lua/patterns.md) · [examples/typescript/patterns.md](examples/typescript/patterns.md) · Filter: [examples/lua/queries.md](examples/lua/queries.md) · [examples/typescript/queries.md](examples/typescript/queries.md).
 
 ### `findAll(collection, filter?, options?)`
 
@@ -283,7 +283,8 @@ TypScript-Typ: `CfxMongoQueryStatsResult` in `src/types/api.ts`.
 | Event | Mechanismus | Payload | Wann |
 |-------|-------------|---------|------|
 | `cfx-mongodb:ready` | `TriggerEvent` | — | Nach `onResourceStart`: Connect + optionaler Index-Init (`mongodb_init_indexes`) abgeschlossen |
-| `cfx-mongodb:connected` | `TriggerEvent` | `(success: boolean)` | Nach erfolgreichem Connect im Connector (`success === true`) |
+| `cfx-mongodb:connected` | `TriggerEvent` | `(success: boolean, error?: string)` | Nach Connect (`connector` oder `connect()`-Export); bei Fehler `success === false` |
+| `cfx-mongodb:disconnected` | `TriggerEvent` | `(success: boolean, error?: string)` | Nach `disconnect()`-Export (Advanced) |
 
 **Empfohlenes Startup-Pattern (Lua):**
 
@@ -328,7 +329,7 @@ on("cfx-mongodb:ready", () => {
 | `mongodb_timeout` | 5000/10000/2000 | Server selection timeout (ms) |
 | `mongodb_max_pool` | 10 | Max pool (0–50) |
 | `mongodb_min_pool` | 0 | Min pool (0–20) |
-| `mongodb_log_level` | `info` | `error\|warn\|info\|debug` |
+| `mongodb_log_level` | `info` | `error\|warn\|info\|debug` — see [LOGGING.md](LOGGING.md) |
 | `mongodb_init_indexes` | — | JSON: Collection → Index-Specs |
 | `mongodb_perf_enabled` | `0` | Slow-query-Timing (0=aus) |
 | `mongodb_perf_slow_ms` | `100` | Schwellwert für `SLOW QUERY`-Warnung (ms) |
@@ -347,11 +348,27 @@ Log-Zeilen erscheinen als `[CFX-MongoDB] SLOW QUERY find players 142ms (threshol
 
 ---
 
+## Limitations (nicht über Exports)
+
+| Feature | Verhalten |
+|---------|-----------|
+| Aggregation (`aggregate`), Transactions, Change Streams | Nicht als Export — nur vertrauenswürdig über `getDb()` + Treiber |
+| `update` / `delete` | Immer **ein** Dokument (`updateOne` / `deleteOne`) |
+| `insert` | **Keine** `validateDocument`-Prüfung auf dem Insert-Pfad (Stand 2026-05) — Filter/Updates werden validiert |
+| Filter/Update-Größe | Max. Tiefe **8**, max. **100** Knoten — sonst `{ success: false, error }` |
+
+Beispiele & JOIN-Ersatz: [examples/lua/queries.md](examples/lua/queries.md). Audit: [DOCUMENTATION-AUDIT-2026.md](DOCUMENTATION-AUDIT-2026.md).
+
+---
+
 ## Sicherheit
 
-Blockierte Operatoren in Filtern/Updates: `$where`, `$function`, `$accumulator`, `$regexFind`, `$regexFindAll`, `$out`, `$merge`.
+Blockierte Operatoren in **Filtern und Updates** (siehe `src/validateQuery.ts`):  
+`$where`, `$function`, `$expr`, `$jsonSchema`, `$accumulator`, `$regexFind`, `$regexFindAll`, `$out`, `$merge`.
 
 User-Input in Queries immer validieren/whitelisten — diese Resource blockiert nur die gefährlichsten Operatoren.
+
+Log-Policy (PII, URI-Redaction, Filter-Keys): **[LOGGING.md](LOGGING.md)**
 
 `getDb`, `connect`, `disconnect` und `getQueryStats` umgehen Query-Validierung bzw. sind Admin-Diagnostik — nur für vertrauenswürdige Server-Interna.
 
@@ -364,5 +381,9 @@ User-Input in Queries immer validieren/whitelisten — diese Resource blockiert 
 | Syntax | `exports["cfx-mongodb"].find(...)` | `exports['cfx-mongodb']:find(...)` |
 | Async | `await` / `.then()` | Citizen await pattern |
 | Events | `on("cfx-mongodb:ready", …)` | `AddEventHandler('cfx-mongodb:ready', …)` |
-| Beispiele | [examples/typescript.md](examples/typescript.md) | [examples/lua.md](examples/lua.md) |
-| Patterns | [examples/patterns.md](examples/patterns.md) | CTFFramework checks, filters, pagination |
+| Beispiele | [examples/typescript/](examples/typescript/README.md) | [examples/lua/](examples/lua/README.md) |
+| Patterns | [lua/patterns.md](examples/lua/patterns.md) · [typescript/patterns.md](examples/typescript/patterns.md) | Success checks, pagination (per language) |
+| Query cookbook | [lua/queries.md](examples/lua/queries.md) · [typescript/queries.md](examples/typescript/queries.md) | Operators, updates, performance |
+| FiveM use cases | [lua/use-cases.md](examples/lua/use-cases.md) · [typescript/use-cases.md](examples/typescript/use-cases.md) | Account/character/vehicle flows; every export |
+| Sample resource | [examples/sample-resource/](examples/sample-resource/README.md) | Multi-file Lua reference consumer |
+| Doc audit | [DOCUMENTATION-AUDIT-2026.md](DOCUMENTATION-AUDIT-2026.md) | Export ↔ docs matrix (2026-05) |

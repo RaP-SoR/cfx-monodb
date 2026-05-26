@@ -1,0 +1,16 @@
+---
+description: When editing consumer examples or API docs — keep Lua and TypeScript examples in parallel
+globs: docs/examples/**,docs/API.md
+alwaysApply: false
+---
+
+# Examples documentation
+
+When changing `docs/examples/**` or export sections in `docs/API.md`:
+
+1. Update **both** `docs/examples/lua/` and `docs/examples/typescript/` (never mixed in one file).
+2. Each block: **What this does** + numbered **Steps** (if ordered) + code — see `.cursor/skills/examples-docs/TEMPLATE.md`.
+3. Refresh export coverage in both `use-cases.md` files.
+4. Run `yarn doc-audit` and `yarn scout` before push.
+
+Skill: `.cursor/skills/examples-docs/SKILL.md`

@@ -30,9 +30,13 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 | Agent-Regeln & Workflow | `AGENTS.md` |
 | Pre-push / PR checklist | `docs/CHECKLIST.md` — `yarn gate`, `yarn scout` |
 | Post-change scout skill | `.cursor/skills/post-change-scout/SKILL.md` |
-| Lua-Beispiele | `docs/examples/lua.md`, `docs/examples/server.lua` |
-| TypeScript-Beispiele | `docs/examples/typescript.md`, `docs/examples/server.ts` |
-| Consumer-Patterns (CTFFramework) | `docs/examples/patterns.md` |
+| Lua-Beispiele | `docs/examples/lua/` (`snippets.md`, `queries.md`, `server.lua`) |
+| TypeScript-Beispiele | `docs/examples/typescript/` (`snippets.md`, `queries.md`, `server.ts`) |
+| Consumer-Patterns | `docs/examples/lua/patterns.md`, `docs/examples/typescript/patterns.md` |
+| Query/filter cookbook | `docs/examples/lua/queries.md`, `docs/examples/typescript/queries.md` |
+| FiveM use cases (all exports) | `docs/examples/lua/use-cases.md`, `docs/examples/typescript/use-cases.md` |
+| Sample multi-file consumer | `docs/examples/sample-resource/` |
+| Documentation audit (exports ↔ docs) | `docs/DOCUMENTATION-AUDIT-2026.md` |
 | Changelog | `docs/CHANGELOG.md` |
 | Dokumentations-Index | `docs/README.md` |
 
@@ -91,7 +95,8 @@ Server-Consumer nutzen **`AddEventHandler`** (Lua) bzw. **`on(...)`** (TS) — c
 | Event | Mechanismus | Wann |
 |-------|-------------|------|
 | `cfx-mongodb:ready` | `TriggerEvent` | Nach Connect + optionaler Index-Init (`src/bootstrap.ts`) |
-| `cfx-mongodb:connected` | `TriggerEvent` | Nach erfolgreichem Connect (`src/connector.ts`, Payload: `true`) |
+| `cfx-mongodb:connected` | `TriggerEvent` | Nach Connect (`src/connector.ts` / `connect` export) |
+| `cfx-mongodb:disconnected` | `TriggerEvent` | Nach `disconnect()` (`src/api/handlers/lifecycle.ts`) |
 
 Consumer-Ressourcen sollten auf **`cfx-mongodb:ready`** warten, bevor sie CRUD-Exports nutzen.
 

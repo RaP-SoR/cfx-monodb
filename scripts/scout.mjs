@@ -48,7 +48,8 @@ function main() {
     const remind = (msg) => console.log(`  → ${msg}`);
 
     if (/src\/api\/handlers|registerExports|responses\.ts|src\/types\/api\.ts/.test(text)) {
-      remind("Export code touched — docs/API.md, fxmanifest server_exports, tests (api-contract)");
+      remind("Export code touched — API.md + lua/ + typescript/ examples (skill: examples-docs)");
+      remind("Run: yarn doc-audit — then update use-cases coverage tables both languages");
     }
     if (/fxmanifest\.lua/.test(text)) {
       remind("fxmanifest changed — keep node_version '22'; sync server_exports");
@@ -60,7 +61,7 @@ function main() {
       remind("Release/CI touched — docs/CONFIGURATION.md, docs/releases/");
     }
     if (/docs\/API\.md/.test(text)) {
-      remind("API.md changed — verify examples/typescript.md + lua.md still match");
+      remind("API.md changed — verify docs/examples/typescript/ + lua/ still match");
     }
     if (/docs\/examples\//.test(text)) {
       remind("Examples changed — cross-check docs/API.md contract");
@@ -69,7 +70,10 @@ function main() {
     console.log("\nFull checklist: docs/CHECKLIST.md");
   }
 
-  console.log("\nRunning gate...\n");
+  console.log("\nDoc export list: yarn doc-audit");
+  console.log("Examples routine: .cursor/skills/examples-docs/SKILL.md\n");
+
+  console.log("Running gate...\n");
   const result = spawnSync("yarn", ["gate"], { cwd: root, stdio: "inherit", shell: true });
   process.exit(result.status ?? 1);
 }

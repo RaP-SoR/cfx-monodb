@@ -1,6 +1,6 @@
 /**
  * @file Resource lifecycle — connect, register exports, index init, ready event.
- * See docs/ARCHITECTURE.md and docs/examples/patterns.md (startup).
+ * See docs/ARCHITECTURE.md and docs/examples/lua/patterns.md (startup).
  */
 
 import MongoDBConnector from "./connector";

@@ -1,7 +1,7 @@
 # Commit & PR checklist — cfx-mongodb
 
 > **Track E** — use before every push to `dev` (PR optional for solo team).  
-> Automated gate: `yarn gate` · Agent skill: `.cursor/skills/post-change-scout/SKILL.md`
+> Automated gate: `yarn gate` · Scout: `yarn scout` · Examples routine: `yarn doc-audit` + `.cursor/skills/examples-docs/`
 
 ---
 
@@ -25,8 +25,10 @@ Touching `src/api/handlers/*`, `registerExports.ts`, `responses.ts`, or export s
 - [ ] `fxmanifest.lua` → `server_exports` (if **new** export name)
 - [ ] `src/types/api.ts` → `CFX_MONGODB_EXPORTS` if contract export
 - [ ] **`docs/API.md`** — signature, envelope, CTFFramework section if applicable
-- [ ] **`docs/examples/typescript.md`** and/or **`lua.md`** on behavior change
-- [ ] **`docs/examples/patterns.md`** if success-check or consumer pattern changes
+- [ ] **`docs/examples/lua/`** and **`docs/examples/typescript/`** in parallel (`use-cases.md` coverage table, `snippets.md`, `queries.md` as needed)
+- [ ] **`docs/examples/*/patterns.md`** if success-check or consumer pattern changes
+- [ ] Skill **`.cursor/skills/examples-docs/`** (TEMPLATE.md: What this does + numbered Steps)
+- [ ] **`yarn doc-audit`** — export list matches docs; update **`docs/DOCUMENTATION-AUDIT-2026.md`** if exports added/removed
 - [ ] **`tests/`** — handler test or `api-contract.test.ts` invariant
 - [ ] `yarn test` includes manifest ↔ runtime sync (`tests/api-contract.test.ts`)
 
@@ -101,6 +103,6 @@ Hooks are local-only (not committed).
 | Doc | Topic |
 |-----|--------|
 | [API.md](API.md) | External contract |
-| [examples/patterns.md](examples/patterns.md) | CTFFramework consumer patterns |
+| [examples/lua/patterns.md](examples/lua/patterns.md) · [typescript/patterns.md](examples/typescript/patterns.md) | Consumer patterns per language |
 | [AI-STACK.md](AI-STACK.md) | Cursor skills & rules |
 | [SEARCH-MAP.md](SEARCH-MAP.md) | File navigation |

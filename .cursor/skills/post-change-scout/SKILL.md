@@ -19,6 +19,14 @@ yarn scout
 
 Runs `scripts/scout.mjs`: change-based reminders + `yarn gate` (lint, tsc, test, build).
 
+**Export or consumer docs changed?** Also run the examples routine:
+
+```bash
+yarn doc-audit
+```
+
+Then follow [.cursor/skills/examples-docs/SKILL.md](../examples-docs/SKILL.md) (Lua + TypeScript in parallel).
+
 ## Manual scout (agent)
 
 If shell unavailable, run equivalent steps:
@@ -35,7 +43,7 @@ If shell unavailable, run equivalent steps:
 
 | Touched | Verify |
 |---------|--------|
-| `src/api/handlers/*`, `registerExports`, `responses` | API.md, fxmanifest, examples, tests |
+| `src/api/handlers/*`, `registerExports`, `responses` | API.md, fxmanifest, **lua/ + typescript/** examples, tests, `yarn doc-audit` |
 | `src/config.ts`, ConVars in manifest | CONFIGURATION.md, `config()` in API.md |
 | `.github/workflows`, `scripts/pack-*` | CONFIGURATION.md, docs/releases/ |
 | Consumer semantics (find not-found, counts) | patterns.md, api-contract tests |
@@ -59,7 +67,8 @@ If shell unavailable, run equivalent steps:
 - [ ] API.md synced
 - [ ] fxmanifest server_exports
 - [ ] tests added/updated
-- [ ] examples if behavior changed
+- [ ] examples (lua + typescript, use-cases coverage) if behavior changed
+- [ ] examples-docs skill / TEMPLATE.md format
 
 ### Notes
 (one line on drift found or "none")

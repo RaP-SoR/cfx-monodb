@@ -2,18 +2,60 @@
 
 Copy-paste starters for **consumer resources** (not part of the `cfx-mongodb` build).
 
-## Files
+Examples are split by language so Lua authors never need to read TypeScript (and vice versa).
+
+## Language folders
+
+| Folder | For |
+|--------|-----|
+| **[lua/](lua/README.md)** | **Lua only** — snippets, query cookbook, patterns, `server.lua`, manifest |
+| **[typescript/](typescript/README.md)** | **TypeScript only** — snippets, query cookbook, patterns, `server.ts`, manifest |
+
+### Lua quick links
 
 | File | Description |
 |------|-------------|
-| [patterns.md](patterns.md) | **CTFFramework patterns** — success checks, filters, pagination, anti-patterns |
-| [typescript.md](typescript.md) | TypeScript snippets per export |
-| [lua.md](lua.md) | Lua snippets per export |
-| [server.ts](server.ts) | Runnable TS tour (wait for `cfx-mongodb:ready`) |
-| [server.lua](server.lua) | Runnable Lua tour (same flow) |
-| [fxmanifest-ts-example.lua](fxmanifest-ts-example.lua) | Manifest for TS consumer |
-| [fxmanifest-lua-example.lua](fxmanifest-lua-example.lua) | Manifest for Lua consumer |
-| [config/](config/) | **Dev/prod ConVar profile templates** (`exec` + gitignore) |
+| **[lua/use-cases.md](lua/use-cases.md)** | **FiveM scenarios** (account, character, vehicle, items) + all exports |
+| [lua/snippets.md](lua/snippets.md) | Per-export quick reference |
+| [lua/queries.md](lua/queries.md) | Filters, operators, updates, performance |
+| [lua/patterns.md](lua/patterns.md) | `ready` event, success checks, pagination |
+| [lua/server.lua](lua/server.lua) | Runnable CRUD tour |
+
+### TypeScript quick links
+
+| File | Description |
+|------|-------------|
+| **[typescript/use-cases.md](typescript/use-cases.md)** | **FiveM scenarios** + all exports |
+| [typescript/snippets.md](typescript/snippets.md) | Per-export quick reference |
+| [typescript/queries.md](typescript/queries.md) | Filters, operators, updates, performance |
+| [typescript/patterns.md](typescript/patterns.md) | Patterns + npm types |
+| [typescript/server.ts](typescript/server.ts) | Runnable CRUD tour |
+
+### For hobby developers
+
+1. Open **[lua/use-cases.md](lua/use-cases.md)** or **[typescript/use-cases.md](typescript/use-cases.md)** — export checklist shows nothing is missing.
+2. Copy a **flow** (player join, character, garage) into your resource.
+3. Use **[queries.md](lua/queries.md)** when filters get complex.
+4. Run **[server.lua](lua/server.lua)** / **[server.ts](typescript/server.ts)** once against local Mongo to build confidence.
+5. Copy **[sample-resource/](sample-resource/README.md)** into `resources/` for a realistic folder layout.
+
+**Doc style:** Cookbook and pattern sections include a short **“What this does”** (and numbered **Steps** where useful) before code.
+
+**Audit (2026-05):** [../DOCUMENTATION-AUDIT-2026.md](../DOCUMENTATION-AUDIT-2026.md) — confirms all exports are documented; lists intentional limitations (no aggregation export, `updateOne` only, etc.).
+
+**Maintainers:** `yarn doc-audit` · Agent skill [`.cursor/skills/examples-docs/`](../../.cursor/skills/examples-docs/SKILL.md) · Block template [TEMPLATE.md](../../.cursor/skills/examples-docs/TEMPLATE.md)
+
+## Sample resource (copy-paste)
+
+| Path | Description |
+|------|-------------|
+| [sample-resource/](sample-resource/README.md) | **Multi-file Lua consumer** — `server/accounts.lua`, `characters.lua`, `vehicles.lua`, `items.lua` |
+
+## Shared
+
+| Path | Description |
+|------|-------------|
+| [config/](config/) | ConVar profile templates (`exec` + gitignore) |
 
 ## server.cfg order
 
@@ -25,35 +67,26 @@ ensure cfx-mongodb
 ensure your-consumer-resource
 ```
 
-Consumer code must wait for **`cfx-mongodb:ready`** before CRUD — see `server.ts` / `server.lua`.
+Wait for **`cfx-mongodb:ready`** before CRUD — see [lua/patterns.md](lua/patterns.md) or [typescript/patterns.md](typescript/patterns.md).
 
 ## Export coverage
 
 Canonical contract: [../API.md](../API.md).
 
-| Export | typescript.md | lua.md | server.ts / server.lua | Notes |
-|--------|:-------------:|:------:|:----------------------:|-------|
-| `insert` | ✓ | ✓ | ✓ | |
-| `find` | ✓ | ✓ | ✓ | incl. not-found (`data: null`) |
-| `findById` | ✓ | ✓ | ✓ | |
-| `findAll` | ✓ | ✓ | ✓ | projection, sort, limit, skip |
-| `update` | ✓ | ✓ | ✓ | `$set` by `_id` |
-| `delete` | ✓ | ✓ | ✓ | incl. not-found error |
-| `count` | ✓ | ✓ | ✓ | |
-| `getVersion` | ✓ | ✓ | ✓ | |
-| `ensureIndexes` | ✓ | ✓ | ✓ | |
-| `health` | ✓ | ✓ | ✓ | |
-| `config` | ✓ | ✓ | ✓ | |
-| `isConnected` | ✓ | ✓ | ✓ | guard after `ready` |
-| `connect` | ✓ | — | — | Advanced — ConVars preferred; see API.md |
-| `disconnect` | — | — | — | Advanced — API.md only |
-| `getDb` | ✓ | ✓ | — | Advanced — API.md + warning in guides |
+| Export | lua/ | typescript/ |
+|--------|:----:|:-----------:|
+| CRUD + `findById` | ✓ | ✓ |
+| `ensureIndexes`, `health`, `config` | ✓ | ✓ |
+| Query operators cookbook | [lua/queries.md](lua/queries.md) | [typescript/queries.md](typescript/queries.md) |
 
-**Not available via exports:** aggregation pipelines, transactions, change streams — use CRUD exports only, or `getDb` in trusted server code (discouraged).
+**Not via exports:** aggregation pipelines, transactions, change streams — CRUD only, or trusted `getDb` ([API.md](../API.md)).
 
-## What the runnable samples demonstrate
+## Legacy paths (redirects)
 
-1. Listen for `cfx-mongodb:ready` (not raw `onResourceStart` on the consumer alone).
-2. Insert → find → findById → findAll → update → count → delete.
-3. Wave 2 semantics: `find` missing doc → `{ success: true, data: null }`.
-4. Delete with no match → `{ success: false, error: "Document not found" }`.
+| Old path | Use instead |
+|----------|-------------|
+| `lua.md` | [lua/snippets.md](lua/snippets.md) |
+| `typescript.md` | [typescript/snippets.md](typescript/snippets.md) |
+| `queries.md` (combined) | [lua/queries.md](lua/queries.md) or [typescript/queries.md](typescript/queries.md) |
+| `patterns.md` (combined) | [lua/patterns.md](lua/patterns.md) or [typescript/patterns.md](typescript/patterns.md) |
+| `server.lua` / `server.ts` (root) | [lua/server.lua](lua/server.lua) / [typescript/server.ts](typescript/server.ts) |
