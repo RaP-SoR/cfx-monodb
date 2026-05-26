@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [main, node22]
+    branches: [main, dev, node22, refactor/staged-hardening]
   pull_request:
-    branches: [main, node22]
+    branches: [main, dev, node22, refactor/staged-hardening]
 
 jobs:
   build:
@@ -24,6 +24,10 @@ jobs:
 
       - name: Install
         run: yarn install --immutable || yarn install
+
+      - name: Audit dependencies
+        run: yarn npm audit --severity moderate
+        continue-on-error: true
 
       - name: Lint
         run: yarn lint

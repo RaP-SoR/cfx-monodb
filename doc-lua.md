@@ -4,6 +4,28 @@
 
 Requires FiveM Node **22** (`node_version '22'`). Wait for `cfx-mongodb:ready` before CRUD calls.
 
+## Events (server)
+
+cfx-mongodb fires lifecycle events with **`TriggerEvent`** (server-local). Use **`AddEventHandler`** — not `emitNet` or client `RegisterNetEvent`.
+
+```lua
+local mongoReady = false
+
+AddEventHandler('cfx-mongodb:ready', function()
+  mongoReady = true
+  print('[my-resource] MongoDB ready')
+end)
+
+AddEventHandler('cfx-mongodb:connected', function(success)
+  print('[my-resource] MongoDB connected:', success)
+end)
+```
+
+| Event | When |
+|-------|------|
+| `cfx-mongodb:ready` | After connect + optional index init — **use this before CRUD** |
+| `cfx-mongodb:connected` | After successful connect (earlier than `ready`) |
+
 ## Check connection
 
 ```lua
@@ -98,15 +120,25 @@ if result.success then print('Count:', result.data) end
 |--------|---------|
 | `insert` | `{ success = true, insertedId = string }` |
 | `findAll` | `{ success = true, data = table[] }` |
-| `find` | `{ success = true, data = table }` |
-| `findById` | `{ success = true, data = table\|nil }` |
+| `find` | `{ success: true, data: table \| nil }` |
+| `findById` | `{ success: true, data: table \| nil }` |
 | `update` | `{ success = true, modifiedCount = number, matchedCount = number }` |
 | `delete` | `{ success = true, deletedCount = number }` |
 | `count` | `{ success = true, data = number }` |
 | `getVersion` | string (no envelope) |
-| `getDb` | Db or nil (no envelope, TS only) |
 | `isConnected` | boolean |
+| `ensureIndexes` | `{ success = true, data = number }` |
+| `health` | `{ success = true, data = { ok, rttMs } }` |
+| `config` | `{ success = true, data = table }` (no secrets/URLs) |
 
 On error: `{ success = false, error = 'message' }` — exports never throw.
 
-Extended: `ensureIndexes`, `health`, `config`, `connect`, `disconnect`.
+### Advanced / Internal (security warning)
+
+`getDb`, `connect`, and `disconnect` bypass the normal CRUD envelope and query validation. Use only in trusted server resources — not from client-triggered code.
+
+| Export | Notes |
+|--------|-------|
+| `getDb` | Returns driver `Db` or nil (no envelope) |
+| `connect` | Runtime URI override |
+| `disconnect` | Close connection |

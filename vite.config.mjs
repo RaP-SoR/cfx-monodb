@@ -2,40 +2,8 @@ import { defineConfig } from "vite";
 import commonjs from "vite-plugin-commonjs";
 import { resolve } from "path";
 
-// Workaround für MongoDB- Navigator-Fehler in RedM
-const polyfillCode = `
-if (typeof global !== "undefined") {
-  global.navigator = {
-    userAgent: "RedM/Server Node.js Environment",
-    platform: process.platform,
-    language: "en", 
-    languages: ["en"],
-    onLine: true,
-    product: "Node.js",
-    productSub: "",
-    vendor: "",
-    appName: "Node.js",
-    appVersion: process.version
-  };
-  global.window = { 
-    navigator: global.navigator,
-    document: {
-      createElement: () => ({}),
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      location: { hostname: "localhost", protocol: "https:" }
-    },
-    location: {
-      protocol: "https:",
-      hostname: "localhost"
-    }
-  };
-  global.HTMLElement = function() {};
-  global.Image = function() {};
-  global.XMLHttpRequest = function() {};
-  console.log("Browser environment for MongoDB initialized");
-}
-`;
+// MongoDB driver browser checks are stubbed via `define` below (not runtime polyfills).
+// A previous polyfillCode block was never injected into the bundle; SSR `define` is sufficient.
 
 export default defineConfig({
   plugins: [commonjs()],

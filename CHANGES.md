@@ -1,5 +1,32 @@
 # Änderungen (Changelog)
 
+## Wave 4 (refactor/staged-hardening) — TypeScript 6 & contract hardening
+
+- **W4A:** `typescript@6` — `tsconfig.json` auf `target: ES2022`, `moduleResolution: bundler`, `lib: ES2022` (kein DOM; Node-22-only).
+- **W4B:** `tests/api-contract.test.ts` — `fxmanifest.lua` ↔ `CFX_MONGODB_EXPORTS` Sync + Response-Envelope-Invarianten.
+- **CI:** Build-Workflow auch für `dev` und `refactor/staged-hardening`; `yarn npm audit --severity moderate` (informational, `continue-on-error`).
+
+## Wave 3 (refactor/staged-hardening) — Bootstrap & IndexService
+
+- **W3A:** `src/bootstrap.ts` — Lifecycle aus `index.ts`; `connector.ts` ohne `registerExports` (kein zirkulärer Import).
+- **W3B:** `src/services/indexService.ts` — gemeinsame Index-Logik für Startup und `ensureIndexes`-Export.
+- **W3C–W3D:** Handler in `src/api/handlers/*`, Wiring in `src/api/registerExports.ts`; `src/exports.ts` ist Shim-Re-Export.
+
+## Wave 2 (refactor/staged-hardening) — Export pipeline & find semantics
+
+- **Breaking:** `find(collection, filter)` bei fehlendem Dokument → `{ success: true, data: null }` (aligned mit `findById`).
+- **Refactor:** CRUD-Exports nutzen `withDb`-Pipeline (`src/api/withDb.ts`) und `normalizeIdFilter`.
+- **Logging:** Kein `console.*` mehr in `exports.ts`; Connection-URLs in `connector.ts` mit `redactMongoUri`.
+- **Events:** `connect`/`disconnect` nutzen `TriggerEvent` statt `emitNet` (server-only Resource).
+
+## Wave 1 (refactor/staged-hardening) — Manifest & Docs Sync (W2A)
+
+- **Kein Runtime-Break:** Verhalten unverändert; nur Manifest- und Dokumentationsabgleich.
+- **`fxmanifest.lua`:** `ensureIndexes`, `health`, `config` zu `server_exports` hinzugefügt (waren implementiert, fehlten im Manifest).
+- **`docs/API.md`:** Vollständiger Export-Index; `getDb`, `connect`, `disconnect` als Advanced/Internal mit Sicherheitswarnung; Events (`TriggerEvent` vs `emitNet`, `cfx-mongodb:ready`, `cfx-mongodb:connected`).
+- **`SEARCH-MAP.md`:** Export-Tabelle bereinigt und mit Manifest synchronisiert.
+- **`doc-lua.md` / `doc-typescript.md`:** Event-Handler-Beispiele und Internal-Export-Hinweise ergänzt.
+
 ## 1.0.1 – CTFFramework-Kompatibilität, Node-22-only, Dependency-Updates
 
 - **Version:** `1.0.1` (experimentell — kein 2.x-Sprung)
@@ -11,7 +38,8 @@
   - `@typescript-eslint/*` 8.50.1 → 8.60.0
   - `@citizenfx/client|server` 2.0.23683-1 → 2.0.29753-1
   - `@types/node` 25.0.3 → 25.9.1, `eslint` 9.39.2 → 9.39.4, `prettier` 3.7.4 → 3.8.3
-- **Bewusst nicht aktualisiert** (Major, Breaking): `eslint@10`, `typescript@6`, `vite@8`
+- **Bewusst nicht aktualisiert** (Major, Breaking): `eslint@10`, `vite@8`
+- **Wave 4:** `typescript@6` (siehe Wave-4-Abschnitt oben)
 - **CI:** Node-16-Matrix entfernt; Build nur noch auf Node 22
 - **Docs:** Search Map, API-Referenz, Cursor Skills/Rules für Agent-Arbeit
 - **Neu:** `findById`, `getDb` Exports implementiert; alle Registrierungen über `exportFn`

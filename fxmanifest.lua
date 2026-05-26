@@ -33,7 +33,10 @@ server_exports {
   'update',
   'delete',
   'count',
-  'getVersion'
+  'getVersion',
+  'ensureIndexes',
+  'health',
+  'config'
 }
 
 node_version '22'

@@ -4,6 +4,28 @@
 
 FiveM Node **22** erforderlich (`node_version '22'`). Auf `cfx-mongodb:ready` warten.
 
+## Events (Server)
+
+cfx-mongodb feuert Lifecycle-Events per **`TriggerEvent`** (server-lokal). Consumer nutzen **`on(...)`** — nicht `emitNet`.
+
+```typescript
+let mongoReady = false;
+
+on("cfx-mongodb:ready", () => {
+  mongoReady = true;
+  console.log("[my-resource] MongoDB ready");
+});
+
+on("cfx-mongodb:connected", (success: boolean) => {
+  console.log("[my-resource] MongoDB connected:", success);
+});
+```
+
+| Event | Wann |
+|-------|------|
+| `cfx-mongodb:ready` | Nach Connect + optionaler Index-Init — **vor CRUD nutzen** |
+| `cfx-mongodb:connected` | Nach erfolgreichem Connect (früher als `ready`) |
+
 ## Verbindungsstatus
 
 ```typescript
@@ -99,15 +121,25 @@ if (result.success) console.log(result.data);
 |--------|--------|
 | `insert` | `{ success: true, insertedId: string }` |
 | `findAll` | `{ success: true, data: T[] }` |
-| `find` | `{ success: true, data: T }` |
+| `find` | `{ success: true, data: T \| null }` |
 | `findById` | `{ success: true, data: T \| null }` |
 | `update` | `{ success: true, modifiedCount: number, matchedCount: number }` |
 | `delete` | `{ success: true, deletedCount: number }` |
 | `count` | `{ success: true, data: number }` |
 | `getVersion` | `string` (kein Envelope) |
-| `getDb` | `Db \| null` (kein Envelope) |
 | `isConnected` | `boolean` |
+| `ensureIndexes` | `{ success: true, data: number }` |
+| `health` | `{ success: true, data: { ok: boolean, rttMs: number } }` |
+| `config` | `{ success: true, data: { env, timeout, maxPoolSize, minPoolSize, logLevel } }` |
 
 Fehler: `{ success: false, error: string }` — Exports werfen keine Exceptions.
 
-Weitere Exporte: `ensureIndexes`, `health`, `config`, `connect`, `disconnect`.
+### Advanced / Internal (Sicherheitswarnung)
+
+`getDb`, `connect` und `disconnect` umgehen Envelope und Query-Validierung. Nur in vertrauenswürdigen Server-Ressourcen verwenden.
+
+| Export | Hinweis |
+|--------|---------|
+| `getDb` | `Db \| null`, sync, kein Envelope |
+| `connect` | Runtime-URI-Override |
+| `disconnect` | Verbindung schließen |

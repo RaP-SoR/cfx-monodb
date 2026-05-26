@@ -43,6 +43,7 @@ Stattdessen: **strukturierte Markdown-Artefakte** als persistentes Agent-Gedäch
 | Skill | Pfad | Wann laden |
 |-------|------|------------|
 | `cfx-mongodb` | `.cursor/skills/cfx-mongodb/SKILL.md` | Export-Änderungen, CTFFramework-Kompatibilität, MongoDB-Wrapper-Arbeit |
+| `refactor-orchestrator` | `.cursor/skills/refactor-orchestrator/SKILL.md` | Parallele Refactor-Waves, Merge-Train, Worktree-Koordination |
 
 Der Skill verweist auf `reference.md` für API-Details — **progressive disclosure** (Skill kurz, Referenz ausführlich).
 
@@ -110,11 +111,21 @@ Bei Widersprüchen gilt **`docs/API.md`** + **`src/exports.ts`**.
 - **Exceptions aus Exports** — bricht CTFFramework
 - **node_version entfernen** — mongodb@7 bricht
 
+## Staged Refactor (Multi-Agent)
+
+| Artefakt | Pfad |
+|----------|------|
+| Playbook | `docs/refactor/README.md` |
+| Wave 1 Spec | `docs/refactor/WAVE-1-SPEC.md` |
+| Status board | `docs/refactor/REFACTOR-STATUS.md` |
+| Target interfaces | `docs/refactor/INTERFACES.md` |
+| Worktree script | `scripts/setup-worktrees-wave1.ps1` |
+
+Branch: `refactor/staged-hardening`. Orchestrator tab loads `refactor-orchestrator` skill; implementer tabs get one worktree each.
+
 ## Erweiterungsmöglichkeiten (optional, später)
 
 | Idee | Nutzen |
 |------|--------|
-| Vitest-Tests unter `tests/` | Agent kann Regressionen sicher prüfen |
-| `findById` implementieren | Manifest ↔ Code angleichen |
 | OpenAPI-ähnliches JSON-Schema | Maschinenlesbarer Vertrag für CTFFramework-Codegen |
-| CI-Check: API.md ↔ exports.ts | Drift verhindern |
+| CI-Check: API.md ↔ exports.ts | Drift verhindern (Wave 2B scaffold started) |

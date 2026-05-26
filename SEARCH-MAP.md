@@ -12,14 +12,15 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 
 | Aufgabe | Wo suchen |
 |---------|-----------|
-| Export hinzufügen/ändern | `src/exports.ts` → `registerExports()` |
+| Export hinzufügen/ändern | `src/api/handlers/*.ts` + `src/api/registerExports.ts` |
+| Export-Shim (Re-Export) | `src/exports.ts` |
 | Rückgabe-Typen (success/error) | `src/responses.ts` |
 | MongoDB-Verbindung / Singleton | `src/connector.ts` |
 | ConVar-Konfiguration (URLs, Pool) | `src/config.ts` |
 | Query-Sicherheit (Denylist) | `src/validateQuery.ts` |
-| findAll-Optionen (limit/skip/sort) | `src/types/options.ts`, `src/exports.ts` |
+| findAll-Optionen (limit/skip/sort) | `src/types/options.ts`, `src/api/handlers/read.ts` |
+| Resource-Start / Index-Init | `src/bootstrap.ts` |
 | FiveM-Globals (GetConvar, exports) | `src/types/fivem.d.ts` |
-| Resource-Start / Index-Init | `src/index.ts` |
 | Hilfsfunktionen (log, ObjectId) | `src/utils.ts` |
 | Manifest, server_exports, node_version | `fxmanifest.lua` |
 | Build (Vite SSR → dist/) | `vite.config.mjs`, `yarn build` |
@@ -35,49 +36,57 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 ```
 fxmanifest.lua
   └── dist/index.js  ← yarn build aus src/
-        ├── index.ts          onResourceStart/Stop, Index-Init
-        ├── connector.ts      MongoClient, connect(), registerExports()
-        ├── exports.ts        Alle FiveM-Exports (CRUD, health, …)
-        ├── config.ts         ConVar → mongoUrl + Pool-Optionen
-        ├── validateQuery.ts  Operator-Denylist
-        ├── responses.ts      Insert/Update/Delete/Response-Typen
-        └── utils.ts          log, exportFn, toObjectIdIfValid
+        ├── index.ts              import bootstrap
+        ├── bootstrap.ts          lifecycle, registerExports, index init
+        ├── connector.ts          MongoClient singleton (DbProvider)
+        ├── exports.ts            shim → api/registerExports
+        ├── api/
+        │     ├── registerExports.ts
+        │     ├── withDb.ts, normalizeIdFilter.ts
+        │     └── handlers/       read, write, admin, lifecycle
+        ├── services/indexService.ts
+        ├── config.ts             ConVar → mongoUrl + Pool
+        ├── validateQuery.ts      Operator-Denylist
+        ├── responses.ts          Response-Typen
+        └── utils.ts              log, exportFn, redactMongoUri
 ```
 
-## Export-Register (Quelle der Wahrheit)
+## Export-Register
 
-Implementiert in `src/exports.ts`:
+Implementiert in `src/api/handlers/*` via `src/api/registerExports.ts` (Shim: `src/exports.ts`), registriert in `fxmanifest.lua` → `server_exports`:
 
-| Export | Zweck |
-|--------|-------|
-| `insert` | insertOne → `{ success, insertedId: string }` |
-| `find` | findOne, `_id`-String→ObjectId |
-| `findAll` | find + limit/skip/sort/projection |
-| `update` | updateOne, liefert `modifiedCount` |
-| `delete` | deleteOne, liefert `deletedCount` |
-| `count` | countDocuments |
-| `getVersion` | Semver aus fxmanifest |
-| `findById` | findOne by id string, optional projection |
-| `getDb` | Returns `Db \| null` (TS advanced scenarios) |
-| `ensureIndexes` | createIndexes (max 20) |
-| `health` | ping + RTT |
-| `config` | sichere Laufzeit-Config (keine Secrets) |
-| `isConnected` | boolean |
-| `connect` / `disconnect` | Runtime-Override |
+| Export | Kategorie | Zweck |
+|--------|-----------|-------|
+| `insert` | CRUD | insertOne → `{ success, insertedId: string }` |
+| `find` | CRUD | findOne, `_id`-String→ObjectId |
+| `findAll` | CRUD | find + limit/skip/sort/projection |
+| `findById` | CRUD | findOne by string id, optional projection → `{ success, data: doc \| null }` |
+| `update` | CRUD | updateOne, liefert `modifiedCount` |
+| `delete` | CRUD | deleteOne, liefert `deletedCount` |
+| `count` | CRUD | countDocuments |
+| `getVersion` | Lifecycle | Semver aus fxmanifest |
+| `isConnected` | Lifecycle | boolean, sync |
+| `ensureIndexes` | Erweitert | createIndexes (max 20) |
+| `health` | Erweitert | ping + RTT |
+| `config` | Erweitert | sichere Laufzeit-Config (keine Secrets) |
+| `getDb` | **Advanced / Internal** | Sync, returns `Db \| null` — umgeht Envelope/validateQuery |
+| `connect` | **Advanced / Internal** | Runtime-URI-Override |
+| `disconnect` | **Advanced / Internal** | Verbindung schließen |
 
 **CTFFramework-Pflicht-Exports:** `find`, `findAll`, `insert`, `update`, `delete`, `count`, `getVersion` — siehe `docs/API.md`.
 
-| `findById` | findOne by string id, optional projection → `{ success, data: doc \| null }` |
-| `getDb` | Sync, returns `Db \| null` (TypeScript advanced use) |
+> **Sicherheit:** `getDb`, `connect`, `disconnect` nur in vertrauenswürdigen Server-Ressourcen — nicht an Client/untrusted Input.
 
 ## Events
 
-| Event | Wann |
-|-------|------|
-| `cfx-mongodb:ready` | Nach Connect + optionaler Index-Init (`TriggerEvent`) |
-| `cfx-mongodb:connected` | Nach erfolgreichem Connect (`TriggerEvent`) |
+Server-Consumer nutzen **`AddEventHandler`** (Lua) bzw. **`on(...)`** (TS) — cfx-mongodb feuert Lifecycle-Events per **`TriggerEvent`** (server-lokal). **`emitNet`** ist für Server→Client; nicht für MongoDB-Startup auf dem Server verwenden.
 
-Consumer-Ressourcen sollten auf `cfx-mongodb:ready` warten, bevor sie Exports nutzen.
+| Event | Mechanismus | Wann |
+|-------|-------------|------|
+| `cfx-mongodb:ready` | `TriggerEvent` | Nach Connect + optionaler Index-Init (`src/index.ts`) |
+| `cfx-mongodb:connected` | `TriggerEvent` | Nach erfolgreichem Connect (`src/connector.ts`, Payload: `true`) |
+
+Consumer-Ressourcen sollten auf **`cfx-mongodb:ready`** warten, bevor sie CRUD-Exports nutzen.
 
 ## ConVars (Keywords)
 
@@ -91,6 +100,7 @@ yarn build     # src/ → dist/index.js
 yarn dev       # watch rebuild
 yarn tsc       # type-check only
 yarn lint      # eslint
+yarn test      # vitest
 ```
 
 **Nie** `dist/` manuell editieren — immer `src/` ändern und bauen.
@@ -102,13 +112,14 @@ yarn lint      # eslint
 3. Gefährliche Operatoren blockiert: `$where`, `$function`, `$merge`, … (`validateQuery.ts`).
 4. `node_version '22'` in `fxmanifest.lua` beibehalten.
 5. Keine Credentials in Repo — nur ConVars.
+6. `getDb` / `connect` / `disconnect` nicht an untrusted Consumer exposen.
 
 ## Typische Agent-Aufgaben
 
 ### Neues Export-Feld / API-Änderung
 1. `src/exports.ts` + `src/responses.ts`
 2. `fxmanifest.lua` → `server_exports` (falls neuer Export)
-3. `docs/API.md` + `doc-lua.md` / `doc-typescript.md`
+3. `docs/API.md` + `doc-lua.md` / `doc-typescript.md` + `SEARCH-MAP.md`
 4. `yarn build` + `yarn tsc`
 
 ### CTFFramework-Kompatibilität prüfen

@@ -25,6 +25,6 @@ Required field semantics:
 - `insertedId`: always `string`
 - `update`: include `modifiedCount` from MongoDB driver
 - `delete`: include `deletedCount` from MongoDB driver
-- `find` not found: `{ success: false, error: "Document not found" }`
+- `find` not found: `{ success: true, data: null }` (aligned with `findById`)
 
 After export changes: update `docs/API.md` and run `yarn build`.

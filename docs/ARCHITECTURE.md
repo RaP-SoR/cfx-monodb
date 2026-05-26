@@ -20,25 +20,30 @@ FiveM/RedM liefern teils noch Node 16 oder 18. Diese Laufzeiten binden veraltete
 
 ## Lebenszyklus
 
-1. **Resource Start** (`src/index.ts` → `onResourceStart`)
+1. **Resource Start** (`src/index.ts` → `src/bootstrap.ts`)
 2. **Connect** (`MongoDBConnector.connect()` aus ConVars)
-3. **Register Exports** (`registerExports()` in `connector.ts` nach Connect)
-4. **Optional:** Index-Init aus `mongodb_init_indexes` ConVar
+3. **Register Exports** (`registerExports()` in `bootstrap.ts` nach Connect)
+4. **Optional:** Index-Init via `IndexService` aus `mongodb_init_indexes` ConVar
 5. **Event:** `TriggerEvent("cfx-mongodb:ready")`
 6. **Resource Stop** → `disconnect()`
 
-Exports sind erst nach erfolgreichem Connect registriert.
+Exports sind nach Connect registriert (`bootstrap.ts`).
 
 ## Schichten
 
 | Schicht | Datei | Verantwortung |
 |---------|-------|---------------|
-| Entry | `index.ts` | Lifecycle, Index-Init, Events |
-| Connector | `connector.ts` | Singleton, MongoClient, Pool |
-| Exports | `exports.ts` | Öffentliche API, Fehler-Envelope |
+| Entry | `index.ts` | Thin import bootstrap |
+| Bootstrap | `bootstrap.ts` | Lifecycle, export registration, index init |
+| Connector | `connector.ts` | Singleton, MongoClient, Pool (`DbProvider`) |
+| API wiring | `api/registerExports.ts` | Handler registration only |
+| Handlers | `api/handlers/*.ts` | CRUD, admin, lifecycle exports |
+| Pipeline | `api/withDb.ts` | Response envelope, error handling |
+| Index | `services/indexService.ts` | Shared index creation |
 | Config | `config.ts` | ConVar → URI + Pool-Optionen |
 | Validation | `validateQuery.ts` | Operator-Denylist |
 | Types | `responses.ts`, `types/*` | Response-Contracts |
+| Shim | `exports.ts` | Re-exports `registerExports` for stable import path |
 
 ## Build-Pipeline
 
@@ -47,7 +52,6 @@ src/**/*.ts  ──vite build (SSR, target node22)──►  dist/index.js
 ```
 
 - MongoDB-Treiber bleibt **external** (FiveM lädt aus `node_modules`)
-- Vite-Polyfills für `navigator`/`window` (RedM-Kompatibilität, siehe `vite.config.mjs`)
 - Source Maps in `dist/index.js.map`
 
 ## Fehlerbehandlung (Design)
@@ -56,10 +60,10 @@ Alle async Exports fangen Fehler und geben `{ success: false, error: string }` z
 
 ## _id-Behandlung
 
-Filter mit String-`_id` werden intern via `toObjectIdIfValid()` in MongoDB `ObjectId` konvertiert (`find`, `update`, `delete`). Rückgabe-Dokumente serialisieren `_id` als String.
+Filter mit String-`_id` werden intern via `normalizeIdFilter()` / `toObjectIdIfValid()` in MongoDB `ObjectId` konvertiert. Rückgabe-Dokumente serialisieren `_id` als String.
 
 ## Erweiterungspunkte
 
-- Neuer Export → `exports.ts` + `fxmanifest.lua` server_exports + `docs/API.md`
+- Neuer Export → passender `api/handlers/*.ts` + `registerExports.ts` + `fxmanifest.lua` + `docs/API.md`
 - Neue ConVar → `config.ts` + `docs/API.md` Configuration
 - Neue Validierung → `validateQuery.ts`
