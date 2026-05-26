@@ -47,19 +47,22 @@ When an idea becomes work: link PR/issue, move to CHANGELOG, remove or mark done
 
 ---
 
-## 3. CI / build pipeline for `main` (GitHub)
+## 3. CI / build pipeline & pre-built releases (GitHub)
 
-**Status:** 💡 Idea  
-**Source:** Post-track discussion
+**Status:** 💡 Idea — detail in [QUALITY-AUDIT-2026.md](QUALITY-AUDIT-2026.md) Track I  
+**Source:** Post-track discussion + distribution UX
 
-**Idea:**
+**Today:** CI on push `dev`/`main` — lint, tsc, test, build; uploads `dist/` artifact (maintainers only).
 
-- Workflow on push/PR to `main` (today CI may focus on `dev`)
-- Gate: `yarn tsc`, `yarn test`, `yarn build`, `yarn lint`
-- Optional: publish artifact `dist/` or release tag on merge to `main`
-- Align with release policy (`dev` → `main` when user wants release)
+**Gap:** Server operators must clone + `yarn build` — bad DX.
 
-**Related:** `main` is ~48 commits behind `dev` — release/PR strategy TBD.
+**Idea (Track I):**
+
+- `release.yml` with `workflow_dispatch` and/or tag `v*` on `dev` — **no merge to `main` required**
+- Output: GitHub Release ZIP with `dist/`, `fxmanifest.lua`, `package.json`, prod `node_modules/` (mongodb)
+- Consumer: download → extract to `resources/cfx-mongodb` → ConVars → `ensure`
+
+**Related:** `main` behind `dev` — irrelevant for single-consumer internal use until external users appear.
 
 ---
 
@@ -150,11 +153,12 @@ ConVar-first connection; `exec mongodb.local.cfg` + gitignore for multi-dev team
 ## Suggested order *when* we implement
 
 ```
-1. Post-track infra (CI main, types publish)     — if release to main planned
-2. Schema versioning D1                          — if CTFFramework needs it
-3. Tests + integration Mongo                     — supports 1 & 2
-4. Migration runner (sibling resource)            — only if 2 insufficient
-5. Observability UI (C3+)                        — staging convenience only
+1. Track I  — pre-built release ZIP from CI (dev tag)   — best DX for server deploy
+2. Track E  — scout + checklist (after push, no PR required)
+3. Track F  — docs / examples / TSDoc headers
+4. Track G  — test depth
+5. Track H  — load bench (optional)
+6. Backlog  — Schema D, types publish, C3 UI
 ```
 
 ---
@@ -173,4 +177,4 @@ ConVar-first connection; `exec mongodb.local.cfg` + gitignore for multi-dev team
 
 | Date | Change |
 |------|--------|
-| 2026-05-26 | Initial backlog — schema versioning, migrations, CI main, tests, types, C3+ |
+| 2026-05-26 | Quality audit baseline; Track I pre-built releases; solo-team workflow |

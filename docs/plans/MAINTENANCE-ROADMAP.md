@@ -6,7 +6,8 @@
 > **Track B:** Complete (patterns.md optional, skipped)  
 > **Track C1:** Complete (slow query log)  
 > **Track C2:** Complete (getQueryStats ring buffer)  
-> **No release target yet** — execute in phases, merge to `dev` incrementally.
+> **Quality audit:** [QUALITY-AUDIT-2026.md](QUALITY-AUDIT-2026.md) (~72% baseline)  
+> **No release target yet** — single consumer; stability on `dev`
 
 After Waves 1–4 (refactor, TS6, docs consolidation), three tracks remain:
 
