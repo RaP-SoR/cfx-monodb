@@ -295,4 +295,4 @@ User-Input in Queries immer validieren/whitelisten — diese Resource blockiert 
 | Syntax | `exports["cfx-mongodb"].find(...)` | `exports['cfx-mongodb']:find(...)` |
 | Async | `await` / `.then()` | Citizen await pattern |
 | Events | `on("cfx-mongodb:ready", …)` | `AddEventHandler('cfx-mongodb:ready', …)` |
-| Beispiele | `doc-typescript.md` | `doc-lua.md` |
+| Beispiele | [examples/typescript.md](examples/typescript.md) | [examples/lua.md](examples/lua.md) |

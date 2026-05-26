@@ -2,11 +2,11 @@
 
 ## Start here
 
-1. **[SEARCH-MAP.md](SEARCH-MAP.md)** — navigation map (task → file), save context tokens
+1. **[docs/SEARCH-MAP.md](docs/SEARCH-MAP.md)** — navigation map (task → file), save context tokens
 2. **[docs/API.md](docs/API.md)** — canonical external export contract (CTFFramework)
 3. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — runtime, lifecycle, build pipeline
 4. **[docs/AI-STACK.md](docs/AI-STACK.md)** — Cursor skills, rules, agent workflows
-5. **[docs/refactor/README.md](docs/refactor/README.md)** — staged refactor waves (multi-agent)
+5. **[docs/refactor/README.md](docs/refactor/README.md)** — staged refactor waves (historical)
 
 Project skill: `.cursor/skills/cfx-mongodb/SKILL.md`  
 Refactor orchestrator: `.cursor/skills/refactor-orchestrator/SKILL.md`
@@ -20,11 +20,13 @@ TypeScript MongoDB wrapper for FiveM/RedM. Other resources call MongoDB **only v
 | Path | Purpose |
 |------|---------|
 | `src/` | TypeScript source (edit here) |
+| `src/api/handlers/` | Export handler modules (read, write, admin, lifecycle) |
+| `src/api/registerExports.ts` | Wires handlers to FiveM exports |
 | `dist/` | Compiled output (`yarn build`) — do not edit |
 | `fxmanifest.lua` | Resource manifest, ConVars, `server_exports` |
 | `docs/API.md` | External API reference |
-| `doc-typescript.md` / `doc-lua.md` | Language-specific examples |
-| `tests/` | Unit tests (add when contributing logic) |
+| `docs/examples/` | Language-specific examples + sample consumer resources |
+| `tests/` | Unit tests (Vitest) |
 
 ## Build, Test, Dev
 
@@ -47,11 +49,11 @@ In FiveM: folder `cfx-mongodb`, `ensure cfx-mongodb` in server.cfg.
 
 ## Export change checklist
 
-- [ ] `src/exports.ts` + `src/responses.ts`
+- [ ] `src/api/handlers/*.ts` + `src/api/registerExports.ts` + `src/responses.ts`
 - [ ] CTFFramework contract in `docs/API.md`
 - [ ] `fxmanifest.lua` → `server_exports` if new export
-- [ ] `yarn build` + `yarn tsc`
-- [ ] Update `doc-lua.md` / `doc-typescript.md` on behavior change
+- [ ] `yarn build` + `yarn tsc` + `yarn test`
+- [ ] Update `docs/examples/typescript.md` / `docs/examples/lua.md` on behavior change
 
 ## Invariants
 

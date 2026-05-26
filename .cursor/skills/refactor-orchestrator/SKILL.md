@@ -75,7 +75,7 @@ DO NOT MERGE YOURSELF
 ## PR review checklist
 
 - [ ] Diff scope matches agent ownership
-- [ ] No CTFFramework breaking changes without `CHANGES.md`
+- [ ] No CTFFramework breaking changes without `docs/CHANGELOG.md`
 - [ ] `insertedId` still string; exports never throw
 - [ ] Tests added/updated for changed behavior
 - [ ] Gate green

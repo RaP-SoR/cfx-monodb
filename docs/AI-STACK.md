@@ -20,7 +20,7 @@ Analyse und Empfehlungen für KI-gestützte Entwicklung an diesem Projekt.
 │  Cursor Agent Session                           │
 ├─────────────────────────────────────────────────┤
 │  AGENTS.md          → Regeln, Build, Stil       │
-│  SEARCH-MAP.md      → Navigation (zuerst lesen) │
+│  docs/SEARCH-MAP.md → Navigation (zuerst lesen) │
 │  docs/API.md        → Externer Vertrag          │
 │  docs/ARCHITECTURE.md → Laufzeit & Schichten    │
 ├─────────────────────────────────────────────────┤
@@ -63,7 +63,7 @@ Rules sind **kurz (<50 Zeilen)** und ergänzen AGENTS.md um datei-spezifische In
 
 ## Search Map als Kontext-Sparer
 
-`SEARCH-MAP.md` ersetzt breites Repo-Scannen:
+`docs/SEARCH-MAP.md` ersetzt breites Repo-Scannen:
 
 1. Agent liest Search Map (~2 min Kontext)
 2. Springt direkt zur Zieldatei
@@ -76,22 +76,22 @@ Rules sind **kurz (<50 Zeilen)** und ergänzen AGENTS.md um datei-spezifische In
 | Priorität | Datei | Zielgruppe |
 |-----------|-------|------------|
 | 1 | `docs/API.md` | Externe Consumer, CTFFramework |
-| 2 | `SEARCH-MAP.md` | Agents, Maintainer |
+| 2 | `docs/SEARCH-MAP.md` | Agents, Maintainer |
 | 3 | `AGENTS.md` | Cursor/CI Contributors |
-| 4 | `doc-lua.md` / `doc-typescript.md` | Sprach-spezifische Beispiele |
-| 5 | `DOCS.md` / `README.md` | Menschliche Übersicht |
-| 6 | `examples/*` | Copy-Paste-Starter |
+| 4 | `docs/examples/typescript.md` / `lua.md` | Sprach-spezifische Beispiele |
+| 5 | `docs/GUIDE.md` / `README.md` | Menschliche Übersicht |
+| 6 | `docs/examples/server.*` | Copy-Paste-Starter |
 
-Bei Widersprüchen gilt **`docs/API.md`** + **`src/exports.ts`**.
+Bei Widersprüchen gilt **`docs/API.md`** + **`src/api/handlers/*`** (Implementierung).
 
 ## Agent-Workflows (Checklisten)
 
 ### Export ändern
-- [ ] `src/exports.ts` + `src/responses.ts`
+- [ ] `src/api/handlers/*.ts` + `src/api/registerExports.ts` + `src/responses.ts`
 - [ ] CTFFramework-Contract in `docs/API.md` prüfen
 - [ ] `fxmanifest.lua` server_exports
-- [ ] `yarn build` + `yarn tsc`
-- [ ] `doc-lua.md` / `doc-typescript.md` bei Verhaltensänderung
+- [ ] `yarn build` + `yarn tsc` + `yarn test`
+- [ ] `docs/examples/typescript.md` / `lua.md` bei Verhaltensänderung
 
 ### Neuer Consumer (andere Resource)
 - [ ] `ensure cfx-mongodb` in server.cfg
@@ -107,7 +107,6 @@ Bei Widersprüchen gilt **`docs/API.md`** + **`src/exports.ts`**.
 ## Nicht empfohlen
 
 - **dist/ manuell patchen** — wird bei Build überschrieben
-- **findById annehmen** — in Manifest gelistet, aber nicht implementiert (siehe SEARCH-MAP)
 - **Exceptions aus Exports** — bricht CTFFramework
 - **node_version entfernen** — mongodb@7 bricht
 

@@ -1,5 +1,11 @@
 # Änderungen (Changelog)
 
+## Docs — consolidation under `docs/` (dev)
+
+- Root MD files moved: `DOCS.md` → `docs/GUIDE.md`, `CHANGES.md` → `docs/CHANGELOG.md`, `SEARCH-MAP.md` → `docs/SEARCH-MAP.md`.
+- Examples unified under `docs/examples/` (`typescript.md`, `lua.md`, `server.ts`, `server.lua`, manifests).
+- New hub: `docs/README.md`. Updated for post-refactor architecture and `find` not-found semantics.
+
 ## Wave 4 (refactor/staged-hardening) — TypeScript 6 & contract hardening
 
 - **W4A:** `typescript@6` — `tsconfig.json` auf `target: ES2022`, `moduleResolution: bundler`, `lib: ES2022` (kein DOM; Node-22-only).

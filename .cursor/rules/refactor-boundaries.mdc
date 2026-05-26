@@ -11,6 +11,6 @@ When working on branch `refactor/w1*` or `refactor/w2*`:
 1. Read `docs/refactor/WAVE-1-SPEC.md` — edit **only** files listed for your agent ID.
 2. Do not merge your own branch; notify orchestrator (see `.cursor/skills/refactor-orchestrator/SKILL.md`).
 3. Finish with `yarn tsc && yarn test && yarn build`.
-4. CTFFramework invariants unchanged unless `CHANGES.md` documents a break.
+4. CTFFramework invariants unchanged unless `docs/CHANGELOG.md` documents a break.
 
 If unsure which agent owns a file, stop and check `docs/refactor/REFACTOR-STATUS.md`.

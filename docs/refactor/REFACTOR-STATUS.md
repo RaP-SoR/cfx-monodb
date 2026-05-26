@@ -50,7 +50,7 @@ yarn tsc && yarn test && yarn build && yarn lint
 ### Wave 2 changes
 
 - [x] `withDb` pipeline wired in `exports.ts`
-- [x] `find` not-found → `{ success: true, data: null }` (breaking — `CHANGES.md`)
+- [x] `find` not-found → `{ success: true, data: null }` (breaking — `docs/CHANGELOG.md`)
 - [x] `redactMongoUri` in connector logs
 - [x] `TriggerEvent` instead of `emitNet` for connect/disconnect
 - [x] `it.todo` resolved in `api-contract.test.ts`

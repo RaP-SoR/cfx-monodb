@@ -1,24 +1,28 @@
-# CFX MongoDB Wrapper — Full Documentation
+# CFX MongoDB Wrapper — Guide
 
-> **Canonical API:** [docs/API.md](docs/API.md)  
+> **Canonical API:** [API.md](API.md)  
+> **Architecture (post-refactor):** [ARCHITECTURE.md](ARCHITECTURE.md)  
 > **Agent navigation:** [SEARCH-MAP.md](SEARCH-MAP.md)
 
 ## Overview
 
 Secure MongoDB wrapper for FiveM/RedM. TypeScript source compiled to `dist/index.js`. Targets **Node 22** and **MongoDB driver v7**. Safe CRUD exports, pooled connections, structured logging, health checks, index creation.
 
+Handler modules live under `src/api/handlers/*`; wiring in `src/api/registerExports.ts` (see [ARCHITECTURE.md](ARCHITECTURE.md)).
+
 ## Requirements
 
 - FiveM/RedM with `node_version '22'` in `fxmanifest.lua`
-- **Node 22 only** — no support for embedded Node 16/18 (outdated, security-critical package chains on RedM)
+- **Node 22 only** — no support for embedded Node 16/18
 - Reachable MongoDB server
-- Node 22.x for local development
+- Node 22.x for local development (`engines: >=22.0.0 <23`)
 
 ## Installation
 
 1. Resource folder: `cfx-mongodb`
 2. `server.cfg`: `ensure cfx-mongodb`
 3. Configure ConVars (below)
+4. Wait for `cfx-mongodb:ready` before CRUD from other resources
 
 ## Configuration (ConVars)
 
@@ -35,13 +39,16 @@ Secure MongoDB wrapper for FiveM/RedM. TypeScript source compiled to `dist/index
 | `mongodb_init_indexes` | JSON map: collection → index specs |
 
 Example index ConVar:
+
 ```json
 { "users": [ { "keys": { "email": 1 }, "options": { "unique": true } } ] }
 ```
 
 ## API Reference
 
-Full contract: **[docs/API.md](docs/API.md)**
+Full contract: **[API.md](API.md)**
+
+Language examples: **[examples/typescript.md](examples/typescript.md)** · **[examples/lua.md](examples/lua.md)**
 
 ### Response envelope
 
@@ -52,12 +59,13 @@ All CRUD exports return `{ success: boolean, ... }`. On error: `{ success: false
 | Export | Returns (success) |
 |--------|-------------------|
 | `insert(collection, doc)` | `{ success: true, insertedId: string }` |
-| `find(collection, filter?)` | `{ success: true, data: doc }` |
+| `find(collection, filter?)` | `{ success: true, data: doc \| null }` — **not found → `data: null`** |
+| `findById(collection, id, projection?)` | `{ success: true, data: doc \| null }` |
 | `findAll(collection, filter?, options?)` | `{ success: true, data: doc[] }` |
 | `update(collection, filter, update)` | `{ success: true, modifiedCount, matchedCount }` |
-| `delete(collection, filter)` | `{ success: true, deletedCount }` |
+| `delete(collection, filter)` | `{ success: true, deletedCount }` or `{ success: false, error }` if not found |
 | `count(collection, filter?)` | `{ success: true, data: number }` |
-| `getVersion()` | `"1.0.1"` (Semver string) |
+| `getVersion()` | `"1.0.1"` (Semver string, no envelope) |
 
 ### findAll options
 
@@ -65,65 +73,44 @@ All CRUD exports return `{ success: boolean, ... }`. On error: `{ success: false
 
 ### Extended exports
 
-`isConnected`, `connect`, `disconnect`, `ensureIndexes`, `health`, `config`
+`isConnected`, `connect`, `disconnect`, `ensureIndexes`, `health`, `config`, `getDb` (internal — see API.md)
 
 ## CTFFramework
 
 Required exports: `find`, `findAll`, `insert`, `update`, `delete`, `count`, `getVersion`.
 
 Framework checks:
+
 - Update success: `(modifiedCount ?? 0) > 0`
 - Delete success: `deletedCount === 1`
 - `insertedId` must be plain string
+- `find` / `findById` not found: `{ success: true, data: null }`
 
 ## Events
 
 | Event | When |
 |-------|------|
-| `cfx-mongodb:ready` | After connect + index init — **use this before CRUD** |
-| `cfx-mongodb:connected` | After connect attempt |
+| `cfx-mongodb:ready` | After connect + index init — **use before CRUD** |
+| `cfx-mongodb:connected` | After connect attempt (`TriggerEvent`, server-local) |
 
-## Usage Examples
-
-### TypeScript
-
-```typescript
-on('cfx-mongodb:ready', async () => {
-  const version = await exports['cfx-mongodb'].getVersion();
-  const ins = await exports['cfx-mongodb'].insert('users', { email: 'u@example.com' });
-  const one = await exports['cfx-mongodb'].find('users', { email: 'u@example.com' });
-  const many = await exports['cfx-mongodb'].findAll('users', { active: true }, { limit: 50, sort: { createdAt: -1 } });
-  await exports['cfx-mongodb'].update('users', { _id: ins.insertedId }, { $set: { active: false } });
-  await exports['cfx-mongodb'].delete('users', { _id: ins.insertedId });
-});
-```
-
-### Lua
-
-```lua
-AddEventHandler('cfx-mongodb:ready', function()
-  local version = exports['cfx-mongodb']:getVersion()
-  local ins = exports['cfx-mongodb']:insert('users', { email = 'u@example.com' })
-  local one = exports['cfx-mongodb']:find('users', { email = 'u@example.com' })
-  exports['cfx-mongodb']:update('users', { _id = ins.insertedId }, { ['$set'] = { active = false } })
-  exports['cfx-mongodb']:delete('users', { _id = ins.insertedId })
-end)
-```
+Consumer resources: **`on(...)`** (TS) or **`AddEventHandler`** (Lua). Not `emitNet`.
 
 ## Development
 
 ```bash
+yarn install
 yarn build
 yarn tsc
+yarn test
 yarn lint
 ```
 
 ## Troubleshooting
 
 - Connection fails: check URI, firewall, `mongodb_log_level debug`, call `health()`
-- Navigator errors: ensure Vite SSR build (see `vite.config.mjs`)
 - Wrong Node version: confirm `node_version '22'` in manifest
+- Consumer timing: ensure `cfx-mongodb:ready` fired before CRUD
 
 ## Changelog
 
-See [CHANGES.md](CHANGES.md)
+See [CHANGELOG.md](CHANGELOG.md)

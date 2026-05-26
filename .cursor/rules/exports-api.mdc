@@ -1,12 +1,12 @@
 ---
 description: cfx-mongodb export API invariants — response envelope, no thrown errors
-globs: src/exports.ts,src/responses.ts
+globs: src/exports.ts,src/api/handlers/**/*.ts,src/responses.ts
 alwaysApply: false
 ---
 
 # Export API Rules
 
-All FiveM exports in `exports.ts` must follow the response envelope pattern:
+All FiveM exports registered via `src/api/registerExports.ts` and handler modules must follow the response envelope pattern:
 
 ```typescript
 // ✅ GOOD

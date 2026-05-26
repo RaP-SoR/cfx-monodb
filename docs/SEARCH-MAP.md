@@ -27,9 +27,10 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 | Externe API (Vertrag) | `docs/API.md` |
 | Architektur-Überblick | `docs/ARCHITECTURE.md` |
 | Agent-Regeln & Workflow | `AGENTS.md` |
-| Lua-Beispiele | `doc-lua.md`, `examples/server.lua` |
-| TypeScript-Beispiele | `doc-typescript.md`, `examples/server.ts` |
-| Changelog | `CHANGES.md` |
+| Lua-Beispiele | `docs/examples/lua.md`, `docs/examples/server.lua` |
+| TypeScript-Beispiele | `docs/examples/typescript.md`, `docs/examples/server.ts` |
+| Changelog | `docs/CHANGELOG.md` |
+| Dokumentations-Index | `docs/README.md` |
 
 ## Modulgraph
 
@@ -83,7 +84,7 @@ Server-Consumer nutzen **`AddEventHandler`** (Lua) bzw. **`on(...)`** (TS) — c
 
 | Event | Mechanismus | Wann |
 |-------|-------------|------|
-| `cfx-mongodb:ready` | `TriggerEvent` | Nach Connect + optionaler Index-Init (`src/index.ts`) |
+| `cfx-mongodb:ready` | `TriggerEvent` | Nach Connect + optionaler Index-Init (`src/bootstrap.ts`) |
 | `cfx-mongodb:connected` | `TriggerEvent` | Nach erfolgreichem Connect (`src/connector.ts`, Payload: `true`) |
 
 Consumer-Ressourcen sollten auf **`cfx-mongodb:ready`** warten, bevor sie CRUD-Exports nutzen.
@@ -117,10 +118,10 @@ yarn test      # vitest
 ## Typische Agent-Aufgaben
 
 ### Neues Export-Feld / API-Änderung
-1. `src/exports.ts` + `src/responses.ts`
+1. `src/api/handlers/*.ts` + `src/api/registerExports.ts` + `src/responses.ts`
 2. `fxmanifest.lua` → `server_exports` (falls neuer Export)
-3. `docs/API.md` + `doc-lua.md` / `doc-typescript.md` + `SEARCH-MAP.md`
-4. `yarn build` + `yarn tsc`
+3. `docs/API.md` + `docs/examples/*.md` + `docs/SEARCH-MAP.md`
+4. `yarn test` + `yarn build` + `yarn tsc`
 
 ### CTFFramework-Kompatibilität prüfen
 1. `docs/API.md` → Abschnitt „CTFFramework Contract“

@@ -11,7 +11,7 @@ description: >-
 
 ## Before coding
 
-1. Read [SEARCH-MAP.md](../../../SEARCH-MAP.md) for file locations.
+1. Read [docs/SEARCH-MAP.md](../../../docs/SEARCH-MAP.md) for file locations.
 2. For API contracts read [docs/API.md](../../../docs/API.md).
 3. Edit `src/`, never `dist/`. Run `yarn build` after changes.
 
@@ -36,17 +36,18 @@ Framework success checks:
 
 | Change | Files |
 |--------|-------|
-| New/changed export | `src/exports.ts`, `src/responses.ts`, `fxmanifest.lua`, `docs/API.md` |
+| New/changed export | `src/api/handlers/*.ts`, `src/api/registerExports.ts`, `src/responses.ts`, `fxmanifest.lua`, `docs/API.md` |
 | ConVar config | `src/config.ts` |
 | Connection logic | `src/connector.ts` |
 | Query safety | `src/validateQuery.ts` |
-| findAll options | `src/types/options.ts`, `src/exports.ts` |
+| findAll options | `src/types/options.ts`, `src/api/handlers/read.ts` |
 
 ## Build verify
 
 ```bash
 yarn build
 yarn tsc
+yarn test
 ```
 
 ## Additional resources
