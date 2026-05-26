@@ -93,8 +93,17 @@ DO NOT MERGE YOURSELF
 
 1. Run full gate on `refactor/staged-hardening`
 2. Mark Wave 1 🟢 in `REFACTOR-STATUS.md`
-3. Create `docs/refactor/WAVE-2-SPEC.md` (export pipeline — `withDb`, wire `redactMongoUri`)
+3. Execute Wave 2 per `docs/refactor/WAVE-2-SPEC.md` (**sequential**: W2A → merge → W2B)
 4. Do **not** merge to `dev` until all planned waves complete or explicit milestone agreed
+
+## Wave 2 — sequential (not parallel)
+
+| Step | Branch | Owns |
+|------|--------|------|
+| W2A | `refactor/w2a-pipeline-infra` | `withDb`, `normalizeIdFilter`, `DbProvider` + tests — **no exports.ts** |
+| W2B | `refactor/w2b-exports-pipeline` | `exports.ts` refactor, find semantics, docs — **after W2A merge** |
+
+Prompt: `docs/refactor/README.md` → Wave 2 `/multitask` block.
 
 ## Invariants (never break)
 

@@ -8,6 +8,7 @@ Orchestrated hardening and architecture refactor on branch `refactor/staged-hard
 |------|---------|
 | [REFACTOR-STATUS.md](REFACTOR-STATUS.md) | Living board — wave/agent/branch/PR status |
 | [WAVE-1-SPEC.md](WAVE-1-SPEC.md) | Wave 1: security, logging, cleanup (5 parallel agents) |
+| [WAVE-2-SPEC.md](WAVE-2-SPEC.md) | Wave 2: withDb pipeline + find semantics (2 sequential agents) |
 | [INTERFACES.md](INTERFACES.md) | Shared types for Wave 2–3 (read-only until merged) |
 
 ## Quick start — native Cursor (recommended)
@@ -38,6 +39,39 @@ I (orchestrator) will merge into refactor/staged-hardening.
 ```
 
 Requires Cursor plan with parallel agents / Multitask Mode. Subagents run in background; you get notified when each completes.
+
+## Wave 2 — sequential (2 agents, not parallel)
+
+Wave 2 touches `exports.ts` — run **W2A first**, merge, then **W2B**. Do not parallelize both.
+
+### Wave 2 `/multitask` orchestrator prompt
+
+```
+/multitask
+
+Wave 2 for cfx-mongodb on refactor/staged-hardening. SEQUENTIAL — not parallel.
+
+DECISION (confirmed): find not-found → { success: true, data: null } (breaking). Document in CHANGES.md.
+
+STEP 1 — Subagent W2A (merge before Step 2):
+Branch: refactor/w2a-pipeline-infra
+Read docs/refactor/WAVE-2-SPEC.md section W2A.
+Create: src/types/dbProvider.ts, src/api/withDb.ts, src/api/normalizeIdFilter.ts + tests.
+Do NOT edit exports.ts. Gate: yarn tsc && yarn test && yarn build.
+Commit: refactor(w2a): add withDb pipeline and normalizeIdFilter
+STOP — notify orchestrator for merge before Step 2.
+
+(After W2A merged — orchestrator re-runs with Step 2 only)
+
+STEP 2 — Subagent W2B:
+Branch: refactor/w2b-exports-pipeline
+Read WAVE-2-SPEC W2B. Refactor exports.ts to use withDb + normalizeIdFilter.
+Wire redactMongoUri in connector logs. Fix find not-found semantics.
+Resolve it.todo in tests/api-contract.test.ts. Update docs/API.md + CHANGES.md.
+Replace emitNet with TriggerEvent in connect/disconnect.
+Gate: yarn tsc && yarn test && yarn build && yarn lint
+Commit: refactor(w2b): wire withDb pipeline and align find not-found semantics
+```
 
 ## Fallback — manual worktrees (optional)
 

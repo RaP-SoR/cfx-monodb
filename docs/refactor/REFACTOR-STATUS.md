@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** `c370b0f` (Wave 1 complete)  
+**Integration HEAD:** `b9f8693` (Wave 1 complete + status board)  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -12,7 +12,7 @@
 | Wave | Focus | Agents | Status |
 |------|-------|--------|--------|
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
-| **2** | Export pipeline (`withDb`) | 1 + tests | 🔵 Ready to start |
+| **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🔵 Ready to start |
 | **3** | Architecture split | 3–6 parallel | ⚪ Blocked by Wave 2 |
 | **4** | TS6 + contract hardening | 2 parallel | ⚪ Blocked by Wave 3 |
 
@@ -20,31 +20,36 @@ Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
 
 ---
 
-## Wave 1 — agents
+## Wave 1 — agents (complete)
 
-| ID | Role | Branch | Worktree | Owned files | Status | Merge |
-|----|------|--------|----------|-------------|--------|-------|
-| **W1A** | Security | `refactor/w1a-security` | `../worktrees/cfx-mongodb/w1a` | `validateQuery.ts`, `tests/validateQuery.test.ts` | 🟢 | `6eb9aae` |
-| **W1B** | Logging | `refactor/w1b-logging` | `../worktrees/cfx-mongodb/w1b` | `utils.ts`, `tests/utils.test.ts` | 🟢 | `b3c415b` |
-| **W1C** | Cleanup | `refactor/w1c-cleanup` | `../worktrees/cfx-mongodb/w1c` | `index.ts`, `connector.ts`, `vite.config.mjs`, `package.json` | 🟢 | `358a7a7` |
-| **W2A** | Manifest/Docs | `refactor/w2a-manifest` | `../worktrees/cfx-mongodb/w2a` | `fxmanifest.lua`, `docs/API.md`, `SEARCH-MAP.md`, … | 🟢 | `c370b0f` |
-| **W2B** | API types | `refactor/w2b-types` | `../worktrees/cfx-mongodb/w2b` | `src/types/api.ts`, `tests/api-contract.test.ts` | 🟢 | `1fc422b` |
+| ID | Role | Branch | Status | Merge |
+|----|------|--------|--------|-------|
+| **W1A** | Security | `refactor/w1a-security` | 🟢 | `6eb9aae` |
+| **W1B** | Logging | `refactor/w1b-logging` | 🟢 | `b3c415b` |
+| **W1C** | Cleanup | `refactor/w1c-cleanup` | 🟢 | `358a7a7` |
+| **W2A** | Manifest/Docs | `refactor/w2a-manifest` | 🟢 | `c370b0f` |
+| **W2B** | API types | `refactor/w2b-types` | 🟢 | `1fc422b` |
 
-### Wave 1 merge order (applied)
+### Wave 1 integration gate
 
-1. W1C → `358a7a7` — gate: 19/19 tests ✓
-2. W1B → `b3c415b` — gate: 30/30 tests ✓
-3. W1A → `6eb9aae` — gate: 52/52 tests ✓
-4. W2B → `1fc422b` — gate: 54 pass, 1 todo ✓
-5. W2A → `c370b0f` — gate: 54 pass, 1 todo ✓
+**Result:** `yarn tsc` ✓ · **54 passed | 1 todo** · `yarn build` ✓
 
-### Wave 1 integration gate (final)
+---
 
-```bash
-yarn tsc && yarn test && yarn build
-```
+## Wave 2 — agents (ready)
 
-**Result:** `yarn tsc` ✓ · **54 passed | 1 todo** (4 test files) · `yarn build` ✓
+| ID | Role | Branch | Owned files | Status | Merge |
+|----|------|--------|-------------|--------|-------|
+| **W2A** | Pipeline infra | `refactor/w2a-pipeline-infra` | `src/api/*`, `src/types/dbProvider.ts`, tests | 🔵 | — |
+| **W2B** | Exports wire-up | `refactor/w2b-exports-pipeline` | `exports.ts`, connector logs, docs, contract test | 🔵 | — |
+
+**Spec:** [WAVE-2-SPEC.md](WAVE-2-SPEC.md)  
+**Merge order:** W2A → gate → W2B → gate (sequential, not parallel)
+
+### Wave 2 decisions
+
+- [x] `find` not-found → `{ success: true, data: null }` (breaking — CHANGES.md required)
+- [ ] Resolve `it.todo` in `tests/api-contract.test.ts`
 
 ---
 
@@ -53,12 +58,11 @@ yarn tsc && yarn test && yarn build
 - [x] All 5 agent branches merged into `refactor/staged-hardening`
 - [x] Gate commands green on integration branch
 - [x] `REFACTOR-STATUS.md` updated
-- [ ] Wave 2 spec unlocked (orchestrator creates `WAVE-2-SPEC.md`)
+- [x] `WAVE-2-SPEC.md` created
 
----
+## Checklist — Wave 2 complete
 
-## Next: Wave 2
-
-- Wire `redactMongoUri` / `formatError` into export pipeline (`withDb`)
-- Resolve `find` vs `findById` not-found semantics (`.todo` in `tests/api-contract.test.ts`)
-- See `.cursor/skills/refactor-orchestrator/SKILL.md` for orchestrator duties
+- [ ] W2A merged
+- [ ] W2B merged
+- [ ] 0 todos in test suite (or documented deferrals)
+- [ ] `REFACTOR-STATUS.md` Wave 2 → 🟢
