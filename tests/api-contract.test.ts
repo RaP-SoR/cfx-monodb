@@ -8,7 +8,12 @@ import {
   installExportCapture,
   listExports,
 } from "./helpers/export-registry";
-import { createMockCollection, createMockConnector, createMockDb } from "./helpers/mock-db";
+import { parseServerExportsFromManifest } from "./helpers/manifest-exports";
+import {
+  createMockCollection,
+  createMockConnector,
+  createMockDb,
+} from "./helpers/mock-db";
 
 function setupRegisteredExports(): string[] {
   clearExports();
@@ -17,6 +22,17 @@ function setupRegisteredExports(): string[] {
   const connector = createMockConnector(db, true);
   registerExports(connector);
   return listExports();
+}
+
+function registerWithConnector(
+  collections: Record<string, ReturnType<typeof createMockCollection>>,
+  connected = true
+) {
+  clearExports();
+  installExportCapture();
+  const db = connected ? createMockDb({ collections }) : null;
+  const connector = createMockConnector(db, connected);
+  registerExports(connector);
 }
 
 describe("cfx-mongodb API contract", () => {
@@ -47,6 +63,120 @@ describe("cfx-mongodb API contract", () => {
         );
       }
       expect(extra).toEqual([]);
+    });
+
+    it("fxmanifest server_exports matches CFX_MONGODB_EXPORTS", () => {
+      const manifestExports = parseServerExportsFromManifest();
+      const manifestSorted = [...manifestExports].sort();
+      const typesSorted = [...CFX_MONGODB_EXPORTS].sort();
+
+      expect(manifestSorted).toEqual(typesSorted);
+    });
+  });
+
+  describe("response envelope invariants", () => {
+    it("insert success returns insertedId as string", async () => {
+      const objectId = new ObjectId();
+      const collection = createMockCollection({
+        insertOne: vi.fn().mockResolvedValue({ insertedId: objectId }),
+      });
+      registerWithConnector({ players: collection });
+
+      const insert = getExport<
+        (
+          name: string,
+          doc: object
+        ) => Promise<{ success: true; insertedId: string } | { success: false; error: string }>
+      >("insert");
+
+      const result = await insert("players", { name: "test" });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(typeof result.insertedId).toBe("string");
+        expect(result.insertedId).toBe(objectId.toString());
+      }
+    });
+
+    it("insert returns error envelope when db is not connected", async () => {
+      registerWithConnector({}, false);
+
+      const insert = getExport<
+        (name: string, doc: object) => Promise<{ success: boolean; error?: string }>
+      >("insert");
+
+      const result = await insert("players", { name: "test" });
+
+      expect(result).toEqual({
+        success: false,
+        error: "Database not connected",
+      });
+    });
+
+    it("update success returns matchedCount and modifiedCount", async () => {
+      const collection = createMockCollection({
+        updateOne: vi.fn().mockResolvedValue({ matchedCount: 1, modifiedCount: 1 }),
+      });
+      registerWithConnector({ players: collection });
+
+      const update = getExport<
+        (
+          name: string,
+          filter: object,
+          update: object
+        ) => Promise<
+          | { success: true; matchedCount: number; modifiedCount: number }
+          | { success: false; error: string }
+        >
+      >("update");
+
+      const result = await update("players", { name: "old" }, { name: "new" });
+
+      expect(result).toEqual({
+        success: true,
+        matchedCount: 1,
+        modifiedCount: 1,
+      });
+    });
+
+    it("delete returns not-found error when nothing deleted", async () => {
+      const collection = createMockCollection({
+        deleteOne: vi.fn().mockResolvedValue({ deletedCount: 0 }),
+      });
+      registerWithConnector({ players: collection });
+
+      const del = getExport<
+        (
+          name: string,
+          filter: object
+        ) => Promise<{ success: boolean; error?: string; deletedCount?: number }>
+      >("delete");
+
+      const result = await del("players", { _id: new ObjectId().toString() });
+
+      expect(result).toEqual({
+        success: false,
+        error: "Document not found",
+      });
+    });
+
+    it("health success returns ok and rttMs", async () => {
+      registerWithConnector({});
+
+      const health = getExport<
+        () => Promise<
+          | { success: true; data: { ok: boolean; rttMs: number } }
+          | { success: false; error: string }
+        >
+      >("health");
+
+      const result = await health();
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.ok).toBe(true);
+        expect(typeof result.data.rttMs).toBe("number");
+      }
     });
   });
 

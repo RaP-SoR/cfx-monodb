@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** `4b100f2` (Wave 3 complete — W3D wiring merged)  
+**Integration HEAD:** Wave 4 pending commit  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -14,7 +14,7 @@
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
 | **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🟢 Complete |
 | **3** | Architecture split | 2 + 3 + 1 staged | 🟢 Complete |
-| **4** | TS6 + contract hardening | 2 parallel | 🔵 Ready |
+| **4** | TS6 + contract hardening | 2 parallel | 🟢 Complete |
 
 Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
 
@@ -94,16 +94,31 @@ yarn tsc && yarn test && yarn build && yarn lint
 - [x] Handlers split: `read`, `write`, `admin`, `lifecycle`
 - [x] `registerExports.ts` wiring; `exports.ts` is 1-line shim
 
-## Next: Wave 4
-
-TS6 upgrade + contract hardening — [WAVE-4-SPEC.md](WAVE-4-SPEC.md). Run `/multitask` with prompt in [README.md](README.md).
-
 ## Wave 4 — agents
 
 | ID | Role | Branch | Status | Merge |
 |----|------|--------|--------|-------|
-| **W4A** | TypeScript 6 + tsconfig | `refactor/w4a-typescript6` | 🔵 | — |
-| **W4B** | Contract tests + CI | `refactor/w4b-contract-ci` | 🔵 | — |
+| **W4A** | TypeScript 6 + tsconfig | `refactor/w4a-typescript6` | 🟢 | (this commit) |
+| **W4B** | Contract tests + CI | `refactor/w4b-contract-ci` | 🟢 | (this commit) |
 
 **Spec:** [WAVE-4-SPEC.md](WAVE-4-SPEC.md)  
 **Order:** W4A ∥ W4B → integration gate → PR to `dev`
+
+### Wave 4 integration gate
+
+```bash
+yarn tsc && yarn test && yarn build && yarn lint
+```
+
+**Result:** `yarn tsc` ✓ · **76/76 tests** · `yarn build` ✓ · `yarn lint` ✓
+
+### Wave 4 changes
+
+- [x] `typescript@6.0.3`, `target: ES2022`, `moduleResolution: bundler`, no DOM lib
+- [x] `fxmanifest.lua` ↔ `CFX_MONGODB_EXPORTS` contract test
+- [x] Response envelope invariant tests in `api-contract.test.ts`
+- [x] CI on `dev` + `refactor/staged-hardening`; audit step (informational)
+
+## Next: milestone PR
+
+Open PR `refactor/staged-hardening` → `dev` with Waves 1–4 summary (`CHANGES.md`).

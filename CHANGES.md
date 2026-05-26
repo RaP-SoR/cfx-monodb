@@ -1,5 +1,11 @@
 # Änderungen (Changelog)
 
+## Wave 4 (refactor/staged-hardening) — TypeScript 6 & contract hardening
+
+- **W4A:** `typescript@6` — `tsconfig.json` auf `target: ES2022`, `moduleResolution: bundler`, `lib: ES2022` (kein DOM; Node-22-only).
+- **W4B:** `tests/api-contract.test.ts` — `fxmanifest.lua` ↔ `CFX_MONGODB_EXPORTS` Sync + Response-Envelope-Invarianten.
+- **CI:** Build-Workflow auch für `dev` und `refactor/staged-hardening`; `yarn npm audit --severity moderate` (informational, `continue-on-error`).
+
 ## Wave 3 (refactor/staged-hardening) — Bootstrap & IndexService
 
 - **W3A:** `src/bootstrap.ts` — Lifecycle aus `index.ts`; `connector.ts` ohne `registerExports` (kein zirkulärer Import).
@@ -32,7 +38,8 @@
   - `@typescript-eslint/*` 8.50.1 → 8.60.0
   - `@citizenfx/client|server` 2.0.23683-1 → 2.0.29753-1
   - `@types/node` 25.0.3 → 25.9.1, `eslint` 9.39.2 → 9.39.4, `prettier` 3.7.4 → 3.8.3
-- **Bewusst nicht aktualisiert** (Major, Breaking): `eslint@10`, `typescript@6`, `vite@8`
+- **Bewusst nicht aktualisiert** (Major, Breaking): `eslint@10`, `vite@8`
+- **Wave 4:** `typescript@6` (siehe Wave-4-Abschnitt oben)
 - **CI:** Node-16-Matrix entfernt; Build nur noch auf Node 22
 - **Docs:** Search Map, API-Referenz, Cursor Skills/Rules für Agent-Arbeit
 - **Neu:** `findById`, `getDb` Exports implementiert; alle Registrierungen über `exportFn`

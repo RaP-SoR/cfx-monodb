@@ -1,24 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2016",
+    "target": "ES2022",
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "strict": true,
     "allowJs": true,
     "sourceMap": false,
     "outDir": "./dist",
-    "baseUrl": ".",
-    "types": ["@citizenfx/server"],
-    "lib": ["es2022", "dom", "dom.iterable"],
-    "skipLibCheck": true,
+    "types": ["@citizenfx/server", "node"],
+    "lib": ["ES2022"],
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
