@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** `50b798d` (Wave 3 W3A bootstrap merged)  
+**Integration HEAD:** `8763957` (Wave 3 W3C handlers merged)  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -13,7 +13,7 @@
 |------|-------|--------|--------|
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
 | **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🟢 Complete |
-| **3** | Architecture split | 2 + 3 + 1 staged | 🟡 W3B done — W3C parallel next |
+| **3** | Architecture split | 2 + 3 + 1 staged | 🟡 W3C merged — W3D next |
 | **4** | TS6 + contract hardening | 2 parallel | ⚪ Blocked by Wave 3 |
 
 Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
@@ -70,15 +70,15 @@ yarn tsc && yarn test && yarn build && yarn lint
 | ID | Role | Branch | Status | Merge |
 |----|------|--------|--------|-------|
 | **W3A** | Bootstrap | `refactor/w3a-bootstrap` | 🟢 | `50b798d` |
-| **W3B** | IndexService | `refactor/w3b-index-service` | 🟢 | (pending commit) |
-| **W3C1** | Read handlers | `refactor/w3c1-handlers-read` | 🔵 | — |
-| **W3C2** | Write handlers | `refactor/w3c2-handlers-write` | 🔵 | — |
-| **W3C3** | Admin/lifecycle | `refactor/w3c3-handlers-ops` | 🔵 | — |
+| **W3B** | IndexService | `refactor/w3b-index-service` | 🟢 | `6cb1192` |
+| **W3C1** | Read handlers | `refactor/w3c1-handlers-read` | 🟢 | `d2ead21` |
+| **W3C2** | Write handlers | `refactor/w3c2-handlers-write` | 🟢 | `9a76cc4` |
+| **W3C3** | Admin/lifecycle | `refactor/w3c3-handlers-ops` | 🟢 | `830eb19` |
 | **W3D** | Wiring + shim | `refactor/w3d-register-exports` | 🔵 | — |
 
 **Spec:** [WAVE-3-SPEC.md](WAVE-3-SPEC.md)  
 **Order:** W3A → W3B → (W3C1 ∥ W3C2 ∥ W3C3) → W3D
 
-## Next: Wave 3 Step 3
+## Next: Wave 3 Step 4
 
-W3C1 + W3C2 + W3C3 in parallel — handler extraction. See `docs/refactor/README.md` Step 3 `/multitask` prompt.
+W3D — `refactor/w3d-register-exports`: wire handlers via `registerExports.ts`, shrink `exports.ts` shim.
