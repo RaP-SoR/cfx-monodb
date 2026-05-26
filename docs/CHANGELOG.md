@@ -1,5 +1,11 @@
 # Änderungen (Changelog)
 
+## Maintenance — Track C2 (getQueryStats) (dev)
+
+- **`getQueryStats` export:** Sync admin snapshot — samples ring buffer, aggregates (p50/p95/slowCount).
+- **ConVar:** `mongodb_perf_buffer` (default 100, max 1000).
+- **Tests:** Ring buffer, percentiles, contract sync for `getQueryStats` (89 tests total).
+
 ## Maintenance — Track B (TSDoc) & Track C1 (slow query log) (dev)
 
 - **TSDoc:** Module headers on `withDb`, `validateQuery`, `connector`, `indexService`, `registerExports`, `perf`; TSDoc standard in `AGENTS.md`.

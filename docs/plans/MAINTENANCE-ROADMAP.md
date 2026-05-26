@@ -5,6 +5,7 @@
 > **Track A:** Complete  
 > **Track B:** Complete (patterns.md optional, skipped)  
 > **Track C1:** Complete (slow query log)  
+> **Track C2:** Complete (getQueryStats ring buffer)  
 > **No release target yet** — execute in phases, merge to `dev` incrementally.
 
 After Waves 1–4 (refactor, TS6, docs consolidation), three tracks remain:
@@ -165,6 +166,7 @@ Extend `.cursor/skills/cfx-mongodb/SKILL.md`:
 Summary:
 
 - **C1 (done):** MySQL-style **slow query warnings** (`mongodb_perf_enabled`, `mongodb_perf_slow_ms`) — ConVar-gated, default off
+- **C2 (done):** `getQueryStats()` export + ring buffer (`mongodb_perf_buffer`)
 - **UI & full monitoring:** deferred — finalize plan later
 - **Production (100+):** perf ConVars aus unless admin consciously enables slow-query logging
 - **Staging (~10–20):** slow log useful for tuning; UI comes later

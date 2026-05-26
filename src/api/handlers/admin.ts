@@ -4,7 +4,9 @@ import type { DbProvider } from "../../types/dbProvider";
 import { withDb } from "../withDb";
 import { ensureIndexesForCollection } from "../../services/indexService";
 import {
+  getPerfBufferSize,
   getPerfSlowMs,
+  getQueryStatsData,
   isPerfEnabled,
   isPerfLogAll,
 } from "../../perf";
@@ -59,6 +61,7 @@ export function registerAdminHandlers(
           perfEnabled: isPerfEnabled(),
           perfSlowMs: getPerfSlowMs(),
           perfLogAll: isPerfLogAll(),
+          perfBuffer: getPerfBufferSize(),
         };
         return { success: true, data: cfg };
       } catch (error) {
@@ -72,4 +75,8 @@ export function registerAdminHandlers(
       }
     }
   );
+
+  register("getQueryStats", (): Response<ReturnType<typeof getQueryStatsData>> => {
+    return { success: true, data: getQueryStatsData() };
+  });
 }

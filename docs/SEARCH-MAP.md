@@ -72,6 +72,7 @@ Implementiert in `src/api/handlers/*` via `src/api/registerExports.ts` (Shim: `s
 | `ensureIndexes` | Erweitert | createIndexes (max 20) |
 | `health` | Erweitert | ping + RTT |
 | `config` | Erweitert | sichere Laufzeit-Config (keine Secrets) |
+| `getQueryStats` | **Advanced / Internal** | Sync — perf ring buffer + p50/p95 (ConVar-gated) |
 | `getDb` | **Advanced / Internal** | Sync, returns `Db \| null` — umgeht Envelope/validateQuery |
 | `connect` | **Advanced / Internal** | Runtime-URI-Override |
 | `disconnect` | **Advanced / Internal** | Verbindung schließen |

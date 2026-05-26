@@ -1,6 +1,6 @@
 # Observability & Performance Plan — cfx-mongodb
 
-> **Status:** C1 implemented (slow query log). UI & full monitoring: deferred.  
+> **Status:** C1 + C2 implemented. UI & full monitoring: deferred.  
 > **First implementation target:** MySQL-style **slow query warnings** (ConVar-gated).  
 > **Parent:** [MAINTENANCE-ROADMAP.md](MAINTENANCE-ROADMAP.md) Track C
 

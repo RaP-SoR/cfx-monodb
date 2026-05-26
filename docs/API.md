@@ -31,6 +31,7 @@ Alle in `fxmanifest.lua` registrierten Exports (Reihenfolge wie im Manifest):
 | `ensureIndexes` | Erweitert |
 | `health` | Erweitert |
 | `config` | Erweitert |
+| `getQueryStats` | Advanced / Internal |
 
 ---
 
@@ -187,7 +188,7 @@ const version = await exports["cfx-mongodb"].getVersion();
 |--------|----------|--------------|
 | `ensureIndexes(collection, specs[])` | `{ success, data: number }` | Indizes idempotent anlegen (max. 20 Specs) |
 | `health()` | `{ success, data: { ok, rttMs } }` | MongoDB ping + Round-Trip-Zeit |
-| `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel, perfEnabled, perfSlowMs, perfLogAll } }` | Sichere Laufzeit-Config — **keine Secrets/URLs** |
+| `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel, perfEnabled, perfSlowMs, perfLogAll, perfBuffer } }` | Sichere Laufzeit-Config — **keine Secrets/URLs** |
 
 ---
 
@@ -198,6 +199,7 @@ const version = await exports["cfx-mongodb"].getVersion();
 | Export | Rückgabe | Beschreibung |
 |--------|----------|--------------|
 | `getDb()` | `Db \| null` | Sync — interne MongoDB-`Db`-Instanz oder `null` wenn getrennt |
+| `getQueryStats()` | `{ success, data: { enabled, samples[], aggregates } }` | Sync — Ring-Buffer-Snapshot (nur wenn `mongodb_perf_enabled` aktiv war) |
 | `connect(url, options?)` | void | Runtime-URI-Override; ersetzt die ConVar-Verbindung |
 | `disconnect()` | void | Verbindung schließen |
 
@@ -211,6 +213,19 @@ if (db) {
 ```
 
 Typischer Anwendungsfall: eine andere **Server-Node-Ressource** braucht Treiber-APIs, die cfx-mongodb nicht als Export anbietet. Für normale CRUD immer `find` / `insert` / … nutzen.
+
+### `getQueryStats()`
+
+Erfordert zuvor `mongodb_perf_enabled 1` — sonst leerer Buffer. Samples werden bei Resource-Restart gelöscht.
+
+```typescript
+const stats = exports["cfx-mongodb"].getQueryStats();
+if (stats.success && stats.data.enabled) {
+  console.log(stats.data.aggregates.p95Ms, stats.data.samples.length);
+}
+```
+
+TypScript-Typ: `CfxMongoQueryStatsResult` in `src/types/api.ts`.
 
 ---
 
@@ -278,6 +293,7 @@ on("cfx-mongodb:ready", () => {
 | `mongodb_perf_enabled` | `0` | Slow-query-Timing (0=aus) |
 | `mongodb_perf_slow_ms` | `100` | Schwellwert für `SLOW QUERY`-Warnung (ms) |
 | `mongodb_perf_log_all` | `0` | Alle Ops bei `debug` loggen (Staging) |
+| `mongodb_perf_buffer` | `100` | Ring-Buffer für `getQueryStats` (max 1000) |
 
 **Slow queries (optional):**
 
@@ -297,7 +313,7 @@ Blockierte Operatoren in Filtern/Updates: `$where`, `$function`, `$accumulator`,
 
 User-Input in Queries immer validieren/whitelisten — diese Resource blockiert nur die gefährlichsten Operatoren.
 
-`getDb`, `connect` und `disconnect` umgehen Query-Validierung und Envelope-Konventionen — nur für vertrauenswürdige Server-Interna.
+`getDb`, `connect`, `disconnect` und `getQueryStats` umgehen Query-Validierung bzw. sind Admin-Diagnostik — nur für vertrauenswürdige Server-Interna.
 
 ---
 

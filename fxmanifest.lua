@@ -20,7 +20,8 @@ convar_category 'MongoDB' {
     { "mongodb_timeout", "5000", "Timeout für MongoDB-Verbindung in Millisekunden", "CV_STRING" },
     { "mongodb_perf_enabled", "0", "Slow-query-Timing aktivieren (0=aus, 1=an)", "CV_STRING" },
     { "mongodb_perf_slow_ms", "100", "Schwellwert für Slow-Query-Warnung in ms", "CV_STRING" },
-    { "mongodb_perf_log_all", "0", "Alle Queries bei debug loggen (Staging)", "CV_STRING" }
+    { "mongodb_perf_log_all", "0", "Alle Queries bei debug loggen (Staging)", "CV_STRING" },
+    { "mongodb_perf_buffer", "100", "Ring-Buffer für getQueryStats (max 1000)", "CV_STRING" }
   }
 }
 
@@ -39,7 +40,8 @@ server_exports {
   'getVersion',
   'ensureIndexes',
   'health',
-  'config'
+  'config',
+  'getQueryStats'
 }
 
 node_version '22'

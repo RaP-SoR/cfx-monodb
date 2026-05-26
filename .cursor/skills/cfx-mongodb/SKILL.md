@@ -42,6 +42,7 @@ Framework success checks:
 | Query safety | `src/validateQuery.ts` |
 | findAll options | `src/types/options.ts`, `src/api/handlers/read.ts` |
 | Slow query perf | `src/perf.ts`, `src/api/withDb.ts` |
+| Query stats export | `getQueryStats` in `src/api/handlers/admin.ts` |
 
 ## Documentation
 

@@ -31,6 +31,27 @@ export type CfxMongoDeleteResult =
   | { success: true; deletedCount: number }
   | { success: false; error: string };
 
+/** Single perf sample from {@link getQueryStats}. */
+export type CfxMongoPerfSample = {
+  export: string;
+  collection: string;
+  ms: number;
+  ok: boolean;
+  at: string;
+};
+
+/** Result of {@link getQueryStats} — ring buffer snapshot (perf ConVar-gated recording). */
+export type CfxMongoQueryStatsResult = CfxMongoResult<{
+  enabled: boolean;
+  samples: CfxMongoPerfSample[];
+  aggregates: {
+    count: number;
+    p50Ms: number;
+    p95Ms: number;
+    slowCount: number;
+  };
+}>;
+
 /**
  * Canonical list of all public exports registered by cfx-mongodb.
  *
@@ -53,6 +74,7 @@ export const CFX_MONGODB_EXPORTS = [
   "config",
   "isConnected",
   "getDb",
+  "getQueryStats",
   "connect",
   "disconnect",
 ] as const;

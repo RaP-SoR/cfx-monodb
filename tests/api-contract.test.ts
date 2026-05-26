@@ -178,6 +178,37 @@ describe("cfx-mongodb API contract", () => {
         expect(typeof result.data.rttMs).toBe("number");
       }
     });
+
+    it("getQueryStats returns envelope with aggregates", () => {
+      registerWithConnector({});
+
+      const getQueryStats = getExport<
+        () =>
+          | {
+              success: true;
+              data: {
+                enabled: boolean;
+                samples: unknown[];
+                aggregates: {
+                  count: number;
+                  p50Ms: number;
+                  p95Ms: number;
+                  slowCount: number;
+                };
+              };
+            }
+          | { success: false; error: string }
+      >("getQueryStats");
+
+      const result = getQueryStats();
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.enabled).toBe(false);
+        expect(result.data.samples).toEqual([]);
+        expect(result.data.aggregates.count).toBe(0);
+      }
+    });
   });
 
   describe("find and findById not-found semantics", () => {
