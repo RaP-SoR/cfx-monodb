@@ -1,1 +1,0 @@
--- Moved to docs/examples/typescript/fxmanifest-ts-example.lua (build typescript/server.ts)

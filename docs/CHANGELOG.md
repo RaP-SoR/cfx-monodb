@@ -1,5 +1,13 @@
 # Änderungen (Changelog)
 
+## Unreleased — Examples cleanup + SF-3 + fixlist
+
+- **SF-3** — collection-name literals + insert validation notes in `lua/patterns.md` and `typescript/patterns.md`
+- **Removed** root example stubs (`docs/examples/server.*`, root manifests); canonical paths under `lua/` and `typescript/`
+- **Removed** thin wrappers `scripts/gate.sh`, `scripts/scout.sh` — use `yarn gate` / `yarn scout`
+- **`docs/plans/PRE-STABLE-FIXLIST.md`** — build checklist, bug list, pre-merge gates
+- **`docs/plans/PRE-STABLE-ROADMAP.md`** — revised order (examples → verify → bug tour → practice test → stable)
+
 ## Unreleased — Perf validation scripts (P1/P2)
 
 - **`yarn seed:test-data`** / **`yarn bench:crud`** — local Mongo stress without framework
@@ -11,7 +19,7 @@
 - **`insert`:** `validateDocument()` before `insertOne` — blocks `$operator` payloads and depth/size overflow
 - **Tests:** +4 insert/config cases — **130** unit tests total
 - **`config()`:** `logLevel` uses effective `getLogLevel()` after invalid ConVar
-- **SF-3** (collection-name patterns in examples) deferred to examples-docs skill
+- **SF-3** — collection-name patterns in examples ✅
 
 ## Unreleased — Security concept finalized (2026-05-27)
 
@@ -57,7 +65,7 @@
 ## Unreleased — Track E (Automatisierung)
 
 - **`docs/CHECKLIST.md`** — Commit/PR-Checklisten nach Änderungstyp
-- **`yarn gate`** / **`scripts/gate.sh`** — lint → tsc → test → build
+- **`yarn gate`** — lint → tsc → test → build
 - **`yarn scout`** / **`scripts/scout.mjs`** — Diff-Reminders + gate (Windows + CI)
 - **Skill:** `.cursor/skills/post-change-scout/SKILL.md`
 - **PR template:** `.github/pull_request_template.md`

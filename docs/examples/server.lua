@@ -1,2 +1,0 @@
--- Moved to docs/examples/lua/server.lua
--- See lua/fxmanifest-lua-example.lua in the same folder.

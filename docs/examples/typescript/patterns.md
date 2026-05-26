@@ -72,6 +72,24 @@ await exports["cfx-mongodb"].findById("players", insertedId);
 const filter = { identifier: playerIdentifier, active: true };
 ```
 
+**Collection names — literals only.** The collection argument is not validated — never use client input:
+
+```typescript
+await exports["cfx-mongodb"].find("characters", { identifier: license });
+// avoid: find(untrustedCollectionName, filter)
+```
+
+See [SECURITY.md](../../SECURITY.md).
+
+**Insert payloads** are validated (`validateDocument`) — no `$operator` keys in documents:
+
+```typescript
+await exports["cfx-mongodb"].insert("accounts", {
+  identifier: license,
+  createdAt: new Date().toISOString(),
+});
+```
+
 ```typescript
 await exports["cfx-mongodb"].update("players", { _id: id }, { level: 10, name: "x" });
 
@@ -160,3 +178,5 @@ const cfg = await exports["cfx-mongodb"].config();
 | Update OK = `matchedCount > 0` | `(modifiedCount ?? 0) > 0` |
 | Client-side mongo | Server-only exports |
 | Raw client JSON as filter | Whitelist fields |
+| Dynamic collection name from client | Literal collection strings in code |
+| Many exports per player event without batching | Cache + tier limits — [SECURITY.md](../../SECURITY.md) |

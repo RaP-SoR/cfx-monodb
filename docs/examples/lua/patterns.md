@@ -88,6 +88,31 @@ local filter = { identifier = playerIdentifier, active = true }
 -- local filter = json.decode(untrustedPayload)
 ```
 
+### Collection names — literals only
+
+**What this does:** The **collection name** is the first argument to every export. It is not validated by cfx-mongodb — treat it like a table name in SQL.
+
+```lua
+-- Good: fixed names in your source
+exports['cfx-mongodb']:find('characters', { identifier = license })
+
+-- Risky: never pass client or event input as collection name
+-- exports['cfx-mongodb']:find(playerChosenCollection, filter)
+```
+
+See [SECURITY.md](../../SECURITY.md) for trust model and rate limits (your resource owns player vs system tiers).
+
+### Insert payloads
+
+**What this does:** `insert` runs the same shape validation as filters — no `$where` / `$function` in documents. Plain fields only.
+
+```lua
+local result = exports['cfx-mongodb']:insert('accounts', {
+  identifier = license,
+  createdAt = os.date('!%Y-%m-%dT%H:%M:%SZ'),
+})
+```
+
 ### Updates (auto `$set`)
 
 **What this does:** If you omit `$`-operators, the resource wraps your table as `{ ['$set'] = { ... } }`.
@@ -183,3 +208,5 @@ set mongodb_perf_slow_ms 150
 | Update OK = `matchedCount > 0` | `(modifiedCount or 0) > 0` | No field change → modified 0 |
 | Client/NUI calling mongo | Server-only exports | Security |
 | Raw client JSON as filter | Whitelist in your script | No automatic schema sandbox |
+| Dynamic collection name from client | Literal `'characters'`, `'vehicles'`, … in code | Collection arg is not validated |
+| 200 exports in one player event | Batch, cache, tier limits in your resource | See [SECURITY.md](../../SECURITY.md) |
