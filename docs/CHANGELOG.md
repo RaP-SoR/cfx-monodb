@@ -1,5 +1,11 @@
 # Änderungen (Changelog)
 
+## Unreleased — Perf validation scripts (P1/P2)
+
+- **`yarn seed:test-data`** / **`yarn bench:crud`** — local Mongo stress without framework
+- **`tests/integration/batch-update.test.ts`** — 200 export updates (&lt;30s threshold)
+- **`tests/fixtures/perf-seed.json`** · **`scripts/README.md`**
+
 ## Unreleased — Security fixes (SF-1, SF-2, SF-4)
 
 - **`insert`:** `validateDocument()` before `insertOne` — blocks `$operator` payloads and depth/size overflow

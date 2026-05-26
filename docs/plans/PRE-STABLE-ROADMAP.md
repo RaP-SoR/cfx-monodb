@@ -14,11 +14,10 @@
 [4] CI green                  ← integration.yml + yarn gate
 [5] dev → main, tag v1.0.0    ← stable ZIP + .tgz
 
-        ─── post-stable ───
+        ─── after stable (batch) ───
 
-[6] Data/perf scripts & tests ← DATA-PERF-VALIDATION-PLAN
+[6] Examples + SF-3 docs      ← examples-docs skill / merge
 [7] Framework test            ← when framework params settle
-[8] v1.0.x patches            ← as needed
 ```
 
 ---
@@ -48,6 +47,18 @@ yarn scout
 ```
 
 **Next:** Step 3 manual practice test.
+
+---
+
+## Step 2b — Perf validation tools ✅
+
+Per [DATA-PERF-VALIDATION-PLAN.md](DATA-PERF-VALIDATION-PLAN.md) (not blocking stable):
+
+- ✅ `yarn seed:test-data` — accounts / characters / items + 200 bench docs
+- ✅ `yarn bench:crud` — driver sequential updates
+- ✅ `tests/integration/batch-update.test.ts` — 200 export updates (&lt;30s)
+
+Consumer **examples** (SF-3) deferred until after stable.
 
 ---
 

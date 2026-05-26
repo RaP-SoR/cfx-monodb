@@ -1,6 +1,6 @@
 # Data & performance validation plan (step 2)
 
-> **Status:** 📋 Planned — **after** [SECURITY-FIXES-PLAN.md](SECURITY-FIXES-PLAN.md) and manual smoke  
+> **Status:** 🟡 P1 + P2 implemented — scripts + `batch-update.test.ts`  
 > **Audience:** Any consumer (accounts, characters, inventories) — not framework-specific  
 > **Goal:** Reproduce load scenarios without hand-written update loops in live framework code
 
@@ -79,10 +79,10 @@ Consumers map their own schema — fixtures are **examples**, not schema enforce
 
 | Criterion | Met when |
 |-----------|----------|
-| Reproducible seed | One command populates test DB |
-| 200-update scenario | Script or integration test runs without manual framework |
-| Documented | README in `scripts/` or `tests/integration/README.md` |
-| Not blocking v1.0.0 | Can ship stable before P2 is green |
+| Reproducible seed | ✅ `yarn seed:test-data` |
+| 200-update scenario | ✅ `yarn bench:crud` + `batch-update.test.ts` |
+| Documented | ✅ `scripts/README.md` (consumer examples deferred) |
+| Not blocking v1.0.0 | Can ship stable before CI runs batch on every PR |
 
 ---
 

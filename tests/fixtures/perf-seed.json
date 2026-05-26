@@ -1,0 +1,15 @@
+{
+  "description": "Illustrative perf/stress dataset — not enforced schema. See scripts/seed-test-data.mjs.",
+  "collections": {
+    "it_seed_accounts": ["license", "email", "createdAt"],
+    "it_seed_characters": ["accountId", "identifier", "slot", "name", "job"],
+    "it_seed_items": ["characterId", "name", "count"],
+    "it_seed_bench_items": ["slot", "label", "count"]
+  },
+  "defaults": {
+    "accounts": 10,
+    "charactersPerAccount": 3,
+    "itemsPerCharacter": 50,
+    "benchItems": 200
+  }
+}

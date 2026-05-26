@@ -29,6 +29,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.mjs",
+    "seed:test-data": "node scripts/seed-test-data.mjs",
+    "bench:crud": "node scripts/bench-crud.mjs",
     "test:watch": "vitest",
     "gate": "yarn lint && yarn tsc && yarn test && yarn build",
     "doc-audit": "node scripts/doc-audit.mjs",

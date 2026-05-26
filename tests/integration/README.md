@@ -30,3 +30,13 @@ GitHub Actions workflow `.github/workflows/integration.yml` starts `mongo:7` and
 Integration tests are **opt-in** locally and run in a separate CI job so `yarn gate` stays fast without MongoDB.
 
 Collections use the `it_` prefix and are dropped in `afterAll`.
+
+## Perf / batch (optional)
+
+| Tool | Command |
+|------|---------|
+| Seed accounts/chars/items + 200 bench docs | `yarn seed:test-data` (needs `TEST_MONGODB_URI`) |
+| Driver-only 200 updates | `yarn bench:crud --updates 200` |
+| Export-path 200 updates | `tests/integration/batch-update.test.ts` via `yarn test:integration` |
+
+See [../../scripts/README.md](../../scripts/README.md) and [../fixtures/perf-seed.json](../fixtures/perf-seed.json).
