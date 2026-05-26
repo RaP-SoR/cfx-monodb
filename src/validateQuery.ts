@@ -8,31 +8,82 @@ const DENY_OPERATORS = new Set([
   "$regexFind",
   "$out",
   "$merge",
+  "$expr",
+  "$jsonSchema",
 ]);
 
+export const MAX_DEPTH = 8;
+export const MAX_KEYS = 100;
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value)
-  );
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+  const proto = Object.getPrototypeOf(value as object);
+  return proto === null || proto === Object.prototype;
+}
+
+interface WalkState {
+  visited: number;
+}
+
+function walk(node: unknown, depth: number, state: WalkState, label: string): void {
+  if (depth > MAX_DEPTH) {
+    throw new Error(
+      `${label} depth exceeded: ${MAX_DEPTH}`,
+    );
+  }
+
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      state.visited += 1;
+      if (state.visited > MAX_KEYS) {
+        throw new Error(`${label} too large: max ${MAX_KEYS} nodes`);
+      }
+      if (item !== null && typeof item === "object") {
+        walk(item, depth + 1, state, label);
+      }
+    }
+    return;
+  }
+
+  if (!isPlainObject(node)) return;
+
+  for (const key of Object.keys(node)) {
+    state.visited += 1;
+    if (state.visited > MAX_KEYS) {
+      throw new Error(`${label} too large: max ${MAX_KEYS} nodes`);
+    }
+    if (DENY_OPERATORS.has(key)) {
+      throw new Error(`Operator not allowed: ${key}`);
+    }
+    const value = node[key];
+    if (value !== null && typeof value === "object") {
+      walk(value, depth + 1, state, label);
+    }
+  }
+}
+
+function validateShape(
+  value: unknown,
+  label: string,
+): asserts value is Document {
+  if (!isPlainObject(value)) throw new Error(`Invalid ${label} shape`);
+  walk(value, 1, { visited: 0 }, label);
 }
 
 export function validateFilter(filter: unknown): asserts filter is Document {
-  if (!isPlainObject(filter)) throw new Error("Invalid filter shape");
-  for (const key of Object.keys(filter as Record<string, unknown>)) {
-    if (DENY_OPERATORS.has(key)) throw new Error(`Operator not allowed: ${key}`);
-  }
+  validateShape(filter, "filter");
 }
 
 export function validateUpdate(update: unknown): asserts update is Document {
   if (!isPlainObject(update)) throw new Error("Invalid update shape");
-  // Basic guard: ensure at least one modifier or set of fields
   if (Object.keys(update as Record<string, unknown>).length === 0) {
     throw new Error("Empty update payload");
   }
-  for (const key of Object.keys(update as Record<string, unknown>)) {
-    if (DENY_OPERATORS.has(key)) throw new Error(`Operator not allowed: ${key}`);
-  }
+  walk(update, 1, { visited: 0 }, "update");
 }
 
+export function validateDocument(doc: unknown): asserts doc is Document {
+  validateShape(doc, "document");
+}
