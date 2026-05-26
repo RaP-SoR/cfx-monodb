@@ -32,7 +32,9 @@
 86%  ██████████████████████████░░░░░░  Audit 2 (2026-05-27)  ← heute
 ```
 
-**Ziel „stable v1.0.0“:** ~**85%** — **erreicht** für internen/Single-Consumer-Betrieb. Offen bleibt vor allem **Integration** (echtes Mongo/FiveM) und optionale **Lasttests**.
+**Ziel „stable v1.0.0“:** ~**85%** gesamt — **Audit 2 ~86% erreicht**, aber **Integration (~8%)** und **Logging (~62%)** sind **zu niedrig für stable**. Erst **Track J + K** (Audit 3), dann `main` + Tag `v1.0.0`.
+
+→ Pläne: [PARALLEL-REVIEW-WORKFLOW.md](PARALLEL-REVIEW-WORKFLOW.md) · [INTEGRATION-REVIEW-PLAN.md](INTEGRATION-REVIEW-PLAN.md) · [LOGGING-REVIEW-PLAN.md](LOGGING-REVIEW-PLAN.md)
 
 ---
 
@@ -158,7 +160,7 @@ Details: [CONFIGURATION.md](../CONFIGURATION.md)
 
 ---
 
-## Stable v1.0.0 — Empfehlung
+## Stable v1.0.0 — Empfehlung (revidiert)
 
 | Kriterium | Erfüllt? |
 |-----------|----------|
@@ -167,10 +169,18 @@ Details: [CONFIGURATION.md](../CONFIGURATION.md)
 | CI + Release-Pipeline | ✅ |
 | Unit-Test-Tiefe (Track G) | ✅ |
 | Automatisierung (Track E) | ✅ |
-| Framework-Smoke live | ⏸️ skip (akzeptiert) |
-| Integration CI | ❌ optional |
+| **Integration ≥70%** (Track J) | ❌ **Blocker** (~8%) |
+| **Logging ≥80%** (Track K) | ❌ **Blocker** (~62%) |
+| Framework-Smoke live | ⏸️ skip (ok) |
 
-**Fazit:** **`dev → main` + Tag `v1.0.0`** ist aus Qualitäts-Sicht vertretbar. Restliche Lücken sind **betriebs-/feature-getrieben** (Schema D, Bench H), nicht Blocker für „große Baustellen abgeschlossen“.
+**Fazit:** **`dev → main` + `v1.0.0` erst nach Track J + K** (parallele Agent-Reviews → Implementierung → Audit 3). Gesamtscore ~86% **maskiert** die zwei Schwachstellen.
+
+### Nächste Tracks (pre-stable)
+
+| Track | Fokus | Ziel-Score |
+|-------|--------|------------|
+| **J** | Integration (real Mongo CI) | Integration ≥70% |
+| **K** | Logging (Policy, tests, redaction) | Logging ≥80% |
 
 ---
 
@@ -190,4 +200,5 @@ Details: [CONFIGURATION.md](../CONFIGURATION.md)
 | Datum | Branch | Commit | Gesamt | Notizen |
 |-------|--------|--------|--------|---------|
 | 2026-05-26 | `dev` | — | ~72% | Erster Audit; Distribution/Tracks E–G offen |
-| 2026-05-27 | `dev` | `0059ca4` | **~86%** | E+F+G+I done; Smoke skip; stable-ready |
+| 2026-05-27 | `dev` | `0059ca4` | **~86%** | E+F+G+I done; Smoke skip |
+| 2026-05-27 | `dev` | — | — | **Stable revidiert:** Track J+K Blocker; Parallel-Review-Pläne |

@@ -43,7 +43,11 @@ Stattdessen: **strukturierte Markdown-Artefakte** als persistentes Agent-Gedäch
 | Skill | Pfad | Wann laden |
 |-------|------|------------|
 | `cfx-mongodb` | `.cursor/skills/cfx-mongodb/SKILL.md` | Export-Änderungen, CTFFramework-Kompatibilität, MongoDB-Wrapper-Arbeit |
+| Skill | Pfad | Wann laden |
+|-------|------|------------|
 | `post-change-scout` | `.cursor/skills/post-change-scout/SKILL.md` | Vor Commit/Push — `yarn scout`, Checklist, Drift-Check |
+| `integration-review` | `.cursor/skills/integration-review/SKILL.md` | Track J — real Mongo tests, CI integration job |
+| `logging-review` | `.cursor/skills/logging-review/SKILL.md` | Track K — log policy, redaction, tests |
 
 Der Skill verweist auf `reference.md` für API-Details — **progressive disclosure** (Skill kurz, Referenz ausführlich).
 

@@ -1,5 +1,12 @@
 # Änderungen (Changelog)
 
+## Unreleased — Pre-stable: Track J + K (Integration & Logging)
+
+- **Stable `v1.0.0` zurückgestellt** — Integration ~8%, Logging ~62% sind Blocker
+- **`docs/plans/PARALLEL-REVIEW-WORKFLOW.md`** — zwei parallele Agent-Reviews
+- **`docs/plans/INTEGRATION-REVIEW-PLAN.md`** (Track J) · **`LOGGING-REVIEW-PLAN.md`** (Track K)
+- Skills: `.cursor/skills/integration-review/`, `.cursor/skills/logging-review/`
+
 ## Unreleased — Quality Audit 2 (2026-05-27)
 
 - **`docs/plans/QUALITY-AUDIT-2026.md`** — Vergleich Audit 1 (~72%) → Audit 2 (**~86%**); Tracks E/F/G/I abgeschlossen; Framework-Smoke bewusst skip; stable-ready Empfehlung
