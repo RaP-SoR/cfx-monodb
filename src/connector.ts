@@ -29,7 +29,7 @@ class MongoDBConnector {
   public async connect(url?: string, options?: MongoOptions): Promise<void> {
     if (url) {
       if (this.isConnected) {
-        MongoDBConnector.getInstance().disconnect();
+        await this.disconnect();
         console.log(
           "[CFX-MongoDB] Disconnecting existing connection for Confuguration"
         );
@@ -95,21 +95,6 @@ class MongoDBConnector {
 
   public getDb(): Db | null {
     return this.db;
-  }
-
-  public async getAllCollections(): Promise<string[]> {
-    if (!this.isConnected || !this.db) {
-      console.log("[CFX-MongoDB] No connection available");
-      return [];
-    }
-
-    try {
-      const collections = await this.db.listCollections().toArray();
-      return collections.map((collection) => collection.name);
-    } catch (error) {
-      console.error("[CFX-MongoDB] Error fetching collections:", error);
-      return [];
-    }
   }
 }
 
