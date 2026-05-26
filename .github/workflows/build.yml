@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [main, dev, node22, refactor/staged-hardening]
+    branches: [main, dev]
   pull_request:
-    branches: [main, dev, node22, refactor/staged-hardening]
+    branches: [main, dev]
 
 jobs:
   build:
