@@ -1,0 +1,15 @@
+---
+description: FiveM Node 22 runtime and build requirements for cfx-mongodb
+alwaysApply: true
+---
+
+# Node 22 Runtime
+
+This resource runs inside FiveM's embedded Node **22** (`node_version '22'` in `fxmanifest.lua`).
+
+- Use Node ≥ 22 locally (`yarn install`, `yarn build`)
+- Target driver: `mongodb@7` — incompatible with FiveM default older Node
+- Source lives in `src/`; output is `dist/index.js` via `yarn build` — never edit `dist/` directly
+- MongoDB driver stays external in Rollup/Vite config — do not bundle it
+
+If build or runtime fails with navigator/window errors, check `vite.config.mjs` SSR polyfills — do not add browser bundles.

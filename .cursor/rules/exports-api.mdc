@@ -1,0 +1,30 @@
+---
+description: cfx-mongodb export API invariants — response envelope, no thrown errors
+globs: src/exports.ts,src/responses.ts
+alwaysApply: false
+---
+
+# Export API Rules
+
+All FiveM exports in `exports.ts` must follow the response envelope pattern:
+
+```typescript
+// ✅ GOOD
+try {
+  const result = await db.collection(name).insertOne(doc);
+  return { success: true, insertedId: String(result.insertedId) };
+} catch (error) {
+  return { success: false, error: error instanceof Error ? error.message : "An unknown error occurred" };
+}
+
+// ❌ BAD — CTFFramework has no try/catch
+throw new Error("Database not connected");
+```
+
+Required field semantics:
+- `insertedId`: always `string`
+- `update`: include `modifiedCount` from MongoDB driver
+- `delete`: include `deletedCount` from MongoDB driver
+- `find` not found: `{ success: false, error: "Document not found" }`
+
+After export changes: update `docs/API.md` and run `yarn build`.

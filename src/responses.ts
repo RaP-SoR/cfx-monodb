@@ -12,7 +12,7 @@ export type Response<T> = SuccessResponse<T> | ErrorResponse;
 
 export interface InsertResponse {
   success: true;
-  insertedId: unknown;
+  insertedId: string;
 }
 
 export interface UpdateResponse {

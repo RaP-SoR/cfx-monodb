@@ -1,65 +1,65 @@
-CititzenFX (FiveM/RedM) MongoDB TypeScript Wrapper
+CitizenFX (FiveM/RedM) MongoDB TypeScript Wrapper
 
-Full Documentation
-- See `DOCS.md` for a complete guide (setup, configuration, API, examples).
+## Documentation
 
-Overview
-- A lightweight, secure, and performant MongoDB wrapper for FiveM/RedM server resources.
-- Targets Node 22 and MongoDB driver v7, with query validation, pooled connections, logging, and index helpers.
+| Doc | Audience |
+|-----|----------|
+| [docs/API.md](docs/API.md) | **External API** — CTFFramework contract, all exports |
+| [SEARCH-MAP.md](SEARCH-MAP.md) | AI agents & maintainers — navigation map |
+| [AGENTS.md](AGENTS.md) | Cursor/CI contributor guidelines |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Runtime, lifecycle, build |
+| [docs/AI-STACK.md](docs/AI-STACK.md) | AI skills, rules, workflows |
+| [DOCS.md](DOCS.md) | Full human-readable guide |
+| [doc-typescript.md](doc-typescript.md) / [doc-lua.md](doc-lua.md) | Language examples |
 
-Requirements
-- FiveM/RedM runtime with Node 22 enabled in your resource manifest: `node_version '22'`.
-- MongoDB server reachable from your game server.
+## Overview
 
-Installation & Configuration
-- In `server.cfg`:
-  - ensure cfx-mongodb
-  - set mongodb_env dev|prod|test
-  - set mongodb_dev_url mongodb://localhost:27017/ctf_dev
-  - set mongodb_prod_url mongodb://localhost:27017/ctf_prod
-  - set mongodb_test_url mongodb://localhost:27017/ctf_test
-  - set mongodb_timeout 5000                # server selection timeout (ms)
-  - set mongodb_max_pool 15                 # clamp 0–50
-  - set mongodb_min_pool 2                  # clamp 0–20
-  - set mongodb_log_level info              # error|warn|info|debug
-  - set mongodb_init_indexes {"users":[{"keys":{"email":1},"options":{"unique":true}}]}
-  - (optional) set mongodb_slow_ms 200      # warn on slow queries (> ms)
+Lightweight MongoDB wrapper for FiveM/RedM server resources. Other resources access MongoDB **only via FiveM exports** — no direct driver access.
 
-Exports (Server)
-- insert(collection, doc)
-- find(collection, filter?) → single doc
-- findAll(collection, filter?, options?) → array (supports projection, sort, limit, skip)
-- update(collection, filter, update|partial)
-- delete(collection, filter)
-- count(collection, filter?)
-- ensureIndexes(collection, [ { keys, options? }, ... ])
-- isConnected() → boolean
-- connect(url, options?) → override (prefer ConVars normally)
-- health() → { success, data: { ok, rttMs } }
-- config() → { success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel } }
+- Node **22** runtime (`node_version '22'` in `fxmanifest.lua`)
+- MongoDB driver **v7**
+- Query validation, pooled connections, logging, index helpers
+- CTFFramework-compatible response envelope (`success`, `insertedId` as string, `modifiedCount`, `deletedCount`, `getVersion`)
 
-Ready Event
-- Emitted after connect and automatic index initialization: `cfx-mongodb:ready`
-- Other resources can listen and safely call exports once ready.
+## Requirements
 
-Security & Performance
-- Query validation blocks dangerous operators (e.g., `$where`, `$function`).
-- Pooling via `mongodb_max_pool` / `mongodb_min_pool` with safe clamps.
-- Slow query logging via `mongodb_slow_ms` (warn) and debug timing logs.
-- No browser polyfills; built as Node SSR.
+- FiveM/RedM with Node **22 only** (`node_version '22'` in `fxmanifest.lua`)
+- **No support** for FiveM/RedM Node 16/18 — outdated dependency chains with known security issues
+- MongoDB server reachable from game server
+- Node 22.x locally for development (`engines: >=22.0.0 <23`)
 
-Development
-- Build: `yarn build`
-- Type-check: `yarn tsc`
-- Lint: `yarn lint`
+## Quick Start (server.cfg)
 
-CI & Releases
-- Branch CI for `node22` and `node16` branches.
-- Release workflow on `main` (artifacts; tag `vX.Y.Z` for a GitHub Release).
+```
+ensure cfx-mongodb
+set mongodb_env dev
+set mongodb_dev_url mongodb://localhost:27017/ctf_dev
+set mongodb_timeout 5000
+set mongodb_log_level info
+```
 
-Examples & Docs
-- TypeScript guide: `examples/typescript.md`
-- Lua guide: `examples/lua.md`
-- Lua sample: `examples/server.lua`
-- TypeScript sample: `examples/server.ts`
-- Changelog: `CHANGES.md`
+Wait for `cfx-mongodb:ready` before calling CRUD exports from other resources.
+
+## Core Exports
+
+See [docs/API.md](docs/API.md) for full reference.
+
+- `insert`, `find`, `findAll`, `update`, `delete`, `count`, `getVersion`
+- `isConnected`, `connect`, `disconnect`
+- `ensureIndexes`, `health`, `config`
+
+## Development
+
+```bash
+yarn install
+yarn build
+yarn tsc
+yarn lint
+```
+
+## Examples
+
+- TypeScript: `examples/server.ts`, `examples/typescript.md`
+- Lua: `examples/server.lua`, `examples/lua.md`
+
+Changelog: [CHANGES.md](CHANGES.md)

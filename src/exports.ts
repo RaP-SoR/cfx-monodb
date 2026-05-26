@@ -2,7 +2,7 @@ import { Filter, OptionalUnlessRequiredId, Document, UpdateFilter } from "mongod
 import type { IndexDescription } from "mongodb";
 import dbConfig from "./config";
 import { validateFilter, validateUpdate } from "./validateQuery";
-import { exportFn, log, toObjectIdIfValid } from "./utils";
+import { exportFn, log, serializeDocumentId, toObjectIdIfValid } from "./utils";
 import type { FindAllOptions } from "./types/options";
 import {
   Response,
@@ -14,9 +14,7 @@ import {
 import MongoDBConnector from "./connector";
 
 export function registerExports(mongoDBInstance: MongoDBConnector): void {
-  // FiveM provides global.exports at runtime; cast for TS compatibility
-  const fxExports = (globalThis as unknown as { exports: (...args: unknown[]) => void }).exports;
-  fxExports(
+  exportFn(
     "insert",
     async <T extends Document>(
       collectionName: string,
@@ -29,7 +27,10 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const result = await db
           .collection<T>(collectionName)
           .insertOne(document);
-        return { success: true, insertedId: result.insertedId };
+        return {
+          success: true,
+          insertedId: String(result.insertedId),
+        };
       } catch (error) {
         console.error(`[CFX-MongoDB Export] insertOne error:`, error);
         return {
@@ -102,10 +103,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         clearTimeout(timer);
 
         for (const doc of result as Array<Record<string, unknown>>) {
-          const id = doc._id as unknown as { toString?: () => string };
-          if (id && typeof id === "object" && typeof id.toString === "function") {
-            doc._id = id.toString();
-          }
+          serializeDocumentId(doc);
         }
 
         return { success: true, data: result as unknown as T[] };
@@ -133,17 +131,17 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         if (!db) throw new Error("Database not connected");
 
         validateFilter(query);
+        if (query && typeof query === "object") {
+          const rec = query as Record<string, unknown>;
+          if (rec._id) rec._id = toObjectIdIfValid(rec._id);
+        }
         const result = await db.collection<T>(collectionName).findOne(query);
         if (!result) {
           return { success: false, error: "Document not found" };
         }
 
         if (result) {
-          const r = result as Record<string, unknown>;
-          const id = r._id as unknown as { toString?: () => string };
-          if (id && typeof id === "object" && typeof id.toString === "function") {
-            r._id = id.toString();
-          }
+          serializeDocumentId(result as Record<string, unknown>);
         }
 
         return { success: true, data: result as T | null };
@@ -159,6 +157,47 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
+
+  exportFn(
+    "findById",
+    async <T extends Document>(
+      collectionName: string,
+      id: string,
+      projection?: Document
+    ): Promise<Response<T | null>> => {
+      try {
+        const db = mongoDBInstance.getDb();
+        if (!db) throw new Error("Database not connected");
+
+        if (typeof id !== "string" || id.length === 0) {
+          return { success: false, error: "Invalid id" };
+        }
+
+        const filter = { _id: toObjectIdIfValid(id) } as Filter<T>;
+        const result = await db.collection<T>(collectionName).findOne(
+          filter,
+          projection ? { projection } : undefined
+        );
+
+        if (!result) {
+          return { success: true, data: null };
+        }
+
+        serializeDocumentId(result as Record<string, unknown>);
+        return { success: true, data: result as T };
+      } catch (error) {
+        console.error(`[CFX-MongoDB Export] findById error:`, error);
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
+        };
+      }
+    }
+  );
+
   exportFn(
     "update",
     async <T extends Document>(
@@ -219,6 +258,11 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
         const db = mongoDBInstance.getDb();
         if (!db) throw new Error("Database not connected");
 
+        if (filter && typeof filter === "object") {
+          const rec = filter as Record<string, unknown>;
+          if (rec._id) rec._id = toObjectIdIfValid(rec._id);
+        }
+
         validateFilter(filter);
         const result = await db
           .collection<T>(collectionName)
@@ -243,6 +287,11 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
+  exportFn("getVersion", async (): Promise<string> => {
+    const version = GetResourceMetadata(GetCurrentResourceName(), "version", 0);
+    return version || "0.0.0";
+  });
+
   exportFn(
     "count",
     async <T extends Document>(
@@ -311,11 +360,15 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       }
     }
   );
-  exports("isConnected", (): boolean => {
+  exportFn("isConnected", (): boolean => {
     return mongoDBInstance?.isDbConnected() || false;
   });
 
-  exports("connect", async (connectionURL: string, options?: import("./types/options").MongoOptions) => {
+  exportFn("getDb", () => {
+    return mongoDBInstance.getDb();
+  });
+
+  exportFn("connect", async (connectionURL: string, options?: import("./types/options").MongoOptions) => {
     try {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.connect(connectionURL, options);
@@ -328,7 +381,7 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     }
   });
 
-  exports("disconnect", async () => {
+  exportFn("disconnect", async () => {
     try {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.disconnect();

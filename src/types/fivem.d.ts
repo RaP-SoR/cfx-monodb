@@ -4,4 +4,9 @@ declare function emitNet(eventName: string, target: number, ...args: unknown[]):
 declare function TriggerEvent(eventName: string, ...args: unknown[]): void;
 declare function GetConvar(name: string, defaultValue: string): string;
 declare function GetCurrentResourceName(): string;
+declare function GetResourceMetadata(
+  resourceName: string,
+  metadataKey: string,
+  index: number
+): string;
 

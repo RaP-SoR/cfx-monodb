@@ -1,6 +1,6 @@
 {
   "name": "cfx-mongodb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cfx Typescript Wrapper for MongoDB",
   "repository": {
     "type": "git",
@@ -17,26 +17,29 @@
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
-    "@citizenfx/client": "^2.0.23683-1",
-    "@citizenfx/server": "^2.0.23683-1",
-    "@types/node": "^25.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.50.1",
-    "@typescript-eslint/parser": "^8.50.1",
-    "eslint": "^9.39.2",
+    "@citizenfx/client": "^2.0.29753-1",
+    "@citizenfx/server": "^2.0.29753-1",
+    "@types/node": "^25.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.3",
     "typescript": "^5.9.3",
-    "vite": "^7.3.0",
-    "vite-plugin-commonjs": "^0.10.4"
+    "vite": "^7.3.3",
+    "vite-plugin-commonjs": "^0.10.4",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
-    "mongodb": "^7.0.0",
+    "mongodb": "^7.2.0",
     "ts-node": "^10.9.2"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.0.0 <23"
   }
 }

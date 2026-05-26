@@ -28,6 +28,13 @@ export function toObjectIdIfValid(value: unknown): ObjectId | string | unknown {
   return value;
 }
 
+export function serializeDocumentId(doc: Record<string, unknown>): void {
+  const id = doc._id as unknown as { toString?: () => string };
+  if (id && typeof id === "object" && typeof id.toString === "function") {
+    doc._id = id.toString();
+  }
+}
+
 export function exportFn(name: string, fn: Function): void {
   const fx = (globalThis as unknown as { exports: (...args: unknown[]) => void }).exports;
   fx(name, fn);

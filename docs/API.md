@@ -1,0 +1,223 @@
+# API Reference — cfx-mongodb (Server Exports)
+
+Kanonische Referenz für externe Consumer (CTFFramework, Lua/TS-Ressourcen).
+
+**Resource-Name:** `cfx-mongodb`  
+**Aufruf TypeScript:** `exports["cfx-mongodb"].find(...)`  
+**Aufruf Lua:** `exports['cfx-mongodb']:find(...)`
+
+Warte auf Event `cfx-mongodb:ready` bevor du CRUD-Exports nutzt.
+
+---
+
+## Response-Envelope
+
+Alle CRUD-Exports (außer `isConnected`, `getVersion`) geben ein Objekt zurück — **nie Exceptions**.
+
+```typescript
+interface CfxMongoResult<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+interface CfxMongoInsertResult {
+  success: boolean;
+  insertedId?: string;   // immer plain String
+  error?: string;
+}
+
+interface CfxMongoUpdateResult {
+  success: boolean;
+  modifiedCount?: number;
+  matchedCount?: number;  // zusätzlich, nicht vom Framework gefordert
+  error?: string;
+}
+
+interface CfxMongoDeleteResult {
+  success: boolean;
+  deletedCount?: number;
+  error?: string;
+}
+```
+
+---
+
+## CTFFramework Contract (Pflicht-Exports)
+
+Diese Signaturen **müssen** exakt erfüllt werden:
+
+| Export | Signatur | Erfolgs-Rückgabe |
+|--------|----------|------------------|
+| `find` | `(collection, filter)` | `{ success: true, data: doc \| null }` |
+| `findAll` | `(collection, filter, options?)` | `{ success: true, data: doc[] }` |
+| `insert` | `(collection, doc)` | `{ success: true, insertedId: string }` |
+| `update` | `(collection, filter, update)` | `{ success: true, modifiedCount: number }` |
+| `delete` | `(collection, filter)` | `{ success: true, deletedCount: number }` |
+| `count` | `(collection, filter)` | `{ success: true, data: number }` |
+| `getVersion` | `()` | `Promise<string>` (Semver, z.B. `"1.0.1"`) |
+| `findById` | `(collection, id, projection?)` | `{ success: true, data: doc \| null }` |
+| `getDb` | `()` | `Db \| null` (sync, no envelope) |
+
+### `findById(collection, id, projection?)`
+
+Lookup by MongoDB `_id` as string. Converts valid ObjectId strings automatically.
+
+```typescript
+const result = await exports["cfx-mongodb"].findById("players", insertedId, { name: 1 });
+// Found:   { success: true, data: { _id: "674a...", name: "test" } }
+// Missing: { success: true, data: null }
+```
+
+Unlike `find`, a missing document returns **`success: true, data: null`** (not an error).
+
+### `getDb()`
+
+Returns the internal MongoDB `Db` instance for advanced TypeScript scenarios, or `null` if disconnected. No response envelope — same pattern as `isConnected()`.
+
+```typescript
+const db = exports["cfx-mongodb"].getDb();
+if (db) {
+  // direct driver access in another Node resource
+}
+```
+
+### Framework-Erfolgslogik
+
+- **Update:** `(result.modifiedCount ?? 0) > 0` → Erfolg
+- **Delete:** `result.deletedCount === 1` → exakter Einzellöschungs-Check
+- **Insert:** `insertedId` muss String sein (kein ObjectId-Objekt)
+
+---
+
+## CRUD Exports (Detail)
+
+### `insert(collection, doc)`
+
+```typescript
+const result = await exports["cfx-mongodb"].insert("players", { name: "test" });
+// { success: true, insertedId: "674a1b2c3d4e5f6789012345" }
+```
+
+### `find(collection, filter?)`
+
+Gibt ein einzelnes Dokument zurück. Wenn nicht gefunden: `{ success: false, error: "Document not found" }`.
+
+`_id` als String im Filter wird automatisch konvertiert.
+
+### `findAll(collection, filter?, options?)`
+
+```typescript
+const result = await exports["cfx-mongodb"].findAll("players", {}, {
+  limit: 10,
+  skip: 0,
+  sort: { name: 1 }   // 1 = asc, -1 = desc
+});
+// { success: true, data: [...] }
+```
+
+**Options:**
+
+| Feld | Typ | Default | Clamp |
+|------|-----|---------|-------|
+| `limit` | number | 100 | 1–1000 |
+| `skip` | number | 0 | 0–1_000_000 |
+| `sort` | `Record<string, 1 \| -1>` | — | — |
+| `projection` | object | — | (Erweiterung) |
+
+Alle `_id`-Felder in Ergebnissen werden als String serialisiert.
+
+### `update(collection, filter, update)`
+
+Akzeptiert MongoDB-Update-Operatoren oder Partial (auto-`$set`):
+
+```typescript
+await exports["cfx-mongodb"].update("players", { _id: "674a..." }, { $set: { name: "x" } });
+// { success: true, matchedCount: 1, modifiedCount: 1 }
+```
+
+### `delete(collection, filter)`
+
+```typescript
+await exports["cfx-mongodb"].delete("players", { _id: "674a..." });
+// { success: true, deletedCount: 1 }
+```
+
+Wenn kein Dokument gelöscht: `{ success: false, error: "Document not found" }`.
+
+### `count(collection, filter?)`
+
+```typescript
+const result = await exports["cfx-mongodb"].count("players", { active: true });
+// { success: true, data: 42 }
+```
+
+### `getVersion()`
+
+```typescript
+const version = await exports["cfx-mongodb"].getVersion();
+// "1.0.1" — aus fxmanifest.lua version '...'
+```
+
+---
+
+## Lifecycle & Connection Exports
+
+| Export | Rückgabe | Beschreibung |
+|--------|----------|--------------|
+| `isConnected()` | `boolean` | Sync, kein Envelope |
+| `connect(url, options?)` | void (wirft intern nicht) | Runtime-URI-Override |
+| `disconnect()` | void | Verbindung schließen |
+
+---
+
+## Erweiterte Exports (optional für Consumer)
+
+| Export | Rückgabe | Beschreibung |
+|--------|----------|--------------|
+| `ensureIndexes(collection, specs[])` | `{ success, data: number }` | Indizes idempotent anlegen |
+| `health()` | `{ success, data: { ok, rttMs } }` | MongoDB ping |
+| `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel } }` | Keine Secrets/URLs |
+
+---
+
+## Events
+
+| Event | Payload | Wann |
+|-------|---------|------|
+| `cfx-mongodb:ready` | — | Connect + Index-Init fertig |
+| `cfx-mongodb:connected` | `(success: boolean, error?: string)` | Nach Connect-Versuch |
+
+---
+
+## Configuration (ConVars)
+
+| ConVar | Default | Beschreibung |
+|--------|---------|--------------|
+| `mongodb_env` | auto (dev/prod) | `dev`, `prod`, `test` |
+| `mongodb_dev_url` | `mongodb://localhost:27017/ctf_dev` | Dev-URI |
+| `mongodb_prod_url` | `mongodb://localhost:27017/ctf_prod` | Prod-URI |
+| `mongodb_test_url` | `mongodb://localhost:27017/ctf_test` | Test-URI |
+| `mongodb_timeout` | 5000/10000/2000 | Server selection timeout (ms) |
+| `mongodb_max_pool` | 10 | Max pool (0–50) |
+| `mongodb_min_pool` | 0 | Min pool (0–20) |
+| `mongodb_log_level` | `info` | `error\|warn\|info\|debug` |
+| `mongodb_init_indexes` | — | JSON: Collection → Index-Specs |
+
+---
+
+## Sicherheit
+
+Blockierte Operatoren in Filtern/Updates: `$where`, `$function`, `$accumulator`, `$regexFind`, `$regexFindAll`, `$out`, `$merge`.
+
+User-Input in Queries immer validieren/whitelisten — diese Resource blockiert nur die gefährlichsten Operatoren.
+
+---
+
+## Lua vs TypeScript
+
+| | TypeScript (Node-Resource) | Lua |
+|--|---------------------------|-----|
+| Syntax | `exports["cfx-mongodb"].find(...)` | `exports['cfx-mongodb']:find(...)` |
+| Async | `await` / `.then()` | Citizen await pattern |
+| Beispiele | `doc-typescript.md` | `doc-lua.md` |

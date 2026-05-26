@@ -1,38 +1,71 @@
-# Repository Guidelines
+# Agent Guidelines — cfx-mongodb
 
-## Project Structure & Modules
-- `src/` — TypeScript source for the MongoDB wrapper and FiveM exports.
-- `dist/` — compiled JS output consumed by the resource runtime.
-- `server.lua` — resource entry for server-side glue (exports/initialization).
-- `fxmanifest.lua` — FiveM resource manifest (name, files, deps).
-- `doc-typescript.md`, `doc-lua.md` — usage docs for TS/Lua consumers.
-- `tests/` — add Node-based tests here if contributing new logic.
+## Start here
 
-## Build, Test, and Dev
-- Node.js: FiveM’s default runtime is a custom v16; this resource supports `node_version '22'` (see `fxmanifest.lua`). Use Node 22 locally to match prod.
-- `yarn install` — install deps with Node 22; clean old locks if upgrading (`rimraf node_modules yarn.lock` first).
-- `yarn build` — type-check and compile TS to `dist/` via Vite/tsc.
-- `yarn dev` — fast rebuilds for local iteration.
-- `yarn test` — run unit tests (if present under `tests/`).
-- In FiveM/RedM, keep folder named `cfx-mongodb` and add `ensure cfx-mongodb` in server cfg.
+1. **[SEARCH-MAP.md](SEARCH-MAP.md)** — navigation map (task → file), save context tokens
+2. **[docs/API.md](docs/API.md)** — canonical external export contract (CTFFramework)
+3. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — runtime, lifecycle, build pipeline
+4. **[docs/AI-STACK.md](docs/AI-STACK.md)** — Cursor skills, rules, agent workflows
 
-## Coding Style & Naming
-- Language: TypeScript (ES modules). Indent with 2 spaces.
-- Naming: `camelCase` for variables/functions, `PascalCase` for classes, `SCREAMING_SNAKE_CASE` for constants.
-- Files: library modules use `kebab-case.ts` (e.g., `mongo-client.ts`).
-- Lint/format: use Prettier defaults (2 spaces, semicolons). Keep public APIs typed and minimal.
+Project skill: `.cursor/skills/cfx-mongodb/SKILL.md`
 
-## Testing Guidelines
-- Place tests under `tests/` mirroring `src/` names: `src/mongo-client.ts` → `tests/mongo-client.test.ts`.
-- Prefer Vitest/Jest-style unit tests; stub FiveM natives where needed.
-- Aim for coverage on new logic and error paths; run `yarn test` locally.
+## What this project is
 
-## Commit & PR Guidelines
-- Commits: concise imperative subject, scope optional (e.g., `fix(client): handle reconnect backoff`).
-- PRs: include a short description, linked issues, reproduction or screenshots/logs, and notes on breaking changes.
-- Keep diffs focused; update `doc-typescript.md`/`doc-lua.md` when APIs change.
+TypeScript MongoDB wrapper for FiveM/RedM. Other resources call MongoDB **only via exports** (`exports["cfx-mongodb"]`). Runs on FiveM Node **22 only** (`node_version '22'`, `engines: >=22.0.0 <23`) with `mongodb@7`. No Node 16/18 support.
 
-## Security & Configuration
-- Secrets: never commit credentials. Use convars/env for Mongo URIs (`mongodb_*_url`).
-- Queries: validate/whitelist fields; avoid `$where` or unbounded operators from user input.
-- Manifest: review `fxmanifest.lua` when adding files and confirm `node_version '22'` is retained.
+## Project Structure
+
+| Path | Purpose |
+|------|---------|
+| `src/` | TypeScript source (edit here) |
+| `dist/` | Compiled output (`yarn build`) — do not edit |
+| `fxmanifest.lua` | Resource manifest, ConVars, `server_exports` |
+| `docs/API.md` | External API reference |
+| `doc-typescript.md` / `doc-lua.md` | Language-specific examples |
+| `tests/` | Unit tests (add when contributing logic) |
+
+## Build, Test, Dev
+
+```bash
+yarn install   # Node 22 locally
+yarn build     # src/ → dist/index.js
+yarn dev       # watch rebuild
+yarn tsc       # type-check
+yarn lint      # eslint
+yarn test      # vitest (Export-API)
+```
+
+In FiveM: folder `cfx-mongodb`, `ensure cfx-mongodb` in server.cfg.
+
+## Coding Style
+
+- TypeScript, 2 spaces, semicolons, Prettier defaults
+- `camelCase` functions/vars, `PascalCase` classes, `kebab-case.ts` files
+- Keep public export APIs typed and minimal
+
+## Export change checklist
+
+- [ ] `src/exports.ts` + `src/responses.ts`
+- [ ] CTFFramework contract in `docs/API.md`
+- [ ] `fxmanifest.lua` → `server_exports` if new export
+- [ ] `yarn build` + `yarn tsc`
+- [ ] Update `doc-lua.md` / `doc-typescript.md` on behavior change
+
+## Invariants
+
+- Exports never throw — return `{ success: false, error }`
+- `insertedId` is always a string
+- Query validation: no `$where` / dangerous operators from user input
+- Never commit MongoDB credentials — use ConVars (`mongodb_*_url`)
+- Retain `node_version '22'` in `fxmanifest.lua` — Node 16/18 not supported
+
+## Security
+
+- Validate/whitelist query fields in consuming resources
+- `validateQuery.ts` blocks worst-case operators only — not a full sandbox
+
+## Commits & PRs
+
+- Imperative subject: `fix(exports): ensure insertedId is string`
+- PRs: description, repro, breaking-change notes
+- Update docs when API changes
