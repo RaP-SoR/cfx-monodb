@@ -1,12 +1,14 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ObjectId } from "mongodb";
 import { CFX_MONGODB_EXPORTS } from "../src/types/api";
 import { registerExports } from "../src/exports";
 import {
   clearExports,
+  getExport,
   installExportCapture,
   listExports,
 } from "./helpers/export-registry";
-import { createMockConnector, createMockDb } from "./helpers/mock-db";
+import { createMockCollection, createMockConnector, createMockDb } from "./helpers/mock-db";
 
 function setupRegisteredExports(): string[] {
   clearExports();
@@ -39,40 +41,40 @@ describe("cfx-mongodb API contract", () => {
       const extra = registered.filter(
         (name) => !(CFX_MONGODB_EXPORTS as readonly string[]).includes(name)
       );
-      // @todo Wave 2: tighten once export list is fully locked in manifest.
-      // For now this test is non-blocking — it warns about undeclared extras
-      // so they become visible during review.
       if (extra.length > 0) {
         console.warn(
           `[api-contract] Extra registered exports not in CFX_MONGODB_EXPORTS: ${extra.join(", ")}`
         );
       }
-      expect(extra).toBeDefined();
+      expect(extra).toEqual([]);
     });
   });
 
-  describe("known semantic inconsistencies (documented placeholders)", () => {
-    /**
-     * INCONSISTENCY: `find` vs `findById` not-found semantics diverge.
-     *
-     * Current behaviour (Wave 1, do NOT change until Wave 2 alignment):
-     *   • `find(collection, filter)` — document not found
-     *       → { success: false, error: "Document not found" }
-     *   • `findById(collection, id)` — document not found
-     *       → { success: true, data: null }
-     *
-     * Impact on CTFFramework callers:
-     *   A caller that checks only `result.success` will treat the two exports
-     *   differently: `find` looks like an error, `findById` looks like success.
-     *   This is a documentation hazard tracked for Wave 2 resolution.
-     *
-     * Proposed resolution (Wave 2):
-     *   Align both to `{ success: true, data: null }` to distinguish
-     *   "not found" from actual runtime errors, matching `findById` semantics.
-     *   Document the breaking change in CHANGES.md before landing.
-     */
-    it.todo(
-      "find and findById should return consistent not-found semantics — currently find returns success:false, findById returns success:true/data:null (Wave 2 alignment needed)"
-    );
+  describe("find and findById not-found semantics", () => {
+    it("both return success true with data null when document is missing", async () => {
+      clearExports();
+      installExportCapture();
+      const collection = createMockCollection({
+        findOne: vi.fn().mockResolvedValue(null),
+      });
+      const connector = createMockConnector(
+        createMockDb({ collections: { players: collection } }),
+        true
+      );
+      registerExports(connector);
+
+      const find = getExport<
+        (name: string, filter: object) => Promise<{ success: boolean; data?: null }>
+      >("find");
+      const findById = getExport<
+        (name: string, id: string) => Promise<{ success: boolean; data?: null }>
+      >("findById");
+
+      const byFilter = await find("players", { name: "missing" });
+      const byId = await findById("players", new ObjectId().toString());
+
+      expect(byFilter).toEqual({ success: true, data: null });
+      expect(byId).toEqual({ success: true, data: null });
+    });
   });
 });

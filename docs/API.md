@@ -92,7 +92,7 @@ const result = await exports["cfx-mongodb"].findById("players", insertedId, { na
 // Missing: { success: true, data: null }
 ```
 
-Unlike `find`, a missing document returns **`success: true, data: null`** (not an error).
+`find` uses the same not-found semantics as `findById` (Wave 2).
 
 ### Framework-Erfolgslogik
 
@@ -113,7 +113,7 @@ const result = await exports["cfx-mongodb"].insert("players", { name: "test" });
 
 ### `find(collection, filter?)`
 
-Gibt ein einzelnes Dokument zurück. Wenn nicht gefunden: `{ success: false, error: "Document not found" }`.
+Gibt ein einzelnes Dokument zurück. Wenn nicht gefunden: `{ success: true, data: null }` (wie `findById`).
 
 `_id` als String im Filter wird automatisch konvertiert.
 

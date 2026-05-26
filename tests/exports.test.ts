@@ -81,19 +81,19 @@ describe("cfx-mongodb export API", () => {
       expect(result.data?._id).toBe(objectId.toString());
     });
 
-    it("returns not-found error", async () => {
+    it("returns success with null data when not found", async () => {
       const collection = createMockCollection({
         findOne: vi.fn().mockResolvedValue(null),
       });
       registerWithDb({ collections: { players: collection } });
 
       const find = getExport<
-        (name: string, filter: object) => Promise<{ success: boolean; error?: string }>
+        (name: string, filter: object) => Promise<{ success: boolean; data?: null; error?: string }>
       >("find");
 
       const result = await find("players", { name: "missing" });
 
-      expect(result).toEqual({ success: false, error: "Document not found" });
+      expect(result).toEqual({ success: true, data: null });
     });
 
     it("converts string _id filter to ObjectId", async () => {

@@ -120,8 +120,8 @@ if result.success then print('Count:', result.data) end
 |--------|---------|
 | `insert` | `{ success = true, insertedId = string }` |
 | `findAll` | `{ success = true, data = table[] }` |
-| `find` | `{ success = true, data = table }` |
-| `findById` | `{ success = true, data = table\|nil }` |
+| `find` | `{ success: true, data: table \| nil }` |
+| `findById` | `{ success: true, data: table \| nil }` |
 | `update` | `{ success = true, modifiedCount = number, matchedCount = number }` |
 | `delete` | `{ success = true, deletedCount = number }` |
 | `count` | `{ success = true, data = number }` |

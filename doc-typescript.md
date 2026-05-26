@@ -121,7 +121,7 @@ if (result.success) console.log(result.data);
 |--------|--------|
 | `insert` | `{ success: true, insertedId: string }` |
 | `findAll` | `{ success: true, data: T[] }` |
-| `find` | `{ success: true, data: T }` |
+| `find` | `{ success: true, data: T \| null }` |
 | `findById` | `{ success: true, data: T \| null }` |
 | `update` | `{ success: true, modifiedCount: number, matchedCount: number }` |
 | `delete` | `{ success: true, deletedCount: number }` |

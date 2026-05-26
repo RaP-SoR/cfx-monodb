@@ -2,7 +2,7 @@ import { Filter, OptionalUnlessRequiredId, Document, UpdateFilter } from "mongod
 import type { IndexDescription } from "mongodb";
 import dbConfig from "./config";
 import { validateFilter, validateUpdate } from "./validateQuery";
-import { exportFn, log, serializeDocumentId, toObjectIdIfValid } from "./utils";
+import { exportFn, log, redactMongoUri, serializeDocumentId, toObjectIdIfValid } from "./utils";
 import type { FindAllOptions } from "./types/options";
 import {
   Response,
@@ -12,6 +12,8 @@ import {
   DeleteResponse,
 } from "./responses";
 import MongoDBConnector from "./connector";
+import { withDb } from "./api/withDb";
+import { normalizeIdFilter } from "./api/normalizeIdFilter";
 
 export function registerExports(mongoDBInstance: MongoDBConnector): void {
   exportFn(
@@ -20,57 +22,40 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       collectionName: string,
       document: OptionalUnlessRequiredId<T>
     ): Promise<InsertResponse | ErrorResponse> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
-
-        const result = await db
+      const result = await withDb(mongoDBInstance, async (db) => {
+        const inserted = await db
           .collection<T>(collectionName)
           .insertOne(document);
-        return {
-          success: true,
-          insertedId: String(result.insertedId),
-        };
-      } catch (error) {
-        console.error(`[CFX-MongoDB Export] insertOne error:`, error);
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        };
-      }
+        return String(inserted.insertedId);
+      });
+      if (!result.success) return result;
+      return { success: true, insertedId: result.data };
     }
   );
 
-  // ensureIndexes export: create multiple indexes on a collection
   exportFn(
     "ensureIndexes",
     async (
       collectionName: string,
       indexes: Array<{ keys: Record<string, 1 | -1>; options?: Record<string, unknown> }>
     ): Promise<Response<number> | ErrorResponse> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
-        if (!Array.isArray(indexes) || indexes.length === 0)
+      const result = await withDb(mongoDBInstance, async (db) => {
+        if (!Array.isArray(indexes) || indexes.length === 0) {
           throw new Error("No index specs provided");
+        }
 
         const models = indexes.slice(0, 20).map((it) => ({
           key: it.keys,
           ...(it.options ? { ...it.options } : {}),
         }));
 
-        const created = await db
+        await db
           .collection(collectionName)
           .createIndexes(models as IndexDescription[]);
         log("info", `Indexes ensured for ${collectionName}: ${models.length}`);
-        return { success: true, data: models.length };
-      } catch (error) {
-        log("error", `[ensureIndexes] ${String((error as Error).message)}`);
-        return { success: false, error: (error as Error).message };
-      }
+        return models.length;
+      });
+      return result;
     }
   );
 
@@ -81,42 +66,38 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       query: Filter<T> = {},
       options: FindAllOptions = {}
     ): Promise<Response<T[]>> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
-
+      const result = await withDb(mongoDBInstance, async (db) => {
         validateFilter(query);
         const { projection, sort } = options;
         const limit = Math.max(1, Math.min(1000, options.limit ?? 100));
         const skip = Math.max(0, Math.min(1_000_000, options.skip ?? 0));
 
         const ac = new AbortController();
-        const timer = setTimeout(() => ac.abort(), ((dbConfig as unknown) as { timeout?: number }).timeout ?? 5000);
+        const timer = setTimeout(
+          () => ac.abort(),
+          dbConfig.options.serverSelectionTimeoutMS
+        );
 
-        const result = await db
+        const docs = await db
           .collection<T>(collectionName)
-          .find(query, { projection, sort, signal: ac.signal as unknown as AbortSignal })
+          .find(query, {
+            projection,
+            sort,
+            signal: ac.signal as unknown as AbortSignal,
+          })
           .limit(limit)
           .skip(skip)
           .toArray();
 
         clearTimeout(timer);
 
-        for (const doc of result as Array<Record<string, unknown>>) {
+        for (const doc of docs as Array<Record<string, unknown>>) {
           serializeDocumentId(doc);
         }
 
-        return { success: true, data: result as unknown as T[] };
-      } catch (error) {
-        console.error(`[CFX-MongoDB Export] find error:`, error);
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        };
-      }
+        return docs as unknown as T[];
+      });
+      return result;
     }
   );
 
@@ -126,35 +107,18 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       collectionName: string,
       query: Filter<T> = {}
     ): Promise<Response<T | null>> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
-
+      const result = await withDb(mongoDBInstance, async (db) => {
         validateFilter(query);
-        if (query && typeof query === "object") {
-          const rec = query as Record<string, unknown>;
-          if (rec._id) rec._id = toObjectIdIfValid(rec._id);
+        const filter = normalizeIdFilter(query);
+        const doc = await db.collection<T>(collectionName).findOne(filter);
+        if (!doc) {
+          return null;
         }
-        const result = await db.collection<T>(collectionName).findOne(query);
-        if (!result) {
-          return { success: false, error: "Document not found" };
-        }
-
-        if (result) {
-          serializeDocumentId(result as Record<string, unknown>);
-        }
-
-        return { success: true, data: result as T | null };
-      } catch (error) {
-        console.error(`[CFX-MongoDB Export] findOne error:`, error);
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        };
-      }
+        serializeDocumentId(doc as Record<string, unknown>);
+        return doc as T;
+      });
+      if (!result.success) return result;
+      return { success: true, data: result.data };
     }
   );
 
@@ -165,36 +129,24 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       id: string,
       projection?: Document
     ): Promise<Response<T | null>> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
+      if (typeof id !== "string" || id.length === 0) {
+        return { success: false, error: "Invalid id" };
+      }
 
-        if (typeof id !== "string" || id.length === 0) {
-          return { success: false, error: "Invalid id" };
-        }
-
+      const result = await withDb(mongoDBInstance, async (db) => {
         const filter = { _id: toObjectIdIfValid(id) } as Filter<T>;
-        const result = await db.collection<T>(collectionName).findOne(
+        const doc = await db.collection<T>(collectionName).findOne(
           filter,
           projection ? { projection } : undefined
         );
-
-        if (!result) {
-          return { success: true, data: null };
+        if (!doc) {
+          return null;
         }
-
-        serializeDocumentId(result as Record<string, unknown>);
-        return { success: true, data: result as T };
-      } catch (error) {
-        console.error(`[CFX-MongoDB Export] findById error:`, error);
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        };
-      }
+        serializeDocumentId(doc as Record<string, unknown>);
+        return doc as T;
+      });
+      if (!result.success) return result;
+      return { success: true, data: result.data };
     }
   );
 
@@ -205,88 +157,67 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       filter: Filter<T>,
       update: UpdateFilter<T> | Partial<T>
     ): Promise<UpdateResponse | ErrorResponse> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
-
-        // Konvertiere String-IDs in ObjectIDs
-        if (filter && typeof filter === "object") {
-          // ID-Konvertierungslogik für _id
-          const rec = filter as Record<string, unknown>;
-          if (rec._id) rec._id = toObjectIdIfValid(rec._id);
-        }
-
-        validateFilter(filter);
+      const result = await withDb(mongoDBInstance, async (db) => {
+        const normalized = normalizeIdFilter(filter);
+        validateFilter(normalized);
         validateUpdate(update as Record<string, unknown>);
-        log("debug", `Updating with filter: ${JSON.stringify(filter)}`);
+        log("debug", `Updating with filter: ${JSON.stringify(normalized)}`);
 
         const updateDoc: UpdateFilter<T> =
           "$set" in update ? update : { $set: update as Partial<T> };
 
-        const result = await db
+        const updated = await db
           .collection<T>(collectionName)
-          .updateOne(filter, updateDoc);
+          .updateOne(normalized, updateDoc);
 
-        console.log(
-          `[CFX-MongoDB] Update result: matched=${result.matchedCount}, modified=${result.modifiedCount}`
+        log(
+          "debug",
+          `Update result: matched=${updated.matchedCount}, modified=${updated.modifiedCount}`
         );
 
         return {
-          success: true,
-          matchedCount: result.matchedCount,
-          modifiedCount: result.modifiedCount,
+          matchedCount: updated.matchedCount,
+          modifiedCount: updated.modifiedCount,
         };
-      } catch (error) {
-        console.error(`[CFX-MongoDB Export] updateOne error:`, error);
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        };
-      }
+      });
+      if (!result.success) return result;
+      return {
+        success: true,
+        matchedCount: result.data.matchedCount,
+        modifiedCount: result.data.modifiedCount,
+      };
     }
   );
+
   exportFn(
     "delete",
     async <T extends Document>(
       collectionName: string,
       filter: Filter<T>
     ): Promise<DeleteResponse | ErrorResponse> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
-
-        if (filter && typeof filter === "object") {
-          const rec = filter as Record<string, unknown>;
-          if (rec._id) rec._id = toObjectIdIfValid(rec._id);
-        }
-
-        validateFilter(filter);
-        const result = await db
+      const result = await withDb(mongoDBInstance, async (db) => {
+        const normalized = normalizeIdFilter(filter);
+        validateFilter(normalized);
+        const deleted = await db
           .collection<T>(collectionName)
-          .deleteOne(filter);
-        if (result.deletedCount === 0) {
-          return { success: false, error: "Document not found" };
-        }
-        if (result.deletedCount > 1) {
-          log("warn", `More than one document deleted (${result.deletedCount})`);
-        }
-        log("info", `Deleted document with filter: ${JSON.stringify(filter as Record<string, unknown>)}`);
-        return { success: true, deletedCount: result.deletedCount };
-      } catch (error) {
-        console.error(`[CFX-MongoDB Export] deleteOne error:`, error);
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        };
+          .deleteOne(normalized);
+        return deleted.deletedCount;
+      });
+      if (!result.success) return result;
+      if (result.data === 0) {
+        return { success: false, error: "Document not found" };
       }
+      if (result.data > 1) {
+        log("warn", `More than one document deleted (${result.data})`);
+      }
+      log(
+        "info",
+        `Deleted document with filter: ${JSON.stringify(filter as Record<string, unknown>)}`
+      );
+      return { success: true, deletedCount: result.data };
     }
   );
+
   exportFn("getVersion", async (): Promise<string> => {
     const version = GetResourceMetadata(GetCurrentResourceName(), "version", 0);
     return version || "0.0.0";
@@ -298,68 +229,47 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       collectionName: string,
       filter: Filter<T> = {}
     ): Promise<Response<number>> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
-
+      const result = await withDb(mongoDBInstance, async (db) => {
         validateFilter(filter);
-        const count = await db
-          .collection<T>(collectionName)
-          .countDocuments(filter);
-        return { success: true, data: count };
-      } catch (error) {
-        console.error(`[CFX-MongoDB Export] countDocuments error:`, error);
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        };
-      }
+        return db.collection<T>(collectionName).countDocuments(filter);
+      });
+      return result;
     }
   );
 
-  // Health check: ping the server and return basic timings
   exportFn(
     "health",
     async (): Promise<Response<{ ok: boolean; rttMs: number }>> => {
-      try {
-        const db = mongoDBInstance.getDb();
-        if (!db) throw new Error("Database not connected");
+      const result = await withDb(mongoDBInstance, async (db) => {
         const start = Date.now();
-        // ping via admin command
         await db.command({ ping: 1 });
-        const rttMs = Date.now() - start;
-        return { success: true, data: { ok: true, rttMs } };
-      } catch (error) {
-        return { success: false, error: (error as Error).message };
-      }
+        return { ok: true, rttMs: Date.now() - start };
+      });
+      return result;
     }
   );
 
-  // Expose current effective config (safe, no secrets)
   exportFn(
     "config",
     (): Response<Record<string, unknown>> => {
       try {
-        const cfgBase = dbConfig as unknown as {
-          timeout?: number;
-          options?: { serverSelectionTimeoutMS?: number; maxPoolSize?: number; minPoolSize?: number };
-        };
         const cfg = {
           env: GetConvar("mongodb_env", "dev"),
-          timeout: cfgBase.timeout ?? cfgBase.options?.serverSelectionTimeoutMS,
-          maxPoolSize: cfgBase.options?.maxPoolSize,
-          minPoolSize: cfgBase.options?.minPoolSize,
+          timeout: dbConfig.options.serverSelectionTimeoutMS,
+          maxPoolSize: dbConfig.options.maxPoolSize,
+          minPoolSize: dbConfig.options.minPoolSize,
           logLevel: GetConvar("mongodb_log_level", "info"),
         };
         return { success: true, data: cfg };
       } catch (error) {
-        return { success: false, error: (error as Error).message };
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "An unknown error occurred",
+        };
       }
     }
   );
+
   exportFn("isConnected", (): boolean => {
     return mongoDBInstance?.isDbConnected() || false;
   });
@@ -368,36 +278,49 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
     return mongoDBInstance.getDb();
   });
 
-  exportFn("connect", async (connectionURL: string, options?: import("./types/options").MongoOptions) => {
-    try {
-      const mongodb = MongoDBConnector.getInstance();
-      await mongodb.connect(connectionURL, options);
-
-      console.log(`CFX-MongoDB verbunden mit URL: ${connectionURL}`);
-      emitNet("cfx-mongodb:connected", source, true);
-    } catch (error) {
-      console.error("CFX-MongoDB Verbindungsfehler:", error);
-      emitNet("cfx-mongodb:connected", source, false, (error as Error).message);
+  exportFn(
+    "connect",
+    async (
+      connectionURL: string,
+      options?: import("./types/options").MongoOptions
+    ) => {
+      try {
+        const mongodb = MongoDBConnector.getInstance();
+        await mongodb.connect(connectionURL, options);
+        log("info", `Connected with URL: ${redactMongoUri(connectionURL)}`);
+        TriggerEvent("cfx-mongodb:connected", true);
+      } catch (error) {
+        log(
+          "error",
+          `Connection error: ${error instanceof Error ? error.message : String(error)}`
+        );
+        TriggerEvent(
+          "cfx-mongodb:connected",
+          false,
+          error instanceof Error ? error.message : String(error)
+        );
+      }
     }
-  });
+  );
 
   exportFn("disconnect", async () => {
     try {
       const mongodb = MongoDBConnector.getInstance();
       await mongodb.disconnect();
-      console.log(`CFX-MongoDB disconnected`);
-      emitNet("cfx-mongodb:disconnected", source, true);
+      log("info", "Disconnected");
+      TriggerEvent("cfx-mongodb:disconnected", true);
     } catch (error) {
-      console.error("CFX-MongoDB Disconnection error:", error);
-      emitNet(
+      log(
+        "error",
+        `Disconnection error: ${error instanceof Error ? error.message : String(error)}`
+      );
+      TriggerEvent(
         "cfx-mongodb:disconnected",
-        source,
         false,
-        (error as Error).message
+        error instanceof Error ? error.message : String(error)
       );
     }
   });
-  console.log(
-    "[CFX-MongoDB] Exports registered with TypeScript generics support"
-  );
+
+  log("info", "Exports registered with TypeScript generics support");
 }

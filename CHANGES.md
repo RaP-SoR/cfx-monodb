@@ -1,5 +1,12 @@
 # Änderungen (Changelog)
 
+## Wave 2 (refactor/staged-hardening) — Export pipeline & find semantics
+
+- **Breaking:** `find(collection, filter)` bei fehlendem Dokument liefert jetzt `{ success: true, data: null }` statt `{ success: false, error: "Document not found" }` — aligned mit `findById`. CTFFramework-Consumer müssen `result.data === null` prüfen statt nur `!result.success`.
+- **Refactor:** CRUD-Exports nutzen `withDb`-Pipeline (`src/api/withDb.ts`) und `normalizeIdFilter`.
+- **Logging:** Kein `console.*` mehr in `exports.ts`; Connection-URLs in `connector.ts` mit `redactMongoUri`.
+- **Events:** `connect`/`disconnect` nutzen `TriggerEvent` statt `emitNet` (server-only Resource).
+
 ## Wave 1 (refactor/staged-hardening) — Manifest & Docs Sync (W2A)
 
 - **Kein Runtime-Break:** Verhalten unverändert; nur Manifest- und Dokumentationsabgleich.

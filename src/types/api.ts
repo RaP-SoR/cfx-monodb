@@ -35,8 +35,6 @@ export type CfxMongoDeleteResult =
  * Canonical list of all public exports registered by cfx-mongodb.
  *
  * Sources: src/exports.ts (registerExports) + fxmanifest.lua server_exports.
- * Note: ensureIndexes, health, and config are implemented in exports.ts but
- * not yet listed in fxmanifest.lua — W2A (manifest sync) will add them.
  *
  * Advanced/internal exports (connect, disconnect, getDb) are included here
  * for completeness; see docs/API.md for security notes on direct usage.

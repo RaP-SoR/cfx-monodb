@@ -2,6 +2,7 @@ import { MongoClient, Db } from "mongodb";
 import dbConfig from "./config";
 import type { MongoOptions } from "./types/options";
 import { registerExports } from "./exports";
+import { log, redactMongoUri } from "./utils";
 
 class MongoDBConnector {
   private static instance: MongoDBConnector;
@@ -14,8 +15,9 @@ class MongoDBConnector {
   constructor() {
     this.connectionString = dbConfig.mongoUrl;
     this.options = dbConfig.options;
-    console.log(
-      `[CFX-MongoDB] Configuring connection with ${this.connectionString}`
+    log(
+      "info",
+      `Configuring connection with ${redactMongoUri(this.connectionString)}`
     );
   }
 
@@ -30,18 +32,17 @@ class MongoDBConnector {
     if (url) {
       if (this.isConnected) {
         await this.disconnect();
-        console.log(
-          "[CFX-MongoDB] Disconnecting existing connection for Confuguration"
-        );
+        log("info", "Disconnecting existing connection for configuration");
       }
       this.connectionString = url;
       this.options = options;
-      console.log(
-        `[CFX-MongoDB] Remote Configuring connection with ${this.connectionString}`
+      log(
+        "info",
+        `Remote configuring connection with ${redactMongoUri(this.connectionString)}`
       );
     }
     if (this.isConnected) {
-      console.log("[CFX-MongoDB] Connection already established");
+      log("info", "Connection already established");
       return;
     }
 
@@ -59,13 +60,17 @@ class MongoDBConnector {
       await this.client.connect();
       this.db = this.client.db();
       this.isConnected = true;
-      console.log("[CFX-MongoDB] Successfully connected");
+      log("info", "Successfully connected");
       TriggerEvent("cfx-mongodb:connected", true);
       registerExports(this);
     } catch (error) {
-      console.error("[CFX-MongoDB] Connection error:", error);
-      console.log(
-        `[CFX-MongoDB] Connection failed with URL: ${this.connectionString}`
+      log(
+        "error",
+        `Connection error: ${error instanceof Error ? error.message : String(error)}`
+      );
+      log(
+        "error",
+        `Connection failed with URL: ${redactMongoUri(this.connectionString)}`
       );
       throw error;
     }
@@ -73,7 +78,7 @@ class MongoDBConnector {
 
   public async disconnect(): Promise<void> {
     if (!this.isConnected || !this.client) {
-      console.log("[CFX-MongoDB] No connection available");
+      log("info", "No connection available");
       return;
     }
 
@@ -82,9 +87,12 @@ class MongoDBConnector {
       this.isConnected = false;
       this.client = null;
       this.db = null;
-      console.log("[CFX-MongoDB] Connection successfully closed");
+      log("info", "Connection successfully closed");
     } catch (error) {
-      console.error("[CFX-MongoDB] Error while disconnecting:", error);
+      log(
+        "error",
+        `Error while disconnecting: ${error instanceof Error ? error.message : String(error)}`
+      );
       throw error;
     }
   }
