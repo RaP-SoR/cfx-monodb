@@ -7,6 +7,12 @@ coverage
 .env.local
 .env.*.local
 
+# FiveM server profile snippets with secrets (copy .example → .local.cfg on server)
+mongodb.local.cfg
+*.local.cfg
+!**/*.local.cfg.example
+!**/*.cfg.example
+
 # Log files
 npm-debug.log*
 yarn-debug.log*

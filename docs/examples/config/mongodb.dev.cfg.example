@@ -1,0 +1,10 @@
+# Development — local MongoDB (copy or exec as-is on localhost)
+set mongodb_env dev
+set mongodb_dev_url mongodb://localhost:27017/ctf_dev
+set mongodb_timeout 5000
+set mongodb_log_level debug
+set mongodb_max_pool 10
+set mongodb_min_pool 0
+
+# Optional: create indexes on resource start (single-line JSON)
+# set mongodb_init_indexes {"users":[{"keys":{"email":1},"options":{"unique":true}}]}

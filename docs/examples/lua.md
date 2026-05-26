@@ -6,7 +6,10 @@ Requires FiveM Node **22** (`node_version '22'`). Wait for `cfx-mongodb:ready` b
 
 ## Configuration (server.cfg)
 
+> **Recommended:** ConVars only — see [CONFIGURATION.md](../CONFIGURATION.md) · [config/](config/)
+
 ```cfg
+exec mongodb.local.cfg
 set mongodb_env dev
 set mongodb_dev_url mongodb://localhost:27017/ctf_dev
 set mongodb_prod_url mongodb://localhost:27017/ctf_prod

@@ -1,0 +1,10 @@
+# Production — REPLACE placeholder URI; do not commit real credentials
+set mongodb_env prod
+set mongodb_prod_url mongodb://USER:PASSWORD@host.example.com:27017/ctf_prod?authSource=admin
+set mongodb_timeout 10000
+set mongodb_log_level info
+set mongodb_max_pool 15
+set mongodb_min_pool 2
+
+# Performance: leave off on live servers unless diagnosing latency
+set mongodb_perf_enabled 0

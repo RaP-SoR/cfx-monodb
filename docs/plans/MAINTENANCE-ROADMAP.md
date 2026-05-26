@@ -171,17 +171,34 @@ Summary:
 - **Production (100+):** perf ConVars aus unless admin consciously enables slow-query logging
 - **Staging (~10–20):** slow log useful for tuning; UI comes later
 
-Execute Track C **after** Track A; implement **C1 only** first.
+Execute Track C **after** Track A; C1 + C2 complete; C3+ deferred.
+
+---
+
+## Track D — Schema versioning
+
+**Separate plan:** [SCHEMA-VERSIONING-PLAN.md](SCHEMA-VERSIONING-PLAN.md)
+
+Summary:
+
+- **Ledger** `_cfx_schema_versions` — `(resource, scope) → version` (integer steps)
+- **Planned exports:** `getSchemaVersion`, `setSchemaVersion` — migration **logic** stays in consumer
+- **Lifecycle:** run on `cfx-mongodb:ready` before CRUD; complements `ensureIndexes`
+- **Deferred:** file-based migration runner (optional sibling resource)
+
+Status: **design only** — implement D1 after review **or when CTFFramework needs it** (see [IDEAS-BACKLOG.md](IDEAS-BACKLOG.md)).
 
 ---
 
 ## Suggested execution order
 
 ```
-Track A (cleanup)  →  merge
-Track B (TSDoc)    →  merge   } can overlap B with A docs-only
-Track C design     →  review OBSERVABILITY-PLAN.md
-Track C implement  →  separate branch, ConVar-gated, tests
+Track A (cleanup)  →  merge ✅
+Track B (TSDoc)    →  merge ✅
+Track C1/C2        →  merge ✅
+Track D design     →  review SCHEMA-VERSIONING-PLAN.md
+Track D implement  →  D1 exports + schemaService + tests
+Post-Track         →  CI main, tests, published .d.ts (separate discussion)
 ```
 
 No `main` release until you explicitly want one; all tracks target `dev`.

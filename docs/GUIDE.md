@@ -1,7 +1,8 @@
 # CFX MongoDB Wrapper — Guide
 
 > **Canonical API:** [API.md](API.md)  
-> **Architecture (post-refactor):** [ARCHITECTURE.md](ARCHITECTURE.md)  
+> **Installation & ConVars (start here):** [CONFIGURATION.md](CONFIGURATION.md)  
+> **Architecture:** [ARCHITECTURE.md](ARCHITECTURE.md)  
 > **Agent navigation:** [SEARCH-MAP.md](SEARCH-MAP.md)
 
 ## Overview
@@ -19,12 +20,16 @@ Handler modules live under `src/api/handlers/*`; wiring in `src/api/registerExpo
 
 ## Installation
 
+**Full walkthrough:** [CONFIGURATION.md](CONFIGURATION.md) (ConVars, dev/prod profiles, multi-developer `exec` + gitignore).
+
 1. Resource folder: `cfx-mongodb`
-2. `server.cfg`: `ensure cfx-mongodb`
-3. Configure ConVars (below)
-4. Wait for `cfx-mongodb:ready` before CRUD from other resources
+2. `server.cfg`: `ensure cfx-mongodb` + MongoDB ConVars (or `exec mongodb.local.cfg`)
+3. Wait for `cfx-mongodb:ready` before CRUD from other resources
 
 ## Configuration (ConVars)
+
+> **Recommended:** configure connection **once** via ConVars — consumers never call `connect()`.  
+> Profile templates: [examples/config/](examples/config/) · Details: [CONFIGURATION.md](CONFIGURATION.md)
 
 | ConVar | Description |
 |--------|-------------|

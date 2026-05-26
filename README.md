@@ -7,7 +7,8 @@ CitizenFX (FiveM/RedM) MongoDB TypeScript Wrapper
 | [docs/README.md](docs/README.md) | **Documentation hub** — start here |
 | [docs/API.md](docs/API.md) | External API — CTFFramework contract |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Runtime, lifecycle, module layout |
-| [docs/GUIDE.md](docs/GUIDE.md) | Installation, ConVars, troubleshooting |
+| [docs/GUIDE.md](docs/GUIDE.md) | Overview, troubleshooting |
+| [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | **Installation, ConVars, dev/prod profiles** |
 | [docs/SEARCH-MAP.md](docs/SEARCH-MAP.md) | AI agents & maintainers — navigation |
 | [docs/examples/typescript.md](docs/examples/typescript.md) / [lua.md](docs/examples/lua.md) | Language examples |
 | [AGENTS.md](AGENTS.md) | Cursor/CI contributor guidelines |
@@ -32,6 +33,9 @@ Lightweight MongoDB wrapper for FiveM/RedM server resources. Other resources acc
 
 ## Quick Start (server.cfg)
 
+> **Connection = ConVars only.** Consumers wait for `cfx-mongodb:ready` — no `connect()` in app code.  
+> Multi-dev teams: [docs/CONFIGURATION.md](docs/CONFIGURATION.md) · templates: [docs/examples/config/](docs/examples/config/)
+
 ```
 ensure cfx-mongodb
 set mongodb_env dev
@@ -39,6 +43,8 @@ set mongodb_dev_url mongodb://localhost:27017/ctf_dev
 set mongodb_timeout 5000
 set mongodb_log_level info
 ```
+
+Or: `exec mongodb.local.cfg` (gitignored per-developer file — see CONFIGURATION.md).
 
 Wait for `cfx-mongodb:ready` before calling CRUD exports from other resources.
 

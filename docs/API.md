@@ -8,6 +8,11 @@ Kanonische Referenz für externe Consumer (CTFFramework, Lua/TS-Ressourcen).
 
 Warte auf Event `cfx-mongodb:ready` bevor du CRUD-Exports nutzt.
 
+> ### Empfohlen — Verbindung nur über ConVars
+>
+> MongoDB-URL und Pool **einmal** in `server.cfg` (oder `exec mongodb.local.cfg`). Consumer-Ressourcen rufen **kein** `connect()` auf.  
+> **Installation, Dev/Prod, Multi-Developer:** [CONFIGURATION.md](CONFIGURATION.md) · Vorlagen: [examples/config/](examples/config/)
+
 ---
 
 ## Export-Index (`server_exports`)
@@ -278,6 +283,8 @@ on("cfx-mongodb:ready", () => {
 ---
 
 ## Configuration (ConVars)
+
+> Vollständiger Installations-Guide (Dev/Prod, `exec`-Profile, Gitignore): **[CONFIGURATION.md](CONFIGURATION.md)**
 
 | ConVar | Default | Beschreibung |
 |--------|---------|--------------|

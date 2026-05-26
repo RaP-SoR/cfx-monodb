@@ -1,5 +1,10 @@
 # Änderungen (Changelog)
 
+## Docs — configuration guide & dev/prod profiles
+
+- **[CONFIGURATION.md](CONFIGURATION.md)** — ConVar-first install (recommended callout), multi-developer `exec` + gitignore, dev vs prod.
+- Profile templates: [examples/config/](examples/config/) (`mongodb.dev/prod/local.cfg.example`).
+
 ## Maintenance — Track C2 (getQueryStats) (dev)
 
 - **`getQueryStats` export:** Sync admin snapshot — samples ring buffer, aggregates (p50/p95/slowCount).

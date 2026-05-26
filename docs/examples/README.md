@@ -12,10 +12,14 @@ Copy-paste starters for **consumer resources** (not part of the `cfx-mongodb` bu
 | [server.lua](server.lua) | Runnable Lua tour (same flow) |
 | [fxmanifest-ts-example.lua](fxmanifest-ts-example.lua) | Manifest for TS consumer |
 | [fxmanifest-lua-example.lua](fxmanifest-lua-example.lua) | Manifest for Lua consumer |
+| [config/](config/) | **Dev/prod ConVar profile templates** (`exec` + gitignore) |
 
 ## server.cfg order
 
+> Full setup: [../CONFIGURATION.md](../CONFIGURATION.md)
+
 ```cfg
+exec mongodb.local.cfg
 ensure cfx-mongodb
 ensure your-consumer-resource
 ```

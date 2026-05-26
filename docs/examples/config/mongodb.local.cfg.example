@@ -1,0 +1,17 @@
+# Personal local overrides — copy to server root as mongodb.local.cfg (gitignored)
+#
+#   cp mongodb.local.cfg.example ../../../mongodb.local.cfg
+#   # or from txData root:
+#   cp resources/[cfxframework]/cfx-mongodb/docs/examples/config/mongodb.local.cfg.example mongodb.local.cfg
+#
+# Then in server.cfg:
+#   exec mongodb.local.cfg
+
+set mongodb_env dev
+set mongodb_dev_url mongodb://localhost:27017/ctf_dev
+
+# Uncomment for MongoDB Atlas / Docker / teammate-specific host:
+# set mongodb_dev_url mongodb+srv://USER:PASSWORD@cluster.mongodb.net/ctf_dev
+
+set mongodb_timeout 5000
+set mongodb_log_level debug
