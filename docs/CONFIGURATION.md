@@ -365,6 +365,8 @@ Use only when:
 | [examples/lua/](examples/lua/README.md) | Lua consumer examples |
 | [examples/config/README.md](examples/config/README.md) | Profile templates |
 | [LOGGING.md](LOGGING.md) | Log levels, PII policy, filter redaction |
+| [SECURITY.md](SECURITY.md) | Trust model, denylist, consumer checklist, abuse boundaries |
+| [plans/PRE-STABLE-ROADMAP.md](plans/PRE-STABLE-ROADMAP.md) | Path to stable `v1.0.0` on `main` |
 
 **Contributors:** integration tests — `yarn test:integration` with `TEST_MONGODB_URI` (see [tests/integration/README.md](../tests/integration/README.md)).
 

@@ -17,7 +17,7 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 | Rückgabe-Typen (success/error) | `src/responses.ts` |
 | MongoDB-Verbindung / Singleton | `src/connector.ts` |
 | ConVar config (URLs, pool) | `src/config.ts` — see [docs/CONFIGURATION.md](../docs/CONFIGURATION.md) |
-| Query-Sicherheit (Denylist) | `src/validateQuery.ts` |
+| Query-Sicherheit (Denylist) | `src/validateQuery.ts`, [SECURITY.md](SECURITY.md) |
 | findAll-Optionen (limit/skip/sort) | `src/types/options.ts`, `src/api/handlers/read.ts` |
 | Resource-Start / Index-Init | `src/bootstrap.ts` |
 | FiveM-Globals (GetConvar, exports) | `src/types/fivem.d.ts` |

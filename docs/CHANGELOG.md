@@ -1,5 +1,13 @@
 # Änderungen (Changelog)
 
+## Unreleased — Security concept finalized (2026-05-27)
+
+- **`docs/SECURITY.md`** — trust model, caller tiers, configurable limits (ConVar / consumer code), operator choice
+- **`docs/plans/SECURITY-FIXES-PLAN.md`** — SF-1 insert validation next; SF-5 optional ConVar quotas post-stable
+- **`docs/plans/PRE-STABLE-ROADMAP.md`** — path to `main` / v1.0.0
+- **`docs/plans/DATA-PERF-VALIDATION-PLAN.md`** — step 2: seed/bench scripts (after security fixes)
+- Audit 3 updates in **`QUALITY-AUDIT-2026.md`** (~92%)
+
 ## Unreleased — Examples-docs skill + doc-audit script
 
 - **Skill:** `.cursor/skills/examples-docs/` — Lua+TS parallel routine, TEMPLATE.md

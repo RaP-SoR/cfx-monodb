@@ -3,8 +3,9 @@
 ## Start here
 
 1. **[docs/SEARCH-MAP.md](docs/SEARCH-MAP.md)** — navigation map (task → file), save context tokens
-2. **[docs/API.md](docs/API.md)** — canonical external export contract (CTFFramework)
-3. **[docs/CHECKLIST.md](docs/CHECKLIST.md)** — pre-push / PR checklist (Track E)
+2. **[docs/API.md](docs/API.md)** — canonical external export contract
+3. **[docs/SECURITY.md](docs/SECURITY.md)** — trust model, consumer checklist (pre-stable)
+4. **[docs/CHECKLIST.md](docs/CHECKLIST.md)** — pre-push / PR checklist (Track E)
 4. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — runtime, lifecycle, build pipeline
 5. **[docs/AI-STACK.md](docs/AI-STACK.md)** — Cursor skills, rules, agent workflows
 
@@ -76,6 +77,7 @@ Full checklist: **[docs/CHECKLIST.md](docs/CHECKLIST.md)**. After edits run **`y
 
 - Validate/whitelist query fields in consuming resources
 - `validateQuery.ts` blocks worst-case operators only — not a full sandbox
+- Pre-stable: [docs/SECURITY.md](docs/SECURITY.md) · fixes [docs/plans/SECURITY-FIXES-PLAN.md](docs/plans/SECURITY-FIXES-PLAN.md)
 
 ## Commits & PRs
 

@@ -370,6 +370,8 @@ User-Input in Queries immer validieren/whitelisten — diese Resource blockiert 
 
 Log-Policy (PII, URI-Redaction, Filter-Keys): **[LOGGING.md](LOGGING.md)**
 
+Vollständiges Security-Modell (Trust, Gaps, Consumer-Checklist, Abuse): **[SECURITY.md](SECURITY.md)** · Fixes: [plans/SECURITY-FIXES-PLAN.md](plans/SECURITY-FIXES-PLAN.md)
+
 `getDb`, `connect`, `disconnect` und `getQueryStats` umgehen Query-Validierung bzw. sind Admin-Diagnostik — nur für vertrauenswürdige Server-Interna.
 
 ---
