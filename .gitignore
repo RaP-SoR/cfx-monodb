@@ -4,6 +4,9 @@ node_modules
 /assets
 coverage
 
+.release-staging
+cfx-mongodb-*.zip
+
 .env.local
 .env.*.local
 

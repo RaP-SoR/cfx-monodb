@@ -15,6 +15,8 @@ CitizenFX (FiveM/RedM) MongoDB TypeScript Wrapper
 
 Changelog: [docs/CHANGELOG.md](docs/CHANGELOG.md)
 
+**Pre-built install:** GitHub Actions → [Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) or `dev` push artifacts — see [docs/CONFIGURATION.md](docs/CONFIGURATION.md#install-from-github-pre-built-no-local-build).
+
 ## Overview
 
 Lightweight MongoDB wrapper for FiveM/RedM server resources. Other resources access MongoDB **only via FiveM exports** — no direct driver access.

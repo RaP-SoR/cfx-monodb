@@ -54,6 +54,46 @@ No connection code in the consumer. That is intentional.
 
 ---
 
+## Install from GitHub (pre-built, no local build)
+
+CI builds a **ready-to-use ZIP** (`dist/` + `fxmanifest.lua` + `node_modules/mongodb`). No `yarn build` on the server.
+
+### Where to download
+
+| Trigger | Where |
+|---------|--------|
+| **Tag** `v*` (e.g. `v1.0.1`) | [GitHub Releases](https://github.com/RaP-SoR/cfx-mongodb/releases) |
+| **Push to `dev`** | Actions → latest **Release** workflow → Artifact `cfx-mongodb-dev-{sha}` |
+| **Manual** | Actions → **Release** → **Run workflow** → Artifact |
+
+### Steps
+
+1. Download `cfx-mongodb-*.zip` from Releases or Actions artifacts  
+2. Extract into `resources/cfx-mongodb` (folder name must match)  
+3. Configure ConVars (`exec mongodb.local.cfg` or inline in `server.cfg`)  
+4. `ensure cfx-mongodb` before consumer resources  
+
+### Version tags (maintainers)
+
+```bash
+# After changes on dev, when a build should be downloadable as a named version:
+git tag v1.0.2
+git push origin v1.0.2
+```
+
+CI runs tests, builds, packs the ZIP, and publishes a **GitHub Release** automatically.
+
+### Check for updates (automation idea)
+
+Compare local `fxmanifest` / `GetResourceMetadata` version with latest tag:
+
+- GitHub API: `GET /repos/RaP-SoR/cfx-mongodb/releases/latest`  
+- Or compare tag list to deployed folder  
+
+Suitable for a small update script on the game server or in CTFFramework — not part of this resource.
+
+---
+
 ## How `mongodb_env` chooses dev vs prod
 
 | Input | Result |

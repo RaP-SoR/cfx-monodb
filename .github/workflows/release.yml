@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - dev
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Mark GitHub Release as pre-release (tag pushes only)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'yarn'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable || yarn install
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Type check
+        run: yarn tsc
+
+      - name: Test
+        run: yarn test
+
+      - name: Build
+        run: yarn build
+
+      - name: Resolve version label
+        id: version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "label=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "label=manual-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          else
+            echo "label=dev-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pack release zip
+        run: |
+          chmod +x scripts/pack-release.sh
+          ./scripts/pack-release.sh "${{ steps.version.outputs.label }}"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cfx-mongodb-${{ steps.version.outputs.label }}
+          path: cfx-mongodb-*.zip
+          retention-days: 90
+
+      - name: Publish GitHub Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cfx-mongodb-*.zip
+          prerelease: ${{ inputs.prerelease == true }}
+          generate_release_notes: true

@@ -39,7 +39,7 @@
 | CI / Automatisierung | 25% | **55%** | +30 |
 | Observability | 10% | **72%** | +62 |
 | Logging & Fehler | 50% | **62%** | +12 |
-| **Distribution (Download ohne Build)** | 15% | **20%** | +5 |
+| **Distribution (Download ohne Build)** | 15% | **75%** | +60 | Track I: release.yml + ZIP |
 
 **Distribution** ist bewusst niedrig: Consumer müssen heute klonen + `yarn build` — siehe Abschnitt [Distribution](#distribution--vorgebaute-releases).
 
@@ -150,14 +150,13 @@ Für internes Projekt: **optional**. Sinnvoll wenn:
 | **Manuell** | `workflow_dispatch` — Gate + Artifact on demand |
 | **Tag auf `dev`** | z. B. `v1.0.2-dev.1` → Release bauen ohne `main` |
 
-Empfehlung Track I: Workflow **`release.yml`** mit `workflow_dispatch` + optional Tag `v*`:
+Empfehlung Track I: **Implementiert** — `.github/workflows/release.yml`
 
 1. lint, tsc, test, build  
-2. `yarn install --production` (nur `mongodb`)  
-3. Zip: `dist/`, `fxmanifest.lua`, `package.json`, `node_modules/` (prod)  
-4. GitHub Release (pre-release) zum Download  
+2. `scripts/pack-release.sh` → prod `node_modules` + `dist/`  
+3. Artifact auf jedem `dev`-Push; **GitHub Release** bei Tag `v*`  
 
-**Kein Merge nötig** — nur grüner Build + Artefakt.
+**Kein Merge nach `main` nötig** — Tag auf `dev` reicht.
 
 ---
 
@@ -216,7 +215,7 @@ Beim nächsten Audit diese Felder erneut bewerten:
 | Tests (Anzahl) | 89 |
 | TSDoc `@file` in src/ | 9 Module |
 | CI | build.yml auf push dev/main |
-| Pre-built Release | Nein |
+| Pre-built Release | ✅ release.yml (dev artifact + tag releases) |
 | Tracks offen | E, F, G, H, I |
 
 **Changelog Audit:** Datum + Branch + Commit-Hash + neue Scores eintragen.

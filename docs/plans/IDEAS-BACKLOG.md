@@ -47,22 +47,20 @@ When an idea becomes work: link PR/issue, move to CHANGELOG, remove or mark done
 
 ---
 
-## 3. CI / build pipeline & pre-built releases (GitHub)
+## 3. CI / pre-built release ZIP (GitHub)
 
-**Status:** 💡 Idea — detail in [QUALITY-AUDIT-2026.md](QUALITY-AUDIT-2026.md) Track I  
-**Source:** Post-track discussion + distribution UX
+**Status:** ✅ Implemented — `.github/workflows/release.yml` + `scripts/pack-release.sh`  
+**Detail:** [QUALITY-AUDIT-2026.md](QUALITY-AUDIT-2026.md) Track I
 
-**Today:** CI on push `dev`/`main` — lint, tsc, test, build; uploads `dist/` artifact (maintainers only).
+| Trigger | Output |
+|---------|--------|
+| Push **tag** `v*` | GitHub Release + ZIP |
+| Push **`dev`** | Actions artifact `cfx-mongodb-dev-{sha}` (90 days) |
+| **workflow_dispatch** | Artifact `cfx-mongodb-manual-{run}` |
 
-**Gap:** Server operators must clone + `yarn build` — bad DX.
+ZIP contains: `dist/`, `fxmanifest.lua`, `package.json`, prod `node_modules/` — extract to `resources/cfx-mongodb`, ConVars only.
 
-**Idea (Track I):**
-
-- `release.yml` with `workflow_dispatch` and/or tag `v*` on `dev` — **no merge to `main` required**
-- Output: GitHub Release ZIP with `dist/`, `fxmanifest.lua`, `package.json`, prod `node_modules/` (mongodb)
-- Consumer: download → extract to `resources/cfx-mongodb` → ConVars → `ensure`
-
-**Related:** `main` behind `dev` — irrelevant for single-consumer internal use until external users appear.
+Install guide: [CONFIGURATION.md](../CONFIGURATION.md#install-from-github-pre-built-no-local-build).
 
 ---
 

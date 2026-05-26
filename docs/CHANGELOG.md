@@ -1,5 +1,11 @@
 # Änderungen (Changelog)
 
+## Docs — GitHub Release CI (Track I)
+
+- **`.github/workflows/release.yml`** — gate + ZIP on `dev` push, tag `v*`, manual dispatch
+- **`scripts/pack-release.sh`** — local/CI pack (dist + fxmanifest + prod node_modules)
+- **[CONFIGURATION.md](CONFIGURATION.md)** — install from Releases/Artifacts without `yarn build`
+
 ## Docs — configuration guide & dev/prod profiles
 
 - **[CONFIGURATION.md](CONFIGURATION.md)** — ConVar-first install (recommended callout), multi-developer `exec` + gitignore, dev vs prod.
