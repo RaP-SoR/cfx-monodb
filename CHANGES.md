@@ -1,5 +1,13 @@
 # Änderungen (Changelog)
 
+## Wave 1 (refactor/staged-hardening) — Manifest & Docs Sync (W2A)
+
+- **Kein Runtime-Break:** Verhalten unverändert; nur Manifest- und Dokumentationsabgleich.
+- **`fxmanifest.lua`:** `ensureIndexes`, `health`, `config` zu `server_exports` hinzugefügt (waren implementiert, fehlten im Manifest).
+- **`docs/API.md`:** Vollständiger Export-Index; `getDb`, `connect`, `disconnect` als Advanced/Internal mit Sicherheitswarnung; Events (`TriggerEvent` vs `emitNet`, `cfx-mongodb:ready`, `cfx-mongodb:connected`).
+- **`SEARCH-MAP.md`:** Export-Tabelle bereinigt und mit Manifest synchronisiert.
+- **`doc-lua.md` / `doc-typescript.md`:** Event-Handler-Beispiele und Internal-Export-Hinweise ergänzt.
+
 ## 1.0.1 – CTFFramework-Kompatibilität, Node-22-only, Dependency-Updates
 
 - **Version:** `1.0.1` (experimentell — kein 2.x-Sprung)

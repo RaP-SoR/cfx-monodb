@@ -10,9 +10,33 @@ Warte auf Event `cfx-mongodb:ready` bevor du CRUD-Exports nutzt.
 
 ---
 
+## Export-Index (`server_exports`)
+
+Alle in `fxmanifest.lua` registrierten Exports (Reihenfolge wie im Manifest):
+
+| Export | Kategorie |
+|--------|-----------|
+| `connect` | Advanced / Internal |
+| `disconnect` | Advanced / Internal |
+| `isConnected` | Lifecycle |
+| `getDb` | Advanced / Internal |
+| `findById` | CRUD |
+| `findAll` | CRUD (CTFFramework) |
+| `find` | CRUD (CTFFramework) |
+| `insert` | CRUD (CTFFramework) |
+| `update` | CRUD (CTFFramework) |
+| `delete` | CRUD (CTFFramework) |
+| `count` | CRUD (CTFFramework) |
+| `getVersion` | Lifecycle (CTFFramework) |
+| `ensureIndexes` | Erweitert |
+| `health` | Erweitert |
+| `config` | Erweitert |
+
+---
+
 ## Response-Envelope
 
-Alle CRUD-Exports (außer `isConnected`, `getVersion`) geben ein Objekt zurück — **nie Exceptions**.
+Alle CRUD-Exports (außer `isConnected`, `getVersion`, `getDb`) geben ein Objekt zurück — **nie Exceptions**.
 
 ```typescript
 interface CfxMongoResult<T = unknown> {
@@ -57,7 +81,6 @@ Diese Signaturen **müssen** exakt erfüllt werden:
 | `count` | `(collection, filter)` | `{ success: true, data: number }` |
 | `getVersion` | `()` | `Promise<string>` (Semver, z.B. `"1.0.1"`) |
 | `findById` | `(collection, id, projection?)` | `{ success: true, data: doc \| null }` |
-| `getDb` | `()` | `Db \| null` (sync, no envelope) |
 
 ### `findById(collection, id, projection?)`
 
@@ -70,17 +93,6 @@ const result = await exports["cfx-mongodb"].findById("players", insertedId, { na
 ```
 
 Unlike `find`, a missing document returns **`success: true, data: null`** (not an error).
-
-### `getDb()`
-
-Returns the internal MongoDB `Db` instance for advanced TypeScript scenarios, or `null` if disconnected. No response envelope — same pattern as `isConnected()`.
-
-```typescript
-const db = exports["cfx-mongodb"].getDb();
-if (db) {
-  // direct driver access in another Node resource
-}
-```
 
 ### Framework-Erfolgslogik
 
@@ -161,13 +173,11 @@ const version = await exports["cfx-mongodb"].getVersion();
 
 ---
 
-## Lifecycle & Connection Exports
+## Lifecycle Exports
 
 | Export | Rückgabe | Beschreibung |
 |--------|----------|--------------|
-| `isConnected()` | `boolean` | Sync, kein Envelope |
-| `connect(url, options?)` | void (wirft intern nicht) | Runtime-URI-Override |
-| `disconnect()` | void | Verbindung schließen |
+| `isConnected()` | `boolean` | Sync, kein Envelope — DB-Verbindung aktiv? |
 
 ---
 
@@ -175,18 +185,80 @@ const version = await exports["cfx-mongodb"].getVersion();
 
 | Export | Rückgabe | Beschreibung |
 |--------|----------|--------------|
-| `ensureIndexes(collection, specs[])` | `{ success, data: number }` | Indizes idempotent anlegen |
-| `health()` | `{ success, data: { ok, rttMs } }` | MongoDB ping |
-| `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel } }` | Keine Secrets/URLs |
+| `ensureIndexes(collection, specs[])` | `{ success, data: number }` | Indizes idempotent anlegen (max. 20 Specs) |
+| `health()` | `{ success, data: { ok, rttMs } }` | MongoDB ping + Round-Trip-Zeit |
+| `config()` | `{ success, data: { env, timeout, maxPoolSize, minPoolSize, logLevel } }` | Sichere Laufzeit-Config — **keine Secrets/URLs** |
+
+---
+
+## Advanced / Internal Exports
+
+> **Sicherheitswarnung:** Diese Exports umgehen den normalen CRUD-Envelope und können die Singleton-Verbindung oder den MongoDB-Treiber direkt exponieren. Nur in vertrauenswürdigen Server-Ressourcen verwenden — **nicht** an Client-Logik oder untrusted Input weitergeben. Bevorzuge immer die CRUD-Exports oben.
+
+| Export | Rückgabe | Beschreibung |
+|--------|----------|--------------|
+| `getDb()` | `Db \| null` | Sync — interne MongoDB-`Db`-Instanz oder `null` wenn getrennt |
+| `connect(url, options?)` | void | Runtime-URI-Override; ersetzt die ConVar-Verbindung |
+| `disconnect()` | void | Verbindung schließen |
+
+### `getDb()`
+
+```typescript
+const db = exports["cfx-mongodb"].getDb();
+if (db) {
+  // Direkter Treiber-Zugriff — umgeht validateQuery und Envelope-Konventionen
+}
+```
+
+Typischer Anwendungsfall: eine andere **Server-Node-Ressource** braucht Treiber-APIs, die cfx-mongodb nicht als Export anbietet. Für normale CRUD immer `find` / `insert` / … nutzen.
 
 ---
 
 ## Events
 
-| Event | Payload | Wann |
-|-------|---------|------|
-| `cfx-mongodb:ready` | — | Connect + Index-Init fertig |
-| `cfx-mongodb:connected` | `(success: boolean, error?: string)` | Nach Connect-Versuch |
+### Server-seitig: `TriggerEvent` vs `emitNet`
+
+| Mechanismus | Geltungsbereich | Consumer-Pattern |
+|-------------|-----------------|------------------|
+| **`TriggerEvent`** | Nur **Server** — lokale Event-Handler in anderen Server-Ressourcen | `AddEventHandler("cfx-mongodb:ready", fn)` |
+| **`emitNet`** | Server → **Client** (Netzwerk) | `RegisterNetEvent` + Client-Handler — **nicht** für Server-CRUD-Startup |
+
+**cfx-mongodb** feuert Lifecycle-Events per **`TriggerEvent`** (server-lokal). Consumer-Ressourcen auf dem Server sollen `AddEventHandler` verwenden — **nicht** `emitNet` oder Client-`RegisterNetEvent`.
+
+### Lifecycle-Events
+
+| Event | Mechanismus | Payload | Wann |
+|-------|-------------|---------|------|
+| `cfx-mongodb:ready` | `TriggerEvent` | — | Nach `onResourceStart`: Connect + optionaler Index-Init (`mongodb_init_indexes`) abgeschlossen |
+| `cfx-mongodb:connected` | `TriggerEvent` | `(success: boolean)` | Nach erfolgreichem Connect im Connector (`success === true`) |
+
+**Empfohlenes Startup-Pattern (Lua):**
+
+```lua
+local mongoReady = false
+
+AddEventHandler('cfx-mongodb:ready', function()
+  mongoReady = true
+  print('[my-resource] MongoDB ready')
+end)
+
+-- Vor CRUD-Aufrufen warten (oder isConnected() prüfen)
+CreateThread(function()
+  while not mongoReady do Wait(100) end
+  local result = exports['cfx-mongodb']:findAll('players')
+end)
+```
+
+**TypeScript (Server-Resource):**
+
+```typescript
+let mongoReady = false;
+on("cfx-mongodb:ready", () => {
+  mongoReady = true;
+});
+```
+
+`cfx-mongodb:connected` signalisiert den Connect-Schritt früher (vor Index-Init); für CRUD reicht in der Regel **`cfx-mongodb:ready`**.
 
 ---
 
@@ -212,6 +284,8 @@ Blockierte Operatoren in Filtern/Updates: `$where`, `$function`, `$accumulator`,
 
 User-Input in Queries immer validieren/whitelisten — diese Resource blockiert nur die gefährlichsten Operatoren.
 
+`getDb`, `connect` und `disconnect` umgehen Query-Validierung und Envelope-Konventionen — nur für vertrauenswürdige Server-Interna.
+
 ---
 
 ## Lua vs TypeScript
@@ -220,4 +294,5 @@ User-Input in Queries immer validieren/whitelisten — diese Resource blockiert 
 |--|---------------------------|-----|
 | Syntax | `exports["cfx-mongodb"].find(...)` | `exports['cfx-mongodb']:find(...)` |
 | Async | `await` / `.then()` | Citizen await pattern |
+| Events | `on("cfx-mongodb:ready", …)` | `AddEventHandler('cfx-mongodb:ready', …)` |
 | Beispiele | `doc-typescript.md` | `doc-lua.md` |
