@@ -29,6 +29,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "gate": "yarn lint && yarn tsc && yarn test && yarn build",
+    "scout": "node scripts/scout.mjs",
     "pack": "yarn build && bash scripts/pack-release.sh",
     "pack:npm": "bash scripts/pack-npm.sh"
   },

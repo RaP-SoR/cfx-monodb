@@ -1,5 +1,13 @@
 # Änderungen (Changelog)
 
+## Unreleased — Track E (Automatisierung)
+
+- **`docs/CHECKLIST.md`** — Commit/PR-Checklisten nach Änderungstyp
+- **`yarn gate`** / **`scripts/gate.sh`** — lint → tsc → test → build
+- **`yarn scout`** / **`scripts/scout.mjs`** — Diff-Reminders + gate (Windows + CI)
+- **Skill:** `.cursor/skills/post-change-scout/SKILL.md`
+- **PR template:** `.github/pull_request_template.md`
+
 ## Unreleased — Track F (Dokumentation)
 
 - **`docs/examples/patterns.md`** — CTFFramework success checks, Filter/Pagination, Anti-Patterns, TS-Types

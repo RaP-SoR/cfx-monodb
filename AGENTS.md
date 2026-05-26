@@ -4,10 +4,11 @@
 
 1. **[docs/SEARCH-MAP.md](docs/SEARCH-MAP.md)** — navigation map (task → file), save context tokens
 2. **[docs/API.md](docs/API.md)** — canonical external export contract (CTFFramework)
-3. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — runtime, lifecycle, build pipeline
-4. **[docs/AI-STACK.md](docs/AI-STACK.md)** — Cursor skills, rules, agent workflows
+3. **[docs/CHECKLIST.md](docs/CHECKLIST.md)** — pre-push / PR checklist (Track E)
+4. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — runtime, lifecycle, build pipeline
+5. **[docs/AI-STACK.md](docs/AI-STACK.md)** — Cursor skills, rules, agent workflows
 
-Project skill: `.cursor/skills/cfx-mongodb/SKILL.md`
+Project skills: `.cursor/skills/cfx-mongodb/SKILL.md` · `.cursor/skills/post-change-scout/SKILL.md`
 
 ## What this project is
 
@@ -35,6 +36,8 @@ yarn dev       # watch rebuild
 yarn tsc       # type-check
 yarn lint      # eslint
 yarn test      # vitest (Export-API)
+yarn gate      # lint + tsc + test + build (pre-push)
+yarn scout     # gate + change reminders (Track E)
 ```
 
 In FiveM: folder `cfx-mongodb`, `ensure cfx-mongodb` in server.cfg.
@@ -53,10 +56,12 @@ In FiveM: folder `cfx-mongodb`, `ensure cfx-mongodb` in server.cfg.
 
 ## Export change checklist
 
+Full checklist: **[docs/CHECKLIST.md](docs/CHECKLIST.md)**. After edits run **`yarn scout`**.
+
 - [ ] `src/api/handlers/*.ts` + `src/api/registerExports.ts` + `src/responses.ts`
 - [ ] CTFFramework contract in `docs/API.md`
 - [ ] `fxmanifest.lua` → `server_exports` if new export
-- [ ] `yarn build` + `yarn tsc` + `yarn test`
+- [ ] `yarn gate` (or `yarn scout`)
 - [ ] Update `docs/examples/typescript.md` / `docs/examples/lua.md` on behavior change
 
 ## Invariants

@@ -13,6 +13,7 @@ Entry point for humans and agents. **Canonical API contract:** [API.md](API.md).
 | [CHANGELOG.md](CHANGELOG.md) | Version and wave history |
 | [SEARCH-MAP.md](SEARCH-MAP.md) | Task → file navigation (read first for agents) |
 | [AI-STACK.md](AI-STACK.md) | Cursor skills, rules, agent workflows |
+| [CHECKLIST.md](CHECKLIST.md) | **Pre-push / PR checklist** — `yarn gate`, `yarn scout` |
 
 ## Examples
 

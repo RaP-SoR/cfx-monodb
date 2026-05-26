@@ -52,9 +52,8 @@ Framework success checks:
 ## Build verify
 
 ```bash
-yarn build
-yarn tsc
-yarn test
+yarn gate    # preferred before push
+# or: yarn build && yarn tsc && yarn test
 ```
 
 ## Additional resources

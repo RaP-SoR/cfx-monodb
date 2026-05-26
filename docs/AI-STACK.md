@@ -43,6 +43,7 @@ Stattdessen: **strukturierte Markdown-Artefakte** als persistentes Agent-Gedäch
 | Skill | Pfad | Wann laden |
 |-------|------|------------|
 | `cfx-mongodb` | `.cursor/skills/cfx-mongodb/SKILL.md` | Export-Änderungen, CTFFramework-Kompatibilität, MongoDB-Wrapper-Arbeit |
+| `post-change-scout` | `.cursor/skills/post-change-scout/SKILL.md` | Vor Commit/Push — `yarn scout`, Checklist, Drift-Check |
 
 Der Skill verweist auf `reference.md` für API-Details — **progressive disclosure** (Skill kurz, Referenz ausführlich).
 
@@ -85,12 +86,11 @@ Bei Widersprüchen gilt **`docs/API.md`** + **`src/api/handlers/*`** (Implementi
 
 ## Agent-Workflows (Checklisten)
 
+**Canonical:** [CHECKLIST.md](CHECKLIST.md) · **Automated:** `yarn gate` / `yarn scout`
+
 ### Export ändern
-- [ ] `src/api/handlers/*.ts` + `src/api/registerExports.ts` + `src/responses.ts`
-- [ ] CTFFramework-Contract in `docs/API.md` prüfen
-- [ ] `fxmanifest.lua` server_exports
-- [ ] `yarn build` + `yarn tsc` + `yarn test`
-- [ ] `docs/examples/typescript.md` / `lua.md` bei Verhaltensänderung
+- [ ] See [CHECKLIST.md — Export / API](CHECKLIST.md#export--api-behavior-change)
+- [ ] Run `yarn scout` before push
 
 ### Neuer Consumer (andere Resource)
 - [ ] `ensure cfx-mongodb` in server.cfg

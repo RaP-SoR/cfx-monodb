@@ -28,6 +28,8 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 | Externe API (Vertrag) | `docs/API.md` |
 | Architektur-Überblick | `docs/ARCHITECTURE.md` |
 | Agent-Regeln & Workflow | `AGENTS.md` |
+| Pre-push / PR checklist | `docs/CHECKLIST.md` — `yarn gate`, `yarn scout` |
+| Post-change scout skill | `.cursor/skills/post-change-scout/SKILL.md` |
 | Lua-Beispiele | `docs/examples/lua.md`, `docs/examples/server.lua` |
 | TypeScript-Beispiele | `docs/examples/typescript.md`, `docs/examples/server.ts` |
 | Consumer-Patterns (CTFFramework) | `docs/examples/patterns.md` |
