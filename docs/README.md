@@ -28,6 +28,7 @@ Sample manifests: [fxmanifest-ts-example.lua](examples/fxmanifest-ts-example.lua
 |----------|---------|
 | [refactor/README.md](refactor/README.md) | Multi-agent playbook (Waves 1–4) |
 | [refactor/REFACTOR-STATUS.md](refactor/REFACTOR-STATUS.md) | Status board — merged to `dev` |
+| [plans/MAINTENANCE-ROADMAP.md](plans/MAINTENANCE-ROADMAP.md) | Post-refactor cleanup, TSDoc, observability |
 
 ## Root (repo)
 
