@@ -1,8 +1,13 @@
 # Änderungen (Changelog)
 
+## Wave 3 (refactor/staged-hardening) — Bootstrap & IndexService
+
+- **W3A:** `src/bootstrap.ts` — Lifecycle aus `index.ts`; `connector.ts` ohne `registerExports` (kein zirkulärer Import).
+- **W3B:** `src/services/indexService.ts` — gemeinsame Index-Logik für Startup (`mongodb_init_indexes`) und `ensureIndexes`-Export.
+
 ## Wave 2 (refactor/staged-hardening) — Export pipeline & find semantics
 
-- **Breaking:** `find(collection, filter)` bei fehlendem Dokument liefert jetzt `{ success: true, data: null }` statt `{ success: false, error: "Document not found" }` — aligned mit `findById`. CTFFramework-Consumer müssen `result.data === null` prüfen statt nur `!result.success`.
+- **Breaking:** `find(collection, filter)` bei fehlendem Dokument → `{ success: true, data: null }` (aligned mit `findById`).
 - **Refactor:** CRUD-Exports nutzen `withDb`-Pipeline (`src/api/withDb.ts`) und `normalizeIdFilter`.
 - **Logging:** Kein `console.*` mehr in `exports.ts`; Connection-URLs in `connector.ts` mit `redactMongoUri`.
 - **Events:** `connect`/`disconnect` nutzen `TriggerEvent` statt `emitNet` (server-only Resource).

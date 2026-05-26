@@ -1,5 +1,4 @@
 import { Filter, OptionalUnlessRequiredId, Document, UpdateFilter } from "mongodb";
-import type { IndexDescription } from "mongodb";
 import dbConfig from "./config";
 import { validateFilter, validateUpdate } from "./validateQuery";
 import { exportFn, log, redactMongoUri, serializeDocumentId, toObjectIdIfValid } from "./utils";
@@ -14,6 +13,7 @@ import {
 import MongoDBConnector from "./connector";
 import { withDb } from "./api/withDb";
 import { normalizeIdFilter } from "./api/normalizeIdFilter";
+import { ensureIndexesForCollection } from "./services/indexService";
 
 export function registerExports(mongoDBInstance: MongoDBConnector): void {
   exportFn(
@@ -39,22 +39,9 @@ export function registerExports(mongoDBInstance: MongoDBConnector): void {
       collectionName: string,
       indexes: Array<{ keys: Record<string, 1 | -1>; options?: Record<string, unknown> }>
     ): Promise<Response<number> | ErrorResponse> => {
-      const result = await withDb(mongoDBInstance, async (db) => {
-        if (!Array.isArray(indexes) || indexes.length === 0) {
-          throw new Error("No index specs provided");
-        }
-
-        const models = indexes.slice(0, 20).map((it) => ({
-          key: it.keys,
-          ...(it.options ? { ...it.options } : {}),
-        }));
-
-        await db
-          .collection(collectionName)
-          .createIndexes(models as IndexDescription[]);
-        log("info", `Indexes ensured for ${collectionName}: ${models.length}`);
-        return models.length;
-      });
+      const result = await withDb(mongoDBInstance, async (db) =>
+        ensureIndexesForCollection(db, collectionName, indexes)
+      );
       return result;
     }
   );

@@ -13,7 +13,7 @@
 |------|-------|--------|--------|
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
 | **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🟢 Complete |
-| **3** | Architecture split | 2 + 3 + 1 staged | 🟡 W3A merged — W3B next |
+| **3** | Architecture split | 2 + 3 + 1 staged | 🟡 W3B done — W3C parallel next |
 | **4** | TS6 + contract hardening | 2 parallel | ⚪ Blocked by Wave 3 |
 
 Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
@@ -70,7 +70,7 @@ yarn tsc && yarn test && yarn build && yarn lint
 | ID | Role | Branch | Status | Merge |
 |----|------|--------|--------|-------|
 | **W3A** | Bootstrap | `refactor/w3a-bootstrap` | 🟢 | `50b798d` |
-| **W3B** | IndexService | `refactor/w3b-index-service` | 🔵 | — |
+| **W3B** | IndexService | `refactor/w3b-index-service` | 🟢 | (pending commit) |
 | **W3C1** | Read handlers | `refactor/w3c1-handlers-read` | 🔵 | — |
 | **W3C2** | Write handlers | `refactor/w3c2-handlers-write` | 🔵 | — |
 | **W3C3** | Admin/lifecycle | `refactor/w3c3-handlers-ops` | 🔵 | — |
@@ -79,6 +79,6 @@ yarn tsc && yarn test && yarn build && yarn lint
 **Spec:** [WAVE-3-SPEC.md](WAVE-3-SPEC.md)  
 **Order:** W3A → W3B → (W3C1 ∥ W3C2 ∥ W3C3) → W3D
 
-## Next: Wave 3
+## Next: Wave 3 Step 3
 
-W3B IndexService — branch `refactor/w3b-index-service` after rebasing on `refactor/staged-hardening`.
+W3C1 + W3C2 + W3C3 in parallel — handler extraction. See `docs/refactor/README.md` Step 3 `/multitask` prompt.
