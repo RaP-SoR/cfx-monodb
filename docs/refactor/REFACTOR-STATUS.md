@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** W3D pending commit (Wave 3 complete after merge)  
+**Integration HEAD:** `4b100f2` (Wave 3 complete — W3D wiring merged)  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -74,7 +74,7 @@ yarn tsc && yarn test && yarn build && yarn lint
 | **W3C1** | Read handlers | `refactor/w3c1-handlers-read` | 🟢 | `d2ead21` |
 | **W3C2** | Write handlers | `refactor/w3c2-handlers-write` | 🟢 | `9a76cc4` |
 | **W3C3** | Admin/lifecycle | `refactor/w3c3-handlers-ops` | 🟢 | `830eb19` |
-| **W3D** | Wiring + shim | `refactor/w3d-register-exports` | 🟢 | (this commit) |
+| **W3D** | Wiring + shim | `refactor/w3d-register-exports` | 🟢 | `4b100f2` |
 
 **Spec:** [WAVE-3-SPEC.md](WAVE-3-SPEC.md)  
 **Order:** W3A → W3B → (W3C1 ∥ W3C2 ∥ W3C3) → W3D
