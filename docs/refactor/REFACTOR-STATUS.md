@@ -3,7 +3,7 @@
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
 **Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** Wave 2 complete (pending merge commit)  
+**Integration HEAD:** `50b798d` (Wave 3 W3A bootstrap merged)  
 **Final target:** `dev`  
 **Last updated:** 2026-05-26
 
@@ -13,7 +13,7 @@
 |------|-------|--------|--------|
 | **1** | Security + hygiene + manifest/types | 5 parallel | 🟢 Merged |
 | **2** | Export pipeline (`withDb`) + find semantics | 2 sequential | 🟢 Complete |
-| **3** | Architecture split | 2 + 3 + 1 staged | 🔵 Ready to start |
+| **3** | Architecture split | 2 + 3 + 1 staged | 🟡 W3A merged — W3B next |
 | **4** | TS6 + contract hardening | 2 parallel | ⚪ Blocked by Wave 3 |
 
 Legend: 🔵 Not started · 🟡 In progress · 🟢 Merged · 🔴 Blocked
@@ -65,11 +65,11 @@ yarn tsc && yarn test && yarn build && yarn lint
 - [x] `REFACTOR-STATUS.md` updated
 - [x] `WAVE-3-SPEC.md` created
 
-## Wave 3 — agents (ready)
+## Wave 3 — agents
 
 | ID | Role | Branch | Status | Merge |
 |----|------|--------|--------|-------|
-| **W3A** | Bootstrap | `refactor/w3a-bootstrap` | 🔵 | — |
+| **W3A** | Bootstrap | `refactor/w3a-bootstrap` | 🟢 | `50b798d` |
 | **W3B** | IndexService | `refactor/w3b-index-service` | 🔵 | — |
 | **W3C1** | Read handlers | `refactor/w3c1-handlers-read` | 🔵 | — |
 | **W3C2** | Write handlers | `refactor/w3c2-handlers-write` | 🔵 | — |
@@ -81,4 +81,4 @@ yarn tsc && yarn test && yarn build && yarn lint
 
 ## Next: Wave 3
 
-Start with W3A bootstrap — `/multitask` prompt in `docs/refactor/README.md`.
+W3B IndexService — branch `refactor/w3b-index-service` after rebasing on `refactor/staged-hardening`.
