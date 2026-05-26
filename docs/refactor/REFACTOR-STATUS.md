@@ -2,9 +2,9 @@
 
 > Orchestrator maintains this file after each merge. Do not edit agent-owned rows while work is in progress.
 
-**Base branch:** `refactor/staged-hardening`  
-**Integration HEAD:** `902ed98` (Wave 4 complete — TS6 + contract/CI)  
-**Final target:** `dev`  
+**Base branch:** `dev`  
+**Integration HEAD:** `5627f2b` (PR #1 merged — Waves 1–4 complete)  
+**Final target:** `dev` ✅  
 **Last updated:** 2026-05-26
 
 ## Wave overview
@@ -119,6 +119,13 @@ yarn tsc && yarn test && yarn build && yarn lint
 - [x] Response envelope invariant tests in `api-contract.test.ts`
 - [x] CI on `dev` + `refactor/staged-hardening`; audit step (informational)
 
-## Next: milestone PR
+## Milestone — merged to dev
 
-Open PR `refactor/staged-hardening` → `dev` with Waves 1–4 summary (`CHANGES.md`).
+- [x] PR [#1](https://github.com/RaP-SoR/cfx-mongodb/pull/1) `refactor/staged-hardening` → `dev` merged at `5627f2b`
+- [x] All 4 waves complete · **76/76 tests** on integration branch
+
+### Optional follow-up
+
+- PR `dev` → `main` when ready for production default branch
+- Remove stale worktrees: `git worktree list` / `git worktree remove …`
+- Delete merged feature branches on remote
