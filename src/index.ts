@@ -1,5 +1,4 @@
 import MongoDBConnector from "./connector";
-import { registerExports } from "./exports";
 import { log, parseInitIndexes } from "./utils";
 
 on("onResourceStart", async (resourceName: string) => {
