@@ -2,7 +2,7 @@
 # Build a FiveM-ready resource zip (dist + fxmanifest + prod node_modules).
 #
 # Usage (CI):
-#   RELEASE_VERSION=1.0.0-dev+abc1234 \
+#   RELEASE_VERSION=1.0.1-dev+dev.abc1234 \
 #   RELEASE_CHANNEL=dev \
 #   RELEASE_BRANCH=dev \
 #   RELEASE_COMMIT=abc1234 \

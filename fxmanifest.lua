@@ -4,7 +4,9 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 author 'RaPSoR'
 description 'MongoDB Typescript Wrapper for CFX'
-version '1.0.1'
+-- Version channel: dev branch = X.Y.Z-dev (txAdmin / getVersion); main = X.Y.Z only.
+-- package.json holds base semver; CI release ZIPs may append +dev.<commit> — see BUILD_INFO.txt.
+version '1.0.1-dev'
 
 server_script 'dist/index.js'
 

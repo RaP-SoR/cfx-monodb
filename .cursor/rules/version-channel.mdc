@@ -1,0 +1,38 @@
+---
+description: fxmanifest version must reflect dev vs stable channel (txAdmin, getVersion)
+alwaysApply: true
+---
+
+# Version channel — dev vs stable
+
+`getVersion()` reads **`version`** from `fxmanifest.lua` (line ~7). txAdmin and server console show this string — operators use it to know if they run an **unstable dev** build.
+
+## Source tree (git checkout)
+
+| Branch | `package.json` | `fxmanifest.lua` `version` |
+|--------|----------------|----------------------------|
+| **`dev`** | Base semver only: `1.0.1` | **Must include `-dev`:** `1.0.1-dev` |
+| **`main`** | Same base: `1.0.1` | **No suffix:** `1.0.1` |
+
+- **`package.json`** = release base version (no channel suffix).
+- **`fxmanifest`** = what FiveM / txAdmin displays — **always match branch channel**.
+- Never ship `main`-style version (`1.0.1` without `-dev`) on the **`dev`** branch in git.
+
+## Release ZIPs (CI)
+
+`scripts/pack-release.sh` overwrites `version` in the shipped manifest:
+
+- **dev** channel: `1.0.1-dev+dev.<commit>` (push artifacts) or `1.0.1-dev` (tag `v1.0.1-dev`)
+- **stable** channel: `1.0.1` (tag `v1.0.1` on `main` only)
+
+Also read **`BUILD_INFO.txt`** in the ZIP (branch, commit, channel).
+
+## When bumping version
+
+1. Set `package.json` → `X.Y.Z`
+2. On **`dev`**: `fxmanifest.lua` → `version 'X.Y.Z-dev'`
+3. After merge to **`main`**: `fxmanifest.lua` → `version 'X.Y.Z'` (drop `-dev`)
+4. Tag: `vX.Y.Z-dev` on dev · `vX.Y.Z` on main
+5. Add `docs/releases/vX.Y.Z-dev.md` (and stable notes when tagging main)
+
+See [docs/CONFIGURATION.md](../../docs/CONFIGURATION.md#dev-vs-stable) and [docs/releases/README.md](../../docs/releases/README.md).

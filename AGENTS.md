@@ -72,6 +72,7 @@ Full checklist: **[docs/CHECKLIST.md](docs/CHECKLIST.md)**. After edits run **`y
 - Query validation: no `$where` / dangerous operators from user input
 - Never commit MongoDB credentials — use ConVars (`mongodb_*_url`)
 - Retain `node_version '22'` in `fxmanifest.lua` — Node 16/18 not supported
+- **Version channel:** on **`dev`**, `fxmanifest.lua` `version` must be `X.Y.Z-dev`; on **`main`**, `X.Y.Z` only (match `package.json` base). See `.cursor/rules/version-channel.mdc`
 
 ## Security
 

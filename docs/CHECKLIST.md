@@ -48,8 +48,10 @@ Touching `src/config.ts`, `fxmanifest.lua` convar_category, perf module:
 
 ## Release / CI change
 
-Touching `.github/workflows/*`, `scripts/pack-*.sh`, `scripts/resolve-release-meta.sh`:
+Touching `.github/workflows/*`, `scripts/pack-*.sh`, `scripts/resolve-release-meta.sh`, or bumping version:
 
+- [ ] **`package.json`** → base semver `X.Y.Z`
+- [ ] **`fxmanifest.lua`** → `X.Y.Z-dev` on **`dev`** branch · `X.Y.Z` on **`main`** (see `.cursor/rules/version-channel.mdc`)
 - [ ] **`docs/CONFIGURATION.md`** — install / dev vs stable
 - [ ] **`docs/releases/`** — release notes for new tags
 - [ ] Tag naming: `vX.Y.Z-dev` on dev, `vX.Y.Z` on main only

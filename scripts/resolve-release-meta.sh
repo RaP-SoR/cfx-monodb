@@ -63,7 +63,7 @@ if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
 elif [[ "${GITHUB_REF:-}" == "refs/heads/dev" ]]; then
   channel="dev"
   branch="dev"
-  display_version="${BASE_VERSION}-dev+${SHORT_SHA}"
+  display_version="${BASE_VERSION}-dev+dev.${SHORT_SHA}"
   zip_label="${BASE_VERSION}-dev-${SHORT_SHA}"
   prerelease="true"
 elif [[ "${GITHUB_REF:-}" == "refs/heads/main" ]]; then

@@ -11,10 +11,12 @@ GitHub Release bodies are loaded from this folder when a matching file exists:
 
 ## Channels
 
-| Channel | Source | Tag pattern | Manifest version | GitHub Release | Assets |
-|---------|--------|-------------|------------------|----------------|--------|
-| **dev** (unstable) | `dev` branch | `vX.Y.Z-dev[.N]` | `X.Y.Z-dev+<sha>` | Pre-release | ZIP + npm `.tgz` |
-| **stable** | `main` branch | `vX.Y.Z` | `X.Y.Z` | Latest / stable | ZIP + npm `.tgz` |
+| Channel | Source | Tag pattern | Git `fxmanifest` | Shipped `getVersion()` | GitHub Release | Assets |
+|---------|--------|-------------|------------------|------------------------|----------------|--------|
+| **dev** (unstable) | `dev` branch | `vX.Y.Z-dev[.N]` | `X.Y.Z-dev` | `X.Y.Z-dev` or `X.Y.Z-dev+dev.<sha>` | Pre-release | ZIP + npm `.tgz` |
+| **stable** | `main` branch | `vX.Y.Z` | `X.Y.Z` (no `-dev`) | `X.Y.Z` | Latest / stable | ZIP + npm `.tgz` |
+
+**Rule:** While developing on **`dev`**, keep `version 'X.Y.Z-dev'` in `fxmanifest.lua` so txAdmin/console shows unstable. On **`main`**, use `version 'X.Y.Z'` only. Base semver lives in `package.json` on both branches.
 
 Push to `dev` or **`main`** → Actions artifact (ZIP + `.tgz`), no GitHub Release unless tagged.  
 Tag on `dev` → pre-release with notes from `docs/releases/vX.Y.Z-dev.md`.  
