@@ -71,7 +71,7 @@ _Populate from failed checks or manual review. Close with commit + test._
 
 | ID | Severity | Area | Description | Status |
 |----|----------|------|-------------|--------|
-| — | — | — | _None filed yet — run Phase C first_ | |
+| D1 | high | runtime | FiveM Node FS sandbox blocks MongoDB `/.dockerenv` probe → connect fails with `Access to this API has been restricted` | ✅ `src/fivemFsCompat.ts` stubs `fs.promises.access` (ENOENT); see Unreleased in CHANGELOG |
 
 ---
 

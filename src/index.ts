@@ -1,1 +1,2 @@
+import "./fivemFsCompat";
 import "./bootstrap";

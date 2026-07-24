@@ -1,5 +1,13 @@
 # Änderungen (Changelog)
 
+## Unreleased (dev)
+
+### Runtime
+
+- **FiveM FS sandbox:** `src/fivemFsCompat.ts` stubs `fs.promises.access` for MongoDB’s `/.dockerenv` probe so connect no longer fails with `Access to this API has been restricted` (official [Cfx workaround](https://docs.fivem.net/docs/scripting-manual/migrating-from-other-platforms/)). Loaded from `src/index.ts` before bootstrap.
+
+---
+
 ## 1.0.1 — Examples, security, integration (2026-05-27)
 
 > **Dev pre-release:** tag [`v1.0.1-dev`](releases/v1.0.1-dev.md) · **130** unit tests · Node 22 + `mongodb@7`
