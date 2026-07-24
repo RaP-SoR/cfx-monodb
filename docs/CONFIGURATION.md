@@ -382,5 +382,6 @@ Use only when:
 | Prod data on local | Explicit `set mongodb_env dev` + local URL |
 | Secrets in git history | Rotate credentials; use `mongodb.local.cfg` + gitignore |
 | `isConnected()` false after ready | Check server console for connect errors |
+| `Access to this API has been restricted` / path `/.dockerenv` | Handled in-resource by `fivemFsCompat` (MongoDB driver probe). Rebuild/restart `cfx-mongodb`; do not rely on `add_unsafe_filesystem_absolute_read_permission` alone |
 
 See [GUIDE.md#troubleshooting](GUIDE.md#troubleshooting).

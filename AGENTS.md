@@ -43,6 +43,8 @@ yarn scout     # gate + change reminders (Track E)
 
 In FiveM: folder `cfx-mongodb`, `ensure cfx-mongodb` in server.cfg.
 
+**Live test (this checkout is under txData):** `yarn build` writes `dist/` in the server resource path. Restart the server/resource and test the **current git branch** live — no merge to `dev` required first. Merge when the fix is verified; avoid extra CI/release triggers just to try a build. See `.cursor/rules/git-branch-naming.mdc`.
+
 ## Coding Style
 
 - TypeScript, 2 spaces, semicolons, Prettier defaults

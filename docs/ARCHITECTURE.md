@@ -20,7 +20,7 @@ FiveM/RedM liefern teils noch Node 16 oder 18. Diese Laufzeiten binden veraltete
 
 ## Lebenszyklus
 
-1. **Resource Start** (`src/index.ts` → `src/bootstrap.ts`)
+1. **Resource Start** (`src/index.ts` → `fivemFsCompat` then `src/bootstrap.ts`)
 2. **Connect** (`MongoDBConnector.connect()` aus ConVars)
 3. **Register Exports** (`registerExports()` in `bootstrap.ts` nach Connect)
 4. **Optional:** Index-Init via `IndexService` aus `mongodb_init_indexes` ConVar
@@ -34,12 +34,17 @@ Exports sind nach Connect registriert (`bootstrap.ts`).
 ```mermaid
 sequenceDiagram
   participant FX as FiveM Server
+  participant Entry as index.ts
+  participant Fs as fivemFsCompat.ts
   participant Boot as bootstrap.ts
   participant Conn as connector.ts
   participant Idx as IndexService
   participant Reg as registerExports.ts
   participant Cons as Consumer Resource
 
+  FX->>Entry: load dist/index.js
+  Entry->>Fs: installFivemFsCompat (stub .dockerenv access)
+  Entry->>Boot: import bootstrap
   FX->>Boot: onResourceStart (cfx-mongodb)
   Boot->>Conn: connect() from ConVars
   Conn-->>Boot: MongoClient + Db
@@ -60,6 +65,7 @@ sequenceDiagram
 flowchart TB
   subgraph entry [Entry]
     index[index.ts]
+    fsCompat[fivemFsCompat.ts]
     bootstrap[bootstrap.ts]
   end
 
@@ -94,6 +100,7 @@ flowchart TB
     mongo[(MongoDB)]
   end
 
+  index --> fsCompat
   index --> bootstrap
   bootstrap --> connector
   bootstrap --> reg
@@ -119,13 +126,14 @@ flowchart TB
   reg --> fivem
 ```
 
-**Leserichtung:** Consumer rufen nur `fivem` (Exports) auf. Handler nutzen `withDb` → `connector` → MongoDB. Optional: `withDb` misst Dauer und loggt Slow Queries (`mongodb_perf_enabled`). `bootstrap` orchestriert Start; `exports.ts` ist nur ein Re-Export-Shim für stabile Imports.
+**Leserichtung:** Consumer rufen nur `fivem` (Exports) auf. Handler nutzen `withDb` → `connector` → MongoDB. Optional: `withDb` misst Dauer und loggt Slow Queries (`mongodb_perf_enabled`). `index` lädt zuerst `fivemFsCompat` (MongoDB `.dockerenv` Probe vs FiveM FS-Sandbox), dann `bootstrap`. `exports.ts` ist nur ein Re-Export-Shim für stabile Imports.
 
 ## Schichten
 
 | Schicht | Datei | Verantwortung |
 |---------|-------|---------------|
-| Entry | `index.ts` | Thin import bootstrap |
+| Entry | `index.ts` | Thin import: `fivemFsCompat` then bootstrap |
+| FS compat | `fivemFsCompat.ts` | Stub `fs.promises.access` for `.dockerenv` probes |
 | Bootstrap | `bootstrap.ts` | Lifecycle, export registration, index init |
 | Connector | `connector.ts` | Singleton, MongoClient, Pool (`DbProvider`) |
 | API wiring | `api/registerExports.ts` | Handler registration only |

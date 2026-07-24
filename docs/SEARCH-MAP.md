@@ -20,6 +20,7 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 | Query-Sicherheit (Denylist) | `src/validateQuery.ts`, [SECURITY.md](SECURITY.md) |
 | findAll-Optionen (limit/skip/sort) | `src/types/options.ts`, `src/api/handlers/read.ts` |
 | Resource-Start / Index-Init | `src/bootstrap.ts` |
+| FiveM FS sandbox (`.dockerenv`) | `src/fivemFsCompat.ts` (vor bootstrap in `index.ts`) |
 | FiveM-Globals (GetConvar, exports) | `src/types/fivem.d.ts` |
 | Hilfsfunktionen (log, ObjectId) | `src/utils.ts` |
 | Slow-query-Logging (ConVar) | `src/perf.ts`, `src/api/withDb.ts` |
@@ -45,7 +46,8 @@ FiveM/RedM **Server-Resource** (`cfx-mongodb`): TypeScript-Wrapper um den offizi
 ```
 fxmanifest.lua
   └── dist/index.js  ← yarn build aus src/
-        ├── index.ts              import bootstrap
+        ├── index.ts              import fivemFsCompat, then bootstrap
+        ├── fivemFsCompat.ts      stub fs.access for .dockerenv probes
         ├── bootstrap.ts          lifecycle, registerExports, index init
         ├── connector.ts          MongoClient singleton (DbProvider)
         ├── exports.ts            shim → api/registerExports
