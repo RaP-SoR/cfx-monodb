@@ -6,8 +6,10 @@ GitHub Release bodies are loaded from this folder when a matching file exists:
 |-----|------|
 | `v1.0.0-dev` | [v1.0.0-dev.md](v1.0.0-dev.md) |
 | `v1.0.1-dev` | [v1.0.1-dev.md](v1.0.1-dev.md) |
+| `v1.0.2-dev` | [v1.0.2-dev.md](v1.0.2-dev.md) |
 | `v1.0.0` | [v1.0.0.md](v1.0.0.md) (create when merging to main) |
 | `v1.0.1` | [v1.0.1.md](v1.0.1.md) (stable, after merge to main) |
+| `v1.0.2` | [v1.0.2.md](v1.0.2.md) (stable, after merge to main) |
 
 ## Channels
 

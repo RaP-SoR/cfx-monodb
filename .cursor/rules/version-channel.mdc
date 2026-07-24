@@ -11,8 +11,8 @@ alwaysApply: true
 
 | Branch | `package.json` | `fxmanifest.lua` `version` |
 |--------|----------------|----------------------------|
-| **`dev`** | Base semver only: `1.0.1` | **Must include `-dev`:** `1.0.1-dev` |
-| **`main`** | Same base: `1.0.1` | **No suffix:** `1.0.1` |
+| **`dev`** | Base semver only: `1.0.2` | **Must include `-dev`:** `1.0.2-dev` |
+| **`main`** | Same base: `1.0.2` | **No suffix:** `1.0.2` |
 
 - **`package.json`** = release base version (no channel suffix).
 - **`fxmanifest`** = what FiveM / txAdmin displays — **always match branch channel**.
@@ -22,8 +22,8 @@ alwaysApply: true
 
 `scripts/pack-release.sh` overwrites `version` in the shipped manifest:
 
-- **dev** channel: `1.0.1-dev+dev.<commit>` (push artifacts) or `1.0.1-dev` (tag `v1.0.1-dev`)
-- **stable** channel: `1.0.1` (tag `v1.0.1` on `main` only)
+- **dev** channel: `1.0.2-dev+dev.<commit>` (push artifacts) or `1.0.2-dev` (tag `v1.0.2-dev`)
+- **stable** channel: `1.0.2` (tag `v1.0.2` on `main` only)
 
 Also read **`BUILD_INFO.txt`** in the ZIP (branch, commit, channel).
 

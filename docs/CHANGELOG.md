@@ -1,10 +1,16 @@
 # Änderungen (Changelog)
 
-## Unreleased (dev)
+## 1.0.2 — FiveM FS sandbox compat (2026-07-24)
+
+> **Dev pre-release:** tag [`v1.0.2-dev`](releases/v1.0.2-dev.md) · **137** unit tests · Node 22 + `mongodb@7`
 
 ### Runtime
 
 - **FiveM FS sandbox:** `src/fivemFsCompat.ts` stubs `fs.promises.access` for MongoDB’s `/.dockerenv` probe so connect no longer fails with `Access to this API has been restricted` (official [Cfx workaround](https://docs.fivem.net/docs/scripting-manual/migrating-from-other-platforms/)). Loaded from `src/index.ts` before bootstrap.
+
+### Docs & tooling
+
+- Live-test note for txData checkouts (`AGENTS.md`) and branch ask-first rule (`.cursor/rules/git-branch-naming.mdc`)
 
 ---
 

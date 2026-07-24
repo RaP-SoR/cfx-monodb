@@ -69,11 +69,11 @@ No `yarn build` on the game server for the ZIP.
 
 | Channel | Branch | Tag example | `fxmanifest` in git | Shipped manifest / `getVersion()` | GitHub Release |
 |---------|--------|-------------|---------------------|-----------------------------------|----------------|
-| **dev** (unstable) | `dev` | `v1.0.1-dev` | `1.0.1-dev` | `1.0.1-dev` (tag) or `1.0.1-dev+dev.abc1234` (push artifact) | Pre-release |
-| **stable** | `main` | `v1.0.1` | `1.0.1` (no `-dev`) | `1.0.1` | Latest (stable) |
+| **dev** (unstable) | `dev` | `v1.0.2-dev` | `1.0.2-dev` | `1.0.2-dev` (tag) or `1.0.2-dev+dev.abc1234` (push artifact) | Pre-release |
+| **stable** | `main` | `v1.0.2` | `1.0.2` (no `-dev`) | `1.0.2` | Latest (stable) |
 
 - **`dev` builds are not production-ready.** txAdmin and F8 show `getVersion()` from `fxmanifest` — a **`-dev`** suffix means unstable / dev branch work.
-- **`package.json`** always uses base semver (`1.0.1`) on both branches; only **`fxmanifest.lua`** carries the channel suffix in git.
+- **`package.json`** always uses base semver (`1.0.2`) on both branches; only **`fxmanifest.lua`** carries the channel suffix in git.
 - **Stable** builds are published only after merging `dev` → `main`, setting `version 'X.Y.Z'` (no `-dev`), and tagging `vX.Y.Z`.
 - **`main` branch pushes** also trigger CI and upload **stable-channel** artifacts (ZIP + npm `.tgz`) — same gate as `dev`, without creating a GitHub Release until you tag.
 
