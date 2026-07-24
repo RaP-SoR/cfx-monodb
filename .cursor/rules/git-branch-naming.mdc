@@ -1,0 +1,35 @@
+---
+description: Ask before branching; live-test in txData via yarn build + server restart before merging to dev
+alwaysApply: true
+---
+
+# Branches & live test (cfx-mongodb)
+
+## Ask first
+
+Before any new branch, **ask** whether to:
+
+- work on an **existing** branch (often **`dev`**, or an open fix branch), or
+- create a **new** one.
+
+Do **not** auto-create `cursor/…` branches.
+
+## This repo lives in the FiveM server tree
+
+Checkout path is under **txData** (resource folder), not a separate clone. That means:
+
+1. Work on the current branch (feature/fix **or** `dev`).
+2. **`yarn build`** → updates `dist/` in place for the running server layout.
+3. **Restart** the FiveM/txAdmin server (or the resource) to load the build.
+4. **Live-test** on the real server (connect, smokes) — no merge to `dev` required first.
+5. Iterate on the same branch if issues appear.
+6. **Merge to `dev` only when ready** (then CI release / version bump in consumers).
+
+Avoid extra triggers early (merge → CI ZIP → copy → restart) when an in-place build already proves the fix. Same pattern applies to **CFXFramework** in this txData layout. Other projects may use separate build/deploy paths — don’t assume this there.
+
+## If a new branch is confirmed
+
+- Prefix by category: `fix/`, `feat/`, `chore/`, `docs/`, `refactor/`, `test/`, `ci/`
+- Never `cursor/…`
+- Base: **`dev`** unless the user says otherwise
+- Prefer testing the branch live (steps above) before merging
